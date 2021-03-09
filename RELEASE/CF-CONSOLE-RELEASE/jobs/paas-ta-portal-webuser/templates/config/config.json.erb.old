@@ -1,0 +1,20 @@
+{
+  "clientId": "portalclient",
+  "clientSecret": "<%= p('portalclient.secret')%>",
+  "redirectUri": "/callback",
+  "logoutredirectUri": "/login",
+  "scope": "openid cloud_controller_service_permissions.read cloud_controller.read cloud_controller.write",
+  "authUrl": "https://uaa.<%= p('cloudfoundry.domain')%>/oauth/authorize",
+  "checkUrl": "https://uaa.<%= p('cloudfoundry.domain')%>/check_token",
+  "accessUrl": "https://uaa.<%= p('cloudfoundry.domain')%>/oauth/token",
+  "infoUrl": "https://uaa.<%= p('cloudfoundry.domain')%>/userinfo",
+  "logoutUrl": "https://uaa.<%= p('cloudfoundry.domain')%>/logout.do",
+  "userinfoUrl": "/commonapi/v2/user",
+  "code": "code",
+  "sessionTimeout": "10",
+  "monitoring": <%= p('monitoring')%>,
+  "quantity": <%= p('quantity')%>,
+  "automaticApproval": <%= p('automaticApproval')%>,
+  "apiversion": "<%= p('cf_api_version')%>",
+  "egov_portal_url": "<%= p('egov_platform_user_url')%>"
+}

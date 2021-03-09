@@ -1,0 +1,40 @@
+---
+name: mariadb
+
+templates:
+  bin/mariadb_ctl.erb: bin/mariadb_ctl
+  bin/pre-start.erb: bin/pre-start
+  bin/post-start.erb: bin/post-start
+  config/mariadb.cnf.erb: config/mariadb.cnf
+  config/init.sql: config/init.sql
+  config/user.sql.erb: config/user.sql
+packages:
+- mariadb
+
+provides:
+- name: mariadb-link
+  type: mariadb
+  properties:
+  - port
+  - admin.username
+  - admin.password
+
+consumes:
+- name: mariadb-link
+  type: mariadb
+- name: service-catalog-engine-link
+  type: service-catalog-engine
+- name: cloudfoundry-broker-link
+  type: cloudfoundry-broker
+
+properties:
+  port:
+    description: MariaDB server port
+    default: 3306
+  admin.username:
+    description: 'MariaDB admin user'
+  admin.password:
+    description: 'MariaDB admin user password'
+    default: admin
+  syslog.ip:
+  metric.url:

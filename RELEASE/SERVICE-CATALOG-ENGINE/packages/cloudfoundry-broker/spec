@@ -1,0 +1,7 @@
+---
+name: cloudfoundry-broker
+
+dependencies: []
+
+files:
+- cloudfoundry-broker/CLOUDFOUNDRY-BROKER.jar

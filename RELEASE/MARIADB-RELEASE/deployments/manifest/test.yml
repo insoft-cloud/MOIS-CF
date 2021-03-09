@@ -1,0 +1,34 @@
+instance_groups:
+- azs:
+  - z5
+  instances: 1
+  jobs:
+  - name: mariadb
+    release: mariadb-on-demand-release
+  name: mariadb
+  env:
+    bosh:
+      password: d61efb95181368f5aa7f10059c765934eb63e6b1e6f12b05ac86202c2737a73322aa4f722005db43dc6883c43eb1fb221886f52367e4a4ec25627d98959af0d3
+  networks:
+  - name: default
+  persistent_disk_type: 10GB
+  stemcell: xenial
+  vm_type: small_password
+name: test
+properties:
+  password: test
+  database: glorydb
+  port: '3380'
+  username: test
+releases:
+- name: mariadb-on-demand-release
+  version: '1.5'
+stemcells:
+- alias: xenial
+  os: ubuntu-xenial
+  version: '315.64'
+update:
+  canaries: 1
+  canary_watch_time: 30000-120000
+  max_in_flight: 1
+  update_watch_time: 30000-120000

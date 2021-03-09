@@ -1,0 +1,25 @@
+---
+name: cubrid
+templates:
+  cubrid_ctl.erb: bin/cubrid_ctl
+  cubrid.conf.erb: config/cubrid.conf
+  .cubrid.sh.erb: config/.cubrid.sh
+  pre-start.erb: bin/pre-start
+  post-start.erb: bin/post-start
+
+packages:
+  - cubrid
+
+provides:
+  - name: cubrid_link
+    type: cubrid
+
+properties:
+  port:
+    description: 'TCP port id for the CUBRID programs (used by all clients).'
+    default: 1523
+  database_name:
+    description: 'cubrid service create default database name'
+    default: 'pch1234'
+  password:
+    defualt: 'admin'

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="../layout/default">
+<head></head>
+<body>
+<div>
+  <header></header>
+  <aside>/</aside>
+
+  <!-- Content Wrapper. Contains page content -->
+    <div layout:fragment="content" class="content-wrapper" th:with="UPDATE_CD = ${T(org.openpaas.paasta.portal.web.admin.common.Constants).CUD_U}, INSERT_CD = ${T(org.openpaas.paasta.portal.web.admin.common.Constants).CUD_C} ">
+
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          대시보드
+        </h1>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+
+        <!-- Small box-->
+        <div class="row">
+          <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-aqua">
+              <div class="inner" data-trigger-type="">
+                <h3 id="organizationCount">&nbsp;</h3>
+
+                <p>조직 수</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-ios-people"></i>
+              </div>
+              <!-- <a href="#" class="small-box-footer">More info
+                <i class="fa fa-arrow-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-green">
+              <div class="inner" data-trigger-type="">
+                <h3 id="spaceCount">&nbsp;</h3>
+
+                <p>공간 수</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-ios-pie-outline"></i>
+              </div>
+              <!-- <a href="#" class="small-box-footer">More info
+                <i class="fa fa-arrow-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-yellow">
+              <div class="inner" data-trigger-type="">
+                <h3 id="applicationCount">&nbsp;</h3>
+
+                <p>APP 수</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-cube"></i>
+              </div>
+              <!-- <a href="#" class="small-box-footer">More info
+                <i class="fa fa-arrow-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-red">
+              <div class="inner" data-trigger-type="">
+                <h3 id="userCount">&nbsp;</h3>
+
+                <p>사용자 수</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-man"></i>
+              </div>
+              <!-- <a href="#" class="small-box-footer">More info
+                <i class="fa fa-arrow-circle-right"></i>
+              </a> -->
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+        <!-- Small box-->
+
+        <div class="row">
+
+          <!-- /.col (LEFT) -->
+          <div class="col-md-12">
+
+            <!-- BAR CHART -->
+            <div class="box box-success">
+              <div class="box-header with-border">
+                <h3 class="box-title"> </h3>
+
+                <!-- <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-box-tool" data-widget="remove">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div> -->
+              </div>
+              <div class="box-body">
+                <div class="chart">
+                  <!--<canvas id="barChart" style="position: relative; height:80vh; width:80vw"></canvas>-->
+                  <div id="chartContainer" style="position: relative; width: 100%; min-height: 400px; margin: 0 auto; display: none;"></div>
+                  <div id="emptySpaceMessageArea" style="display: none;">
+                    <h4 style="text-align:center; min-height: 200px; line-height: 200px;"> <!--생성된 공간이 없습니다.--> </h4>
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+          </div>
+          <!-- /.col (RIGHT) -->
+        </div>
+        <!-- /.row -->
+        <input type="hidden" id="organizationId" name="organizationId" th:value="${ORGANIZATION_ID}" th:default="''"/>
+      </section>
+      <!-- /.content -->
+    </div>
+  <!-- /.content-wrapper -->
+
+  <footer></footer>
+
+</div>
+<!-- ./wrapper -->
+
+<div layout:fragment="custom-area">
+  <script type="text/javascript" src="/resources/js/highcharts.js"
+          th:src="@{../../resources/js/highcharts.js}"></script>
+  <script type="text/javascript" src="/resources/js/exporting.js"
+          th:src="@{../../resources/js/exporting.js}"></script>
+  <script type="text/javascript" src="/resources/js/offline-exporting.js"
+          th:src="@{../../resources/js/offline-exporting.js}"></script>
+
+</div>
+
+<script th:inline="javascript" type="text/javascript" layout:fragment="custom-script">
+  /*<![CDATA[*/
+
+  var MAIN_DASH_BOARD_URL = "/dashboard";
+  var TOTAL_COUNT_LIST_PROC_URL = "/v2/statistics";
+  var TOTAL_ORGANIZATION_LIST_PROC_URL = "/v2/statistics/organizations";
+
+  var SPACE_LABEL = "공간";
+  var APP_LABEL   = "APP";
+  var USER_LABEL  = "사용자";
+
+  // ON LOAD
+  $(document.body).ready(function() {
+   if(new URLSearchParams(location.search).get('USER_SE_CD') != null){
+      let return_url = new URLSearchParams(location.search).get('returnUrl') || 'dashboard';
+      let param_url = new URLSearchParams(location.search).get('USER_SE_CD');
+      param_url = atob(param_url);
+      switch (param_url) {
+        case 'A01':
+        case 'A02':
+        case 'A11':
+        case 'A12': {
+          window.location.href = window.location.origin + '/dashboard'
+          break;
+        }
+        default:
+          window.location.href = window.location.origin + '/error';
+      }
+    }
+    procInitPage();
+  }); // End ready()
+
+  function doLogin(return_url){
+    $.ajax({
+      url: "/login/autoLogin",
+      method: "GET",
+      data: null,
+      dataType: 'json',
+      contentType: "application/json",
+      success: function(data){
+        window.location.href = data['result'] +'&redirect_uri=' + window.location.origin + '/callback' + ('%3FreturnUrl%3d' + return_url);
+      },
+      complete : function(data) {
+      }
+    });
+  }
+
+  function doLogout(){
+    $.ajax({
+      url: "/login/logout",
+      method: "DELETE",
+      data: null,
+      dataType: 'json',
+      contentType: "application/json",
+      success: function(data){
+        console.log(data);
+        window.location.href = data['result'] +'&redirect_uri=' + window.location.origin + '/index';
+      },
+      complete : function(data) {
+      }
+    });
+  }
+
+
+
+  // Init
+  var procInitPage = function() {
+    getInitMarketPlaceURL();
+    getTotalCountList();  // 조직 / 공간 / 앱 /사용자 수 조회
+    getChartList();       // 조직 / 공간 차트 조회
+    setBoardEvent();      // Board Event Listener Setting
+  };
+
+
+  // 조직.공간.앱.사용자 수 조회
+  var getTotalCountList = function() {
+    window.sessionStorage.setItem("test","test");
+    procCallAjax(TOTAL_COUNT_LIST_PROC_URL,"GET", {}, procCallbackGetTotalCountList,null);
+  };
+
+  // 조직.공간.앱.사용자 수 조회 CALLBACK
+  var procCallbackGetTotalCountList = function(data) {
+
+    var resultList = data.list[0];
+    var organizationCount = $('#organizationCount');
+    var spaceCount = $('#spaceCount');
+    var applicationCount = $('#applicationCount');
+    var userCount = $('#userCount');
+
+    organizationCount.text(resultList.organizationCount);
+    spaceCount.text(resultList.spaceCount);
+    applicationCount.text(resultList.applicationCount);
+    userCount.text(resultList.userCount);
+  };
+
+
+  var getChartList = function(){
+      // 조직 공간 앱 사용자 통계정보
+      procCallAjax(TOTAL_ORGANIZATION_LIST_PROC_URL,"GET", {}, procCallbackGetTotalOrganizationList,null);
+  };
+
+  // '조직'차트 CALLBACK
+    var procCallbackGetTotalOrganizationList = function(data) {
+      setOrganizationChart(data);
+  }; // END procCallbackGetTotalOrganizationList
+
+
+  // '조직'차트 Draw
+  var setOrganizationChart = function(data) {
+    var resultList = data.list;
+    var chartContainer = $('#chartContainer');
+    var listLength = resultList.length;
+
+    // SET OPTIONS
+    var chartOptions = setOrganizationChartOptions(resultList);
+
+    // EXECUTE CHART
+    chartContainer.css('height', listLength * 80 + 'px');
+    chartContainer.fadeIn();
+    chartContainer.highcharts(chartOptions);
+
+  };
+
+
+  // SET CHART OPTIONS
+  var setOrganizationChartOptions = function(resultList) {
+    var listLength = resultList.length;
+    var arrayOrganizationName = [];
+    var arraySpaceCount = [];
+    var arrayApplicationCount = [];
+    var arrayUserCount = [];
+    var organizationName = '';
+    var organizationId = '';
+    var arrayOrganizationId = [];
+
+    for (var i = 0; i < listLength; i++) {
+      organizationName = resultList[i].organizationName;
+      organizationId = resultList[i].organizationId;
+
+      arrayOrganizationName.push(organizationName);
+      arrayOrganizationId.push(organizationId);
+
+      for (var j = 0; j < listLength; j++) {
+        if (organizationName == resultList[j].organizationName) {
+          arraySpaceCount.push(resultList[j].spaceCount);
+          arrayApplicationCount.push(resultList[j].applicationCount);
+          arrayUserCount.push(resultList[j].userCount);
+        }
+      }
+    }
+
+    arrayOrganizationName.join(',');
+    arraySpaceCount.join(',');
+    arrayApplicationCount.join(',');
+    arrayUserCount.join(',');
+
+    return {
+      legend: {
+        verticalAlign: 'top',
+        align: 'left',
+        itemStyle: {
+          'font-size': '16px', 'font-family':'"Spoqa Han Sans","Helvetica Neue",Helvetica,Arial,sans-serif', 'color':'#494747'
+        }
+      },
+      colors: ['#F39C12', '#00A65A', '#DD4B39'],
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: ''
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: {
+        categories: arrayOrganizationName,
+        labels: {
+          style: {'font-size': '16px', 'font-family':'"Spoqa Han Sans","Helvetica Neue",Helvetica,Arial,sans-serif', 'color':'#494747'},
+        }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: ''
+        }
+      },
+      plotOptions: {
+        bar: {
+          dataLabels: {
+            enabled: true
+          }
+        },
+        series: {
+          animation: {
+            //duration: 2000,
+            complete: function () {
+
+              // 브라우저 개발도구나 소스보기에서 해당 data속성 확인 불가(랜더링 시점)
+              var $labelsTxt = $('.highcharts-xaxis-labels text');
+
+              if( $labelsTxt.eq(0).data('organizationId') === undefined ){
+
+                $labelsTxt.off('click');
+
+                for(var i=0; i < $labelsTxt.length; i++ ){
+                  $labelsTxt.eq(i).on('click',{value:arrayOrganizationId[i]},function(event){
+                    //console.log('OrganizationId:'+event.data.value);
+                    getTotalSpaceList(event.data.value);
+                  });
+
+                  // cursor
+                  $('.highcharts-xaxis-labels text').on("mouseover", function() {
+                    $(this).css('cursor', 'pointer');
+                  });
+
+                  $labelsTxt.eq(i).data('organizationId',arrayOrganizationId[i]); // For one excute
+
+                }
+              }
+            }
+          }
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      series: [
+        {
+          name: APP_LABEL,
+          data: arrayApplicationCount
+        }, {
+          name: SPACE_LABEL,
+          data: arraySpaceCount
+        }, {
+          name: USER_LABEL,
+          data: arrayUserCount
+        }
+      ]
+    };
+  };
+
+  // 조직 차트 셋팅
+  var setSpaceChart = function(data) {
+    var resultList = data.list;
+    var chartContainer = $('#chartContainer');
+    var listLength = resultList.length;
+
+    // CHECK EMPTY SPACE
+    if (0 == listLength) {
+      setViewEmptySpaceMessageArea();
+      return false;
+    }
+
+    // SET OPTIONS
+    var chartOptions = setSpaceChartOptions(resultList);
+
+    // EXECUTE CHART
+    chartContainer.css('height', listLength * 80 + 'px');
+    chartContainer.fadeIn();
+    chartContainer.highcharts(chartOptions);
+
+    // VIEW BUTTON
+    $('#btnMoveMainArea').fadeIn();
+  };
+
+  // 조직 차트 옵션 셋팅
+  var setSpaceChartOptions = function(resultList) {
+    var listLength = resultList.length;
+    var arraySpaceName = [];
+    var arrayApplicationCount = [];
+    var spaceName = '';
+
+    for (var i = 0; i < listLength; i++) {
+      spaceName = resultList[i].spaceName;
+      arraySpaceName.push(spaceName);
+
+      for (var j = 0; j < listLength; j++) {
+        if (spaceName == resultList[j].spaceName) {
+          arrayApplicationCount.push(resultList[j].applicationCount);
+        }
+      }
+    }
+
+    arraySpaceName.join(',');
+    arrayApplicationCount.join(',');
+
+    return {
+      colors: ['#77807e', '#c0c0c0', '#738de0'],
+
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: ''
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: {
+        categories: arraySpaceName,
+        labels: {
+          style: {'font-size': '16px', 'font-family':'"Spoqa Han Sans","Helvetica Neue",Helvetica,Arial,sans-serif', 'color':'#494747'}
+        }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: ''
+        }
+      },
+      plotOptions: {
+        bar: {
+          dataLabels: {
+            enabled: true
+          }
+        }
+      },
+      legend: {
+        verticalAlign: 'top',
+        align: 'left',
+        itemStyle: {
+          'font-size': '16px', 'font-family':'"Spoqa Han Sans","Helvetica Neue",Helvetica,Arial,sans-serif', 'color':'#494747'
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      series: [{
+        name: 'APP',
+        data: arrayApplicationCount
+      }]
+    };
+  };
+
+
+  // 조직 Label Click Event
+  var getTotalSpaceList = function(reqOrganizationId) {
+    procCallAjax(TOTAL_ORGANIZATION_LIST_PROC_URL+"/"+reqOrganizationId+"/spaces","GET", {}, procCallbackGetTotalSpaceList,null);
+  };
+
+  // '공간'차트 CALLBACK
+  var procCallbackGetTotalSpaceList = function(data) {
+    setSpaceChart(data);
+
+  };
+
+  // VIEW EMPTY SPACE MESSAGE AREA
+  var setViewEmptySpaceMessageArea = function () {
+    $('#emptySpaceMessageArea').fadeIn();
+    $('#btnMoveMainArea').fadeIn();
+  };
+
+  /*
+    대시보드 이벤트 리스너 정의
+     - 조직/공간/APP/사용자수 박스 클릭 이벤트
+     - 조직 : 하위 항목 전체 차트 노출
+     - 그외 : 각 항목에 해당 하는 차트 노출
+     - Chart Legend 이벤트와 트리거 연결
+  */
+  var setBoardEvent = function(){
+    var ORGANIZATION_LABEL = "조직";
+    var $innnerElem = $('section .inner');
+
+    // 차트의 Legend 항목 관련, 버튼 순서 변경시 아래 확인 필요
+    $innnerElem.eq(0).data('triggerType',ORGANIZATION_LABEL);
+    $innnerElem.eq(1).data('triggerType',SPACE_LABEL);
+    $innnerElem.eq(2).data('triggerType',APP_LABEL);
+    $innnerElem.eq(3).data('triggerType',USER_LABEL);
+
+    $innnerElem.on("click", function() {
+      var triggerType = $(this).data('triggerType');
+      var $legendElem = $('.highcharts-legend-item');
+      var hiddenClassStr = 'highcharts-legend-item-hidden';
+
+      $legendElem.children('text').each(function(){
+        // 조직상세(공간별 APP) 상태에서 클릭 or 조직 클릭시 전체 표시
+        // 차트 여러번 조작시 animation complete시 셋팅한 데이터들이 사라지는 현상이 있어,
+        // 조직 클릭시 차트를 새로 만드는 걸로 변경
+        if($legendElem.children('text').length == 1 || triggerType == ORGANIZATION_LABEL) {
+          getChartList();
+          return;
+        }
+
+        // 각 항목 제외 hidden
+        if($(this).text() != triggerType){
+          if(!$(this).parent().hasClass(hiddenClassStr)){
+            $(this).trigger('click');
+          }
+        }else{
+          // 각 항목 view
+          if($(this).parent().hasClass(hiddenClassStr)){
+            $(this).trigger('click');
+          }
+        }
+      })
+    });
+  };
+
+  /*]]>*/
+</script>
+
+
+</body>
+</html>

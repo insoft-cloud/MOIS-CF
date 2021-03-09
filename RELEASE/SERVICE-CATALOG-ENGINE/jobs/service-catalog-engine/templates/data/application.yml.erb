@@ -1,0 +1,69 @@
+server:
+  port: <%= p('server.port')%>
+
+spring:
+  application:
+    name: service-catalog-engine
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+  rabbitmq:
+    host: <%= p('spring.rabbitmq.host')%>
+    port: <%= p('spring.rabbitmq.port')%>
+    username: <%= p('spring.rabbitmq.username')%>
+    password: <%= p('spring.rabbitmq.password')%>
+
+config:
+  vault:
+    path: <%= p('vault.path') %>
+  rabbitmq:
+    queue-name: <%= p('config.rabbitmq.queue-name') %>
+    exchange-name: <%= p('config.rabbitmq.exchange-name') %>
+    routing-key: <%= p('config.rabbitmq.routing-key') %>
+    response:
+      mp:
+        topic: <%= p('config.rabbitmq.response.mp.topic') %>
+        routing: <%= p('config.rabbitmq.response.mp.routing') %>
+      up:
+        topic: <%= p('config.rabbitmq.response.up.topic') %>
+        routing: <%= p('config.rabbitmq.response.up.routing') %>
+      cm:
+        topic: cm.topic
+        routing: egovplatform.*.cm.*
+
+db1:
+  datasource:
+    url: "jdbc:mariadb://<%= link('mariadb-link').instances[0].address %>:<%= link('mariadb-link').p('port') %>/broker?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul"
+    username: <%= link('mariadb-link').p('admin.username') %>
+    password: <%= link('mariadb-link').p('admin.password') %>
+    driver-class-name: org.mariadb.jdbc.Driver
+
+
+db2:
+  datasource:
+   url: "<%= p('ecp.url') %>"
+   username: <%= p('ecp.username') %>
+   password: <%= p('ecp.password') %>
+   driver-class-name: org.mariadb.jdbc.Driver
+   maximum-pool-size: 16
+   connectionTimeout : 10000
+   max-lifetime: 240000
+
+db3:
+  datasource:
+   url: "<%= p('ecp2.url') %>"
+   username: <%= p('ecp2.username') %>
+   password: <%= p('ecp2.password') %>
+   driver-class-name: org.mariadb.jdbc.Driver
+   maximum-pool-size: 16
+   connectionTimeout : 10000
+   max-lifetime: 240000
+
+logging:
+  level:
+    root: <%= p('log.level') %>
+
+
+

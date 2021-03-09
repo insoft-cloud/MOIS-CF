@@ -1,0 +1,73 @@
+---
+name: service-catalog-engine
+
+templates:
+  bin/service_ctl.erb: bin/service_ctl
+  data/bootstrap.yml.erb: data/bootstrap.yml 
+  data/application.yml.erb: data/application.yml
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+  
+packages:
+- java
+- service-catalog-engine
+
+provides:
+- name: service-catalog-engine-link
+  type: service-catalog-engine
+
+consumes:
+- name: mariadb-link
+  type: mariadb
+
+properties:
+  server.port:
+    description: "service broker server port"
+    default: 8333
+  spring.rabbitmq.host:
+    description: "rabbitmq host ip for service broker"
+  spring.rabbitmq.port:
+    description: "rabbitmq port for service broker"
+  spring.rabbitmq.username:
+    description: "rabbitmq username"
+  spring.rabbitmq.password:
+    description: "rabbitmq password"
+  config.rabbitmq.queue-name:
+    description: "rabbitmq queue name for connection"
+  config.rabbitmq.exchange-name:
+    description: "rabbitmq exchange name for connection"
+  config.rabbitmq.routing-key:
+    description: "rabbitmq routing key for connection"
+  config.rabbitmq.response.mp.topic:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.mp.routing:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.up.routing:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.up.topic:
+    description: "rabbitmq response exchange name for connection"
+  java_opts:
+    description: "Java options"
+    default: "-Xms1024m -Xmx1024m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m"
+  vault.host:
+    description: "vault server host"
+  vault.port:
+    description: "vault server port"
+  vault.scheme:
+    description: "vault server scheme"
+  vault.authentication:
+    description: "vault server authentication"
+  vault.token:
+    description: "vault server token"
+  vault.path:
+    description: "vault path"
+  ecp.url:
+  ecp.username:
+  ecp.password:
+  ecp2.url:
+  ecp2.username:
+  ecp2.password:
+  log.level:
+
+
+

@@ -1,0 +1,5 @@
+set -e -x
+
+JAR_NAME="cloudfoundry-broker/CLOUDFOUNDRY-BROKER.jar"
+
+cp -a ${JAR_NAME} ${BOSH_INSTALL_TARGET}

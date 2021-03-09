@@ -1,0 +1,88 @@
+<%
+pkg_dir = '/var/vcap/packages/mariadb/mariadb'
+data_dir = '/var/vcap/store/mariadb-data'
+run_dir = '/var/vcap/sys/run/mariadb'
+log_dir = '/var/vcap/sys/log/mariadb'
+tmp_dir = '/var/vcap/sys/tmp/mariadb'
+instance_addresses = link('mariadb-link').instances.map { |instance| instance.address }
+
+
+%>
+
+[client]
+port            = <%= p('port') %>
+socket          = <%= "#{run_dir}/mysql.sock" %>
+
+[mysqld_safe]
+socket          = <%= "#{run_dir}/mysql.sock" %>
+nice            = 0
+
+[mysqld]
+user            = vcap
+pid-file        = <%= "#{run_dir}/mariadb.pid" %>
+port            = <%= p('port') %>
+socket          = <%= "#{run_dir}/mysql.sock" %>
+basedir         = <%= "#{pkg_dir}" %>
+datadir         = <%= "#{data_dir}" %>
+tmpdir          = <%= "#{tmp_dir}" %>
+skip-external-locking
+bind-address    = 0.0.0.0
+
+key_buffer_size         = 16M
+max_allowed_packet      = 50M
+table_open_cache        = 64
+sort_buffer_size        = 512K
+net_buffer_length       = 8K
+read_buffer_size        = 256K
+read_rnd_buffer_size    = 512K
+myisam_sort_buffer_size = 8M
+
+general_log_file        = <%= "#{log_dir}/mariadb-general.log" %>
+general_log             = 1
+log-error               = <%= "#{log_dir}/mariadb-error.log" %>
+log_warnings            = 2
+slow_query_log_file     = <%= "#{log_dir}/mariadb-slow.log" %>
+slow_query_log          = 1
+long_query_time         = 3
+log_slow_verbosity      = query_plan
+
+character_set_server = utf8
+
+[mysqldump]
+quick
+#quote-names
+max_allowed_packet      = 16M
+
+[mysql]
+#no-auto-rehash # faster start of mysql but no tab completition
+
+[myisamchk]
+key_buffer_size             = 20M
+sort_buffer_size            = 20M
+read_buffer                 = 2M
+write_buffer                = 2M
+
+
+
+[galera]
+wsrep_on=ON
+wsrep_provider=/usr/lib/libgalera_smm.so
+#wsrep_cluster_address=gcomm://<%= instance_addresses.join(",") %>
+<% unless spec.bootstrap -%>
+wsrep_cluster_address=gcomm://<%= instance_addresses.join(",") %>
+<% else -%>
+wsrep_cluster_address="gcomm://"
+<% end -%>
+
+
+wsrep_load_data_splitting=ON
+wsrep_cluster_name='cluster'
+wsrep_node_address='<%= spec.ip %>'
+wsrep_node_name=<%= name %>/<%= index %>
+wsrep_sst_method=rsync
+binlog_format=row
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+bind-address=0.0.0.0
+#wsrep_sst_method=xtrabackup-v2
+wsrep_sst_auth=<%= p('admin.username')%>:<%= p('admin.password') %>

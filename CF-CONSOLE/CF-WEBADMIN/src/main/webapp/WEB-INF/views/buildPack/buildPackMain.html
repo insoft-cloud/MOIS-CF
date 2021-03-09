@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="../layout/default">
+<head></head>
+<body>
+<div>
+  <header></header>
+  <aside>/</aside>
+
+  <!-- Content Wrapper. Contains page content -->
+    <div layout:fragment="content" class="content-wrapper">
+
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>
+          빌드팩
+        </h1>
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="box">
+              <div id="loadingBar" class="overlay"><i class="fa fa-refresh fa-spin"></i></div>
+              <!--<div class="box-header">-->
+                <!--<h3 class="box-title"></h3>-->
+              <!--</div>-->
+              <div class="box-body">
+                <table class="table table-striped text-center"> <!-- table-responsive --> <!-- table-bordered --> <!-- table-striped -->
+                  <thead>
+                  <tr>
+                    <th width="30%">이름</th>
+                    <th width="30%">파일명</th>
+                    <th width="13%">순서</th>
+                    <th width="13%">사용유무</th>
+                    <th width="13%">Lock유무</th>
+                  </tr>
+                  </thead>
+                  <tbody id="buildPackList" th:remove="body">
+                  <tr class="text-center">
+                    <td>staticfile_buildpack</td>
+                    <td>staticfile-buildpack-v1.4.13.zip</td>
+                    <td><select name='positionNo' style='width:50px;'><option value="1">1</option><option value="2">2</option></select></td>
+                    <td><input name='isEnabled' type="checkbox" checked="true"/></td>
+                    <td><input name='isLocked' type="checkbox" checked="true"/></td>
+                  </tr>
+                  <tr class="text-center">
+                    <td>staticfile_buildpack</td>
+                    <td>staticfile-buildpack-v1.4.13.zip</td>
+                    <td><select name='positionNo' style='width:50px;'><option value="1">1</option><option value="2" selected="true">2</option></select></td>
+                    <td><input name='isEnabled' type="checkbox" /></td>
+                    <td><input name='isLocked' type="checkbox" /></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+          </div>
+        </div>
+
+        <!-- Modal Layer-->
+        <!-- Modal Layer-->
+
+      </section>
+      <!-- /.content -->
+    </div>
+  <!-- /.content-wrapper -->
+
+  <footer></footer>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript" type="text/javascript" layout:fragment="custom-script">
+  /*<![CDATA[*/
+
+  $(document).ready(function(){
+
+    getInitMarketPlaceURL();
+    getBuildPackList();
+
+    //순서 Event
+    $(document).on('change','select[name=positionNo]',function(){
+      updateBuildPack( $(this).closest('tr'), true );
+    });
+
+    //사용유무,Lock유무 Event
+    $(document).on('change','input[name=isEnabled],input[name=isLocked]',function(){
+
+      updateBuildPack( $(this).closest('tr'), false );
+    });
+
+  });
+
+  function getBuildPackList() {
+    procCallAjax("/v2/buildpacks", "GET", null, procCallbackGetBuildPackList, $('#loadingBar'));
+  };
+
+  let procCallbackGetBuildPackList = function(datalist){
+
+    if(datalist.resources){ //
+
+      let dataLength = datalist.resources.length;
+
+      $.each(datalist.resources, function (index, data) {
+        index += 1;
+
+        let positionOption = "";
+
+        for(let i = 1; i < dataLength+1; i++ ){
+          if(i ==  data.entity.position) {
+            positionOption += "<option value='" + i + "' selected>" + i + "</option>";
+          }else{
+            positionOption += "<option value='" + i + "'>" + i + "</option>";
+          }
+        }
+
+        let enabled = "";
+        if(data.entity.enabled){
+          enabled = "checked";
+        }
+
+        let locked = "";
+        if(data.entity.locked){
+          locked = "checked";
+        }
+
+        $("#buildPackList").append(
+                "<tr align='center' data-guid='"+data.metadata.id+"' >" +
+                "<td> " + data.entity.name + "</td>" +
+                "<td> " + data.entity.filename + "</td>" +
+                "<td class='col-md-1' align='center'><select name='positionNo' style='width:50px;'>" + positionOption + "</select></td>" +
+                "<td class='col-md-1' align='center'><input  name='isEnabled' type='checkbox' "+enabled+"></td>" +
+                "<td class='col-md-1' align='center'><input  name='isLocked' type='checkbox' "+locked+"></td>"
+        );
+
+      });
+    }
+  }
+
+  function updateBuildPack(data, refresh){
+
+    let guid = data.data('guid');
+    let position = data.find('select[name=positionNo]').val();
+    let enable  = data.find('input[name=isEnabled]').prop("checked");
+    let lock = data.find('input[name=isLocked]').prop("checked");
+
+    let param = {
+      guid:  guid,
+      position: position,
+      enable : enable,
+      lock : lock
+    }
+
+    procCallAjax("/v2/buildpacks/"+guid, "PUT", JSON.stringify(param), procCallbackUpdateBuildPack, $('#loadingBar'));
+  }
+
+  let procCallbackUpdateBuildPack = function(data){
+    if(data){
+      $("#buildPackList").html("");
+      getBuildPackList();
+    }
+  }
+//$("input[name=dashBoardUseYn]:checked").val()
+  /*]]>*/
+</script>
+
+
+</body>
+</html>

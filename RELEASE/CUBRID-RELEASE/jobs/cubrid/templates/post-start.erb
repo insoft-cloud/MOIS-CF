@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+export JOB_NAME=cubrid
+export JOB_DIR=/var/vcap/jobs/${JOB_NAME}
+export PKG_DIR=/var/vcap/packages/${JOB_NAME}
+export DATA_DIR=/var/vcap/data/packages/${JOB_NAME}
+export RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+export LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+export STORE_DIR=/var/vcap/store
+
+if [ ! $CUBRID ]
+then
+  . /var/vcap/jobs/cubrid/config/.cubrid.sh
+fi
+
+
+
+
+if [ ! -d $CUBRID_DATABASES/cubrid_database/<%= p('database_name')%> ]; then
+  cubrid createdb --db-volume-size=100M --log-volume-size=100M --file-path=$CUBRID_DATABASES/cubrid_database <%= p('database_name')%> ko_KR.utf8
+  sleep 20
+  cubrid server start <%= p('database_name')%>
+  sleep 20
+  csql -c "CREATE USER admin PASSWORD '<%= p('password')%>' GROUPS DBA" <%= p('database_name')%> -u dba
+  cm_admin changeuserpwd admin -o admin -n <%= p('password')%>
+fi

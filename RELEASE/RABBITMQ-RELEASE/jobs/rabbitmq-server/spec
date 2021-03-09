@@ -1,0 +1,163 @@
+# vim: set filetype=yaml :
+---
+name: rabbitmq-server
+packages:
+- erlang-22
+- rabbitmq-server-3.8
+- rabbitmq-common
+- rabbitmq-upgrade-preparation
+- rabbitmq-admin
+
+properties:
+  rabbitmq-server.version:
+    description: "Version of RabbitMQ to use"
+    default: "3.8"
+  rabbitmq-server.plugins:
+    description: "List of RabbitMQ plugins"
+    default:
+      - rabbitmq_management
+      - rabbitmq_mqtt
+      - rabbitmq_stomp
+  
+  rabbitmq-server.ssl.enabled:
+    default: false
+    description: "Use TLS listeners. Will not accept non-TLS connections"
+  rabbitmq-server.ssl.cacert:
+    description: "RabbitMQ server CA certificate(s).  If there is more than one certificate, they should be concatenated"
+  rabbitmq-server.ssl.cert:
+    description: "RabbitMQ server certificate"
+  rabbitmq-server.ssl.key:
+    description: "RabbitMQ server private key"
+  rabbitmq-server.ssl.versions:
+    description: "TLS protocol versions to support"
+    default: ['tlsv1.2','tlsv1.1']
+  rabbitmq-server.ssl.ciphers:
+    description: "TLS ciphers to use"
+  rabbitmq-server.ssl.verify:
+    description: "Peer verification method used by RabbitMQ server"
+    default: false
+  rabbitmq-server.ssl.verification_depth:
+    description: "Peer verification depth used by RabbitMQ server"
+    default: 5
+  rabbitmq-server.ssl.fail_if_no_peer_cert:
+    description: "Should RabbitMQ server reject connection if there is no peer cert"
+    default: false
+  rabbitmq-server.ssl.disable_non_ssl_listeners:
+    description: "Should RabbitMQ reject connections on non-TLS ports when TLS is enabled"
+    default: false
+
+  rabbitmq-server.management_tls.enabled:
+    default: false
+    description: "Use HTTPS listeners on management. Will not accept HTTP connections"
+  rabbitmq-server.management_tls.cacert:
+    description: "RabbitMQ management CA certificate"
+  rabbitmq-server.management_tls.cert:
+    description: "RabbitMQ management certificate"
+  rabbitmq-server.management_tls.key:
+    description: "RabbitMQ management private key"
+
+  rabbitmq-server.ports:
+    description: "List of ports on which the RabbitMQ cluster accepts connections"
+    default:
+      - 5672
+      - 5671
+      - 1883
+      - 8883
+      - 61613
+      - 61614
+      - 15672
+      - 15674
+  rabbitmq-server.timeouts:
+    description: "Server and client timeout for a specific port"
+
+  rabbitmq-server.administrators.broker.username:
+    description: "RabbitMQ admin username for broker"
+    default: myadmin
+  password: 
+    description: "RabbitMQ admin password for broker"
+    default: myadmin
+  port:
+    default: 5672
+  dashboard_port:
+    default: 15672
+  rabbitmq-server.administrators.management.username:
+    description: "RabbitMQ admin username for operator"
+    default: admin
+  rabbitmq-server.administrators.management.password:
+    description: "RabbitMQ admin password for operator"
+    default: admin
+
+  rabbitmq-server.config:
+    description: "RabbitMQ configuration (base64 encoded)"
+    default: "W10u" # base64 encoding of '[].'
+
+  rabbitmq-server.erlang_major_version:
+    description: "Major version of Erlang to use on RabbitMQ instances in this deployment"
+    default: 22
+  rabbitmq-server.cookie:
+    description: "Erlang cookie used by RabbitMQ nodes and rabbitmqctl. You should set this to a secure password"
+    default: "insoft@2020"
+  rabbitmq-server.fd_limit:
+    description: "The file descriptor limit for the RabbitMQ process"
+    default: 300000
+
+  rabbitmq-server.disk_alarm_threshold:
+    description: "The threshold in bytes of free disk space at which rabbitmq will raise an alarm"
+    default: "{mem_relative,0.4}"
+
+  rabbitmq-server.cluster_partition_handling:
+    description: "Cluster partition recover mode property. Valid values are: pause_minority, autoheal"
+    default: "pause_minority"
+
+  rabbitmq-server.force_cluster_shutdown_on_version_change:
+    description: "Force a cluster shutdown in the event of a Erlang major version upgrade, to ensure cluster consistency. This will lead to app downtime."
+    default: false
+
+  rabbitmq-server.load_definitions:
+    description: "Definitions to be loaded by RabbitMQ at startup"
+  
+  admin:
+    defulat: myadmin
+  
+
+templates:
+  add-rabbitmqctl-to-path.bash:             bin/add-rabbitmqctl-to-path
+  cleanup-http-logs.bash:                   bin/cleanup-http-logs
+  cluster-check.bash:                       bin/cluster-check
+  drain.bash:                               bin/drain
+  pre-stop.bash:                            bin/pre-stop
+  env.erb:                                  bin/env
+  kill-with-fire.bash:                      bin/kill-with-fire
+  node-check.bash.erb:                      bin/node-check
+  plugins.sh.erb:                           bin/plugins.sh
+  post-start.bash:                          bin/post-start
+  post-deploy.bash:                         bin/post-deploy
+  pre-start.bash:                           bin/pre-start
+  rabbitmq-server.init.bash:                bin/rabbitmq-server.init
+  setup.bash.erb:                               bin/setup.sh
+  cacert.pem.erb:                           etc/cacert.pem
+  cert.pem.erb:                             etc/cert.pem
+  config.erb:                               etc/config
+  definitions.json.erb:                     etc/definitions.json
+  key.pem.erb:                              etc/key.pem
+  management-cacert.pem.erb:                etc/management-cacert.pem
+  management-cert.pem.erb:                  etc/management-cert.pem
+  management-key.pem.erb:                   etc/management-key.pem
+  rabbitmq.config.erb:                      etc/rabbitmq.config
+  users.erb:                                etc/users
+  delete_old_files.bash:                    lib/delete_old_files.bash
+  prepare-for-upgrade.bash:                 lib/prepare-for-upgrade.bash
+  rabbitmq-config-vars.bash.erb:            lib/rabbitmq-config-vars.bash
+  setup-vars.bash.erb:                      lib/setup-vars.bash
+  indicators.yml.erb:                       config/indicators.yml
+
+provides:
+  - name: rabbitmq-server
+    type: rabbitmq-server
+    properties:
+    - rabbitmq-server.ports 
+    - rabbitmq-server.timeouts 
+
+consumes:
+  - name: rabbitmq-server
+    type: rabbitmq-server

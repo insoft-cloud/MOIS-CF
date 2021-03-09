@@ -1,0 +1,25 @@
+- path: /releases/name=os-conf?
+  release: os-conf
+  type: replace
+  value:
+    name: os-conf
+    sha1: 7579a96515b265c6d828924bf4f5fae115798199
+    url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/bosh/os-conf-release-21.0.0.tgz
+    version: 21.0.0
+- path: /instance_groups/name=bosh/properties/director/default_ssh_options?/gateway_user
+  type: replace
+  value: jumpbox
+- path: /instance_groups/name=bosh/jobs/-
+  type: replace
+  value:
+    name: user_add
+    properties:
+      users:
+      - name: jumpbox
+        public_key: ((jumpbox_ssh.public_key))
+    release: os-conf
+- path: /variables/-
+  type: replace
+  value:
+    name: jumpbox_ssh
+    type: ssh

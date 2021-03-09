@@ -1,0 +1,7 @@
+# abort script on any command that exits with a non zero value
+set -e
+
+SRC_NAME=mariadb-10.1.22
+
+cp -r ${BOSH_COMPILE_TARGET}/mariadb/mariadb-10.5.8-linux-x86_64.tar.gz ${BOSH_INSTALL_TARGET}
+cp -r ${BOSH_COMPILE_TARGET}/mariadb/galera-4_26.4.6-xenial_amd64.deb ${BOSH_INSTALL_TARGET}

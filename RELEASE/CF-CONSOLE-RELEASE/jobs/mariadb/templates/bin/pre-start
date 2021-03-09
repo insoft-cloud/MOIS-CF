@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -e -x
+
+JOB_NAME=mariadb
+BASE_DIR=/var/vcap/store/${JOB_NAME}
+
+JOB_DIR=/var/vcap/jobs/${JOB_NAME}
+CONF_DIR=${JOB_DIR}/config
+PKG_DIR=/var/vcap/packages/${JOB_NAME}
+DATA_DIR=/var/vcap/store/${JOB_NAME}
+
+RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+TMP_DIR=/var/vcap/sys/tmp/${JOB_NAME}
+DATA_DIR=/var/vcap/store/mariadb-data
+
+
+dpkg -i ${PKG_DIR}/galera-4_26.4.6-xenial_amd64.deb
+
+if [ ! -d "$DATA_DIR" ]; then
+  tar zxvf ${PKG_DIR}/mariadb-10.5.8-linux-x86_64.tar.gz -C /var/vcap/store
+  ln -s /var/vcap/store/mariadb-10.5.8-linux-x86_64 ${BASE_DIR}
+  mkdir -p /var/vcap/store/mariadb-data
+  sudo chown -R vcap:vcap /var/vcap/store/mariadb-data
+fi
+
+
+rm -rf /var/vcap/store/mariadb-data/galera.cache
+rm -rf /var/vcap/store/mariadb-data/grastate.dat
+
+function setup_environment() {
+
+  for dir in ${RUN_DIR} ${LOG_DIR} ${TMP_DIR}
+  do
+    mkdir -p ${dir}
+    chown vcap:vcap ${dir}
+    chmod 775 ${dir}
+    echo "##### SETUP_ENVIRONMENT :: BROKER :: ${dir}"
+  done
+
+}
+
+setup_environment
+
+if [ ! -d /usr/local/mysql ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /usr/local/mysql -- ${PKG_DIR}"
+  ln -s ${DATA_DIR} /usr/local/mysql
+fi
+
+if [ ! -e /tmp/mysql.sock ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /tmp/mysql.sock -- ${RUN_DIR}/mysql.sock"
+  ln -sf ${RUN_DIR}/mysql.sock /tmp/mysql.sock
+fi
+
+if [ ! -f /etc/mariadb/mariadb.cnf ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /etc/mariadb/mariadb.cnf -- ${CONF_DIR}/mariadb.cnf"
+  mkdir -p /etc/mariadb
+  ln -sf ${CONF_DIR}/mariadb.cnf /etc/mariadb/mariadb.cnf
+fi
+
+cd $BASE_DIR
+./scripts/mysql_install_db --defaults-file=${CONF_DIR}/mariadb.cnf --user=vcap
+

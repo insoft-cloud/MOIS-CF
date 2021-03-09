@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    vault:
+      host: vault.mgmt.dev.egovp.kr
+      port: 80
+      scheme: http
+      authentication: TOKEN
+      token: s.0d7i6JRRo0vdpmhr3svDNAHQ

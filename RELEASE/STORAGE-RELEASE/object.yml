@@ -1,0 +1,31 @@
+instance_groups:
+- azs:
+  - 41e08abb-a906-46bf-b9b3-132f57a4739a
+  instances: 1
+  jobs:
+  - name: binary_storage
+    release: storage2-release
+  name: binary_storage
+  networks:
+  - name: 41e08abb-a906-46bf-b9b3-132f57a4739a
+  persistent_disk_type: 5GB
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: medium
+name: test 
+properties:
+  password: test
+releases:
+- name: storage2-release
+  version: latest
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: 315.64
+update:
+  canaries: 1
+  canary_watch_time: 5000-120000
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-120000
+

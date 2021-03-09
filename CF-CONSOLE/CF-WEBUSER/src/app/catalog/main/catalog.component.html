@@ -1,0 +1,136 @@
+<div class="wrap dashboard">
+  <app-app-top [cursorId]="'cur_catalog'"></app-app-top>
+  <app-catalog-nav></app-catalog-nav>
+<div class="contain">
+    <div class="content">
+      <div class="row one_line catalog maT30">
+        <div class="col-md-12">
+          <div class="input-group">
+            <div class="input-group-btn">
+              <button name="button" class="btn" type="button"><i class="fas fa-search"></i></button>
+            </div>
+            <input class="form-control" id="catalog-search" type="text" placeholder="Catalog Search" (keyup)="Search()"/>
+          </div>
+        </div>
+<!--        <div class="">
+          <p class="tit">{{ 'catalog.main.recentWork' | translate }}</p>
+          <ul>
+            <li (click)="goHistory(recent)" *ngFor="let recent of catalogService.recentpacks">
+              <dl>
+                <dt>
+                <div id="1">
+                  <img src="{{recent.Img}}" alt="" style="width: 100%; height: 100%" onError="this.src='assets/resources/images/catalog/catalog_3.png'"/>
+                </div>
+                </dt>
+                <dd>
+                  <ul>
+                    <li style=" text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{recent.name}}
+                    </li>
+                    <li><p style="display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{recent.summary}}</p>
+                    </li>
+                    <li>
+                      <ng-container *ngFor="let class of recent.buttonclass">
+                        <button style="margin-left: 5px" class="{{class.buttonclass}}">{{ 'catalog.main.'+ class.buttonvalue | translate }}</button>
+                      </ng-container>
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </li>
+          </ul>
+        </div>-->
+<!--        <ng-container *ngIf="catalogService.viewstartpack && catalogService.viewstarterpacks &&catalogService.viewstarterpacks.length > 0">
+        <div>
+          <p class="tit">{{ 'catalog.main.appTemplate' | translate }}</p>
+          <ul>
+            <li *ngFor="let stater of catalogService.viewstarterpacks" (click)="goStarter(stater)">
+              <dl>
+                <dt>
+                <div>
+                  <img src="{{stater.Img}}" alt="" style="width: 100%; height: 100%"  onError="this.src='assets/resources/images/catalog/catalog_3.png'"/>
+                </div>
+                </dt>
+                <dd>
+                  <ul>
+                    <li style=" text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{stater.name}}
+                    </li>
+                    <li><p style="display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">{{stater.summary}}</p>
+                    </li>
+                    <li>
+                      <ng-container *ngFor="let class of stater.buttonclass">
+                        <button style="margin-left: 5px" class="{{class.buttonclass}}">{{ 'catalog.main.'+ class.buttonvalue | translate }}</button>
+                      </ng-container>
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+          </ng-container>-->
+        <ng-container *ngIf="catalogService.viewbuildpack && catalogService.viewbuildpacks && catalogService.viewbuildpacks.length > 0">
+        <div class="cataloglast">
+          <p class="tit">{{ 'catalog.main.appDevelopment' | translate }}</p>
+          <ul >
+            <li *ngFor="let build of catalogService.viewbuildpacks" (click)="goDevelopMent(build)">
+              <dl>
+                <dt>
+                <div>
+                  <img src="{{build.Img}}" alt="" style="width: 100%; height: 100%" onError="this.src='assets/resources/images/catalog/catalog_3.png'"/>
+                </div>
+                </dt>
+                <dd>
+                  <ul>
+                    <li style=" text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{build.name}}
+                    </li>
+                    <li><p style="display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;"> {{build.summary}}
+                    </p>
+                    </li>
+                    <li>
+                      <ng-container *ngFor="let class of build.buttonclass">
+                      <button style="margin-left: 5px" class="{{class.buttonclass}}">{{ 'catalog.main.'+ class.buttonvalue | translate }}</button>
+                      </ng-container>
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+          </ng-container>
+<!--        <ng-container *ngIf="catalogService.viewservicepack && catalogService.viewservicepacks && catalogService.viewservicepacks.length > 0">
+        <div class="cataloglast" >
+          <p class="tit">{{ 'catalog.main.service' | translate }}</p>
+          <ul >
+            <li *ngFor="let service of catalogService.viewservicepacks" (click)="goService(service)">
+              <dl>
+                <dt>
+                <div>
+                  <img src="{{service.Img}}" alt="" style="width: 100%; height: 100%" onError="this.src='assets/resources/images/catalog/catalog_3.png'"/>
+                </div>
+                </dt>
+                <dd>
+                  <ul>
+                    <li style=" text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{service.name}}
+                    </li>
+                    <li><p style="display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;"> {{service.summary}}
+                    </p>
+                    </li>
+                    <li>
+                    <ng-container *ngFor="let class of service.buttonclass">
+                      <button style="margin-left: 5px" class="{{class.buttonclass}}">{{ 'catalog.main.'+ class.buttonvalue | translate }}</button>
+                    </ng-container>
+                    </li>
+                  </ul>
+                </dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+          </ng-container>-->
+      </div><!-- row one_line -->
+    </div>
+    <div class="footer">Copyright © 2020 eGovCP CloudFoundry. All rights reserved</div>
+  </div>
+</div>
+

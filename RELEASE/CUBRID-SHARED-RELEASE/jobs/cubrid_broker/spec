@@ -1,0 +1,47 @@
+---
+name: cubrid_broker
+packages: 
+  - cubrid_broker
+  - java
+templates:
+  bin/cubrid_broker_ctl: bin/cubrid_broker_ctl
+  bin/monit_debugger: bin/monit_debugger
+  bin/pre-start.erb: bin/pre-start
+  data/properties.sh.erb: data/properties.sh
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+  config/cubrid_broker.yml.erb: config/cubrid_broker.yml
+  config/application-mvc.properties.erb: config/application-mvc.properties
+  config/datasource.properties.erb: config/datasource.properties
+  config/logback.xml.erb: config/logback.xml
+  ssh/private_key.pem.erb: ssh/private_key.pem
+
+provides:
+  - name: cubrid_broker_link
+    type: cubrid_broker
+    properties:
+    - cubrid_broker.cubrid_db_name
+    - cubrid_broker.cubrid_db_passwd
+
+consumes:
+  - name: cubrid_link
+    type: cubrid
+
+properties:
+  cubrid_broker.cubrid_db_port: 
+    description: 'The port number of the broker(query_editor). The value must be unique and smaller than 65,535.'
+    default: 30000
+  cubrid_broker.cubrid_db_name: 
+    description: 'The name used in the cubrid service broker.'
+  cubrid_broker.cubrid_db_user: 
+    description: 'The user name used in the cubrid service broker database.'
+    default: dba
+  cubrid_broker.cubrid_db_passwd:
+    description: 'The password of db_user'
+  cubrid_broker.cubrid_ssh_port: 
+    description: 'The port number of the ssh.'
+    default: 22
+  cubrid_broker.cubrid_ssh_user:
+    description: 'The user name used in the ssh.'
+  cubrid.private_key:
+    description: 'Private key for cubrid'

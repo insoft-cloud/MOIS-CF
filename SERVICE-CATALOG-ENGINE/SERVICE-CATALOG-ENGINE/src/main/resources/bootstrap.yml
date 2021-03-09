@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    vault:
+      host: 127.0.0.1
+      port: 9200
+      scheme: http
+      authentication: TOKEN
+      token: 4ScodsDb9nWH6l3ohBecbqcc
+
+

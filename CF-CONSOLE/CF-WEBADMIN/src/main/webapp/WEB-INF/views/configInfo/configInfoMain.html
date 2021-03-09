@@ -1,0 +1,325 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org"-->
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorator="../layout/default">-->
+<!--<head>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="wrapper">-->
+<!--    <header></header>-->
+<!--    &lt;!&ndash; Left side column. contains the logo and sidebar &ndash;&gt;-->
+<!--    &lt;!&ndash; Content Wrapper. Contains page content &ndash;&gt;-->
+<!--    &lt;!&ndash; ===================================================================================== &ndash;&gt;-->
+<!--    &lt;!&ndash; Content Header (Page header) &ndash;&gt;-->
+<!--    <div layout:fragment="content">-->
+<!--        <section class="content-header">-->
+<!--            <h3>-->
+<!--                설정 정보-->
+<!--            </h3>-->
+<!--        </section>-->
+
+<!--        &lt;!&ndash; Main content &ndash;&gt;-->
+<!--        <section class="content">-->
+<!--            <div class="box box-default">-->
+<!--                &lt;!&ndash; /.box box-default-header &ndash;&gt;-->
+<!--                <div class="col-sm-6 pt5">-->
+<!--                    <h3>인프라 설정</h3>-->
+<!--                </div>-->
+<!--                <div class="box-header">-->
+<!--                    <div class="pull-right" style="padding-right: 0px;">-->
+<!--                        <button type="button" class="btn btn-block btn-primary btn-sm" id="configBtn"-->
+<!--                                name="configBtn" data-toggle="modal" data-backdrop="static" data-keyboard="false"-->
+<!--                                data-target="#configFormModal">-->
+<!--                            인프라 등록-->
+<!--                        </button>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div style="padding:10px;">-->
+
+<!--                    <table class="table table-striped">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <td width="15%" style="vertical-align: middle">Name</td>-->
+<!--                            <td width="15%" style="vertical-align: middle">Portal_Api_Uri</td>-->
+<!--                            <td width="17.5%" style="vertical-align: middle">UAA_Uri</td>-->
+<!--                            <td width="17.5%" style="vertical-align: middle">Authorization</td>-->
+<!--                            <td width="17.5%" style="vertical-align: middle">CaaS_Api_Uri</td>-->
+<!--                            <td width="17.5%" style="vertical-align: middle">CaaS_Authorization</td>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody name="dataList">-->
+<!--                        <tr th:each="infra_info : ${infra_infos}" style="cursor:pointer;" th:attr="data-id=${infra_info.key}">-->
+<!--                            <td th:text="${infra_info.name}"></td>-->
+<!--                            <td th:text="${infra_info.apiUri}"></td>-->
+<!--                            <td th:text="${infra_info.uaaUri}"></td>-->
+<!--                            <td th:text="${infra_info.authorization}"></td>-->
+<!--                            <td th:text="${infra_info.caas_apiUri}"></td>-->
+<!--                            <td th:text="${infra_info.caas_authorization}"></td>-->
+<!--                        </tr>-->
+
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+
+<!--            </div>-->
+<!--        </section>-->
+<!--        &lt;!&ndash; /.content &ndash;&gt;-->
+<!--        &lt;!&ndash; ===================================================================================== &ndash;&gt;-->
+<!--        &lt;!&ndash; [앱 서비스] Modal&ndash;&gt;-->
+<!--        <div class="modal fade" id="configFormModal" data-backdrop="static" data-keyboard="false">-->
+<!--            <div class="modal-dialog modal-lg">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                            <span aria-hidden="true">×</span></button>-->
+
+<!--                        <h4 class="modal-title">-->
+<!--                            <div id="serviceTitle" name="modalTitle">인프라 정보 등록</div>-->
+<!--                        </h4>-->
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+
+<!--                        <div class="box" style="margin-bottom: 0px; border-top: 0px; box-shadow: 0 0px 0px">-->
+<!--                            <div id="configModalLoadingBar" name="modalLoadingBar" class="overlay hide"><i-->
+<!--                                    class="fa fa-refresh fa-spin"></i></div>-->
+<!--                            <form id="serviceForm" class="form-horizontal">-->
+<!--                                <div class="box-body">-->
+<!--                                    <div class="form-group required">-->
+<!--                                        <label for="infra_name" class="col-sm-3 control-label">NAME</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="infra_name"-->
+<!--                                                   name="infra_name" placeholder=""/>-->
+<!--                                            <input type="hidden" id="key" name="key"/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="form-group required">-->
+<!--                                        <label for="apiUri" class="col-sm-3 control-label">Portal_Api_Uri</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="apiUri"-->
+<!--                                                   name="apiUri" placeholder=""/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="form-group required">-->
+<!--                                        <label for="uaaUri" class="col-sm-3 control-label">UAA_Uri</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="uaaUri"-->
+<!--                                                   name="uaaUri" placeholder=""/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+
+<!--                                    <div class="form-group required">-->
+<!--                                        <label for="authorization" class="col-sm-3 control-label">Authorization</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="authorization"-->
+<!--                                                   name="authorization" placeholder=""/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="desc" class="col-sm-3 control-label">설명</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <textarea class="form-control" rows="5" id="desc"></textarea>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="caas_apiUri" class="col-sm-3 control-label">CaaS_Api_Uri</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="caas_apiUri"-->
+<!--                                                   name="caas_apiUri" placeholder=""/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="caas_authorization" class="col-sm-3 control-label">CaaS_Authorization</label>-->
+<!--                                        <div class="col-sm-9">-->
+<!--                                            <input type="text" class="form-control checkServiceForm" id="caas_authorization"-->
+<!--                                                   name="caas_authorization" placeholder=""/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </form>-->
+<!--                        </div>-->
+
+<!--                    </div>-->
+<!--                    <div class="modal-footer">-->
+<!--                        <button type="button" id="configDeleteBtn" name="modalDeleteBtn"-->
+<!--                                class="btn btn-sm btn-danger pull-left" onClick="deleteConfig();">삭제-->
+<!--                        </button>-->
+<!--                        <button type="button" id="configUpdateBtn" name="modalSaveBtn"-->
+<!--                                class="btn btn-sm btn-primary pull-right" onClick="updateInfra();">저장-->
+<!--                        </button>-->
+<!--                        <button type="button" id="configSaveBtn" name="modalSaveBtn"-->
+<!--                                class="btn btn-sm btn-primary pull-right" onClick="addInfra();">저장-->
+<!--                        </button>-->
+<!--                        <button type="button" id="configCloseBtn" class="btn btn-sm btn-default pull-left"-->
+<!--                                data-dismiss="modal">취소-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; /.modal-content &ndash;&gt;-->
+<!--            </div>-->
+<!--            &lt;!&ndash; /.modal-dialog &ndash;&gt;-->
+<!--        </div>-->
+<!--        &lt;!&ndash; Modal END &ndash;&gt;-->
+
+
+<!--    </div>-->
+
+
+<!--    &lt;!&ndash; /.content-wrapper &ndash;&gt;-->
+
+<!--    &lt;!&ndash;footer &ndash;&gt;-->
+
+
+<!--    &lt;!&ndash; Control Sidebar &ndash;&gt;-->
+<!--    &lt;!&ndash; /.control-sidebar &ndash;&gt;-->
+
+<!--    &lt;!&ndash; Add the sidebar's background. This div must be placed-->
+<!--         immediately after the control sidebar &ndash;&gt;-->
+<!--    &lt;!&ndash;<div class="control-sidebar-bg"></div>&ndash;&gt;-->
+<!--    &lt;!&ndash; ./wrapper &ndash;&gt;-->
+<!--    <footer></footer>-->
+<!--</div>-->
+<!--<script th:inline="javascript" type="text/javascript" layout:fragment="custom-script">-->
+<!--    var V2_URL = "/v2";-->
+<!--    var REST_URL = V2_URL + "/configInfos"-->
+
+<!--    $(document).ready(function () {-->
+<!--        $('#configFormModal').on('shown.bs.modal', function () {-->
+<!--        });-->
+
+<!--        $(document).on("click", 'button[name=configBtn]', function (e) {-->
+<!--            initTextBox();-->
+<!--        });-->
+
+<!--        // 리스트 클릭시 상세 출력-->
+<!--        $(document).on("mouseup", 'tbody[name=dataList]', function (e) {-->
+
+<!--            $("#configSaveBtn").hide();-->
+<!--            $("#configDeleteBtn").show();-->
+<!--            $("#configUpdateBtn").show();-->
+
+<!--            var id = $(e.target).parent().data('id');-->
+<!--            getInfo(id);-->
+<!--            $('#configFormModal').modal('toggle');-->
+<!--        });-->
+
+<!--    });-->
+
+<!--    /*-->
+<!--    * 인프라 정보 등록-->
+<!--     */-->
+<!--    function initTextBox(){-->
+<!--        $("#key").val("");-->
+<!--        $("#infra_name").val("");-->
+<!--        $("#apiUri").val("");-->
+<!--        $("#uaaUri").val("");-->
+<!--        $("#authorization").val("");-->
+<!--        $("#desc").val("");-->
+<!--        $("#configSaveBtn").show();-->
+<!--        $("#configDeleteBtn").hide();-->
+<!--        $("#configUpdateBtn").hide();-->
+<!--    }-->
+
+<!--    function addInfra() {-->
+<!--        if (!procCheckValidStringSpaceClass('checkServiceForm')) {-->
+<!--            return false;-->
+<!--        }-->
+<!--        var infra_name    = $("#infra_name").val();-->
+<!--        var apiUri        = $("#apiUri").val();-->
+<!--        var uaaUri        = $("#uaaUri").val();-->
+<!--        var authorization = $("#authorization").val();-->
+<!--        var desc          = $("#desc").val();-->
+<!--        var caas_apiUri          = $("#caas_apiUri").val();-->
+<!--        var caas_authorization          = $("#caas_authorization").val();-->
+<!--        var params = {-->
+<!--            "name": infra_name,-->
+<!--            "apiUri": apiUri,-->
+<!--            "uaaUri": uaaUri,-->
+<!--            "authorization": authorization,-->
+<!--            "desc": desc,-->
+<!--            "caas_apiUri" : caas_apiUri,-->
+<!--            "caas_authorization" : caas_authorization-->
+<!--        };-->
+<!--        procCallAjax5(REST_URL, "POST", JSON.stringify(params), refresh, $('#configModalLoadingBar'));-->
+<!--    }-->
+
+<!--    /*-->
+<!--     * 인프라 정보 업데이트-->
+<!--     */-->
+<!--    function updateInfra() {-->
+<!--        if (!procCheckValidStringSpaceClass('checkServiceForm')) {-->
+<!--            return false;-->
+<!--        }-->
+<!--        var key           = $("#key").val();-->
+<!--        var infra_name    = $("#infra_name").val();-->
+<!--        var apiUri        = $("#apiUri").val();-->
+<!--        var uaaUri        = $("#uaaUri").val();-->
+<!--        var authorization = $("#authorization").val();-->
+<!--        var desc          = $("#desc").val();-->
+<!--        var caas_apiUri   = $("#caas_apiUri").val();-->
+<!--        var caas_authorization = $("#caas_authorization").val();-->
+<!--        var params = {-->
+<!--            "name": infra_name,-->
+<!--            "apiUri": apiUri,-->
+<!--            "uaaUri": uaaUri,-->
+<!--            "authorization": authorization,-->
+<!--            "desc": desc,-->
+<!--            "caas_apiUri" : caas_apiUri,-->
+<!--            "caas_authorization" : caas_authorization-->
+<!--        };-->
+<!--        procCallAjax5(REST_URL + "/" + key, "PUT", JSON.stringify(params), refresh, $('#configModalLoadingBar'));-->
+<!--    }-->
+
+<!--    /*-->
+<!--    * Config를 삭제한다.-->
+<!--     */-->
+
+<!--    function deleteConfig() {-->
+<!--        var key           = $("#key").val();-->
+<!--        procCallAjax5(REST_URL + "/" + key, "DELETE", '', refresh, $('#configModalLoadingBar'));-->
+<!--    }-->
+
+<!--    var procCallbackGetInfo = function (data) {-->
+<!--        var key           = data.key;-->
+<!--        var infra_name    = data.name;-->
+<!--        var apiUri        = data.apiUri;-->
+<!--        var uaaUri        = data.uaaUri;-->
+<!--        var authorization = data.authorization;-->
+<!--        var desc          = data.desc;-->
+<!--        var caas_apiUri   = data.caas_apiUri;-->
+<!--        var caas_authorization = data.caas_authorization;-->
+<!--        $("#key").val(key);-->
+<!--        $("#infra_name").val(infra_name);-->
+<!--        $("#apiUri").val(apiUri);-->
+<!--        $("#uaaUri").val(uaaUri);-->
+<!--        $("#authorization").val(authorization);-->
+<!--        $("#desc").val(desc);-->
+<!--        $("#caas_apiUri").val(caas_apiUri);-->
+<!--        $("#caas_authorization").val(caas_authorization);-->
+<!--    }-->
+
+<!--    // Refresh Page-->
+<!--    var refresh = function () {-->
+<!--        location.reload();-->
+<!--    };-->
+
+
+
+
+<!--    // GET Infra_info-->
+<!--    var getInfo = function (id) {-->
+<!--        $('.modal').modal('hide');-->
+<!--        procCallAjax(REST_URL + "/" + id, "GET", null, procCallbackGetInfo, $('#configModalLoadingBar'));-->
+<!--    };-->
+
+
+
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

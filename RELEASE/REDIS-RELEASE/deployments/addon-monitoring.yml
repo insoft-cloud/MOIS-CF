@@ -1,0 +1,23 @@
+- type: replace
+  path: /addons?/-
+  value:
+    include:
+      stemcell:
+      - os: ubuntu-trusty
+      - os: ubuntu-xenial
+    jobs:
+    - name: metrics_agent
+      properties:
+        metrics_agent:
+          influxdb:
+            database: cf_metric_db
+            measurement: cf_metrics
+            processMeasurement: cf_process_metrics
+            url: ((metric_url)):8089
+      release: paasta-monitoring-agent
+    name: paasta_metrics_agent
+- type: replace
+  path: /releases/-
+  value:
+    name: paasta-monitoring-agent
+    version: latest

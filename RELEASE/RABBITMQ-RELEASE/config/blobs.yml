@@ -1,0 +1,21 @@
+---
+# this comment prevents git conflicts
+basht/basht_0.1.0_Linux_x86_64.tgz:
+  size: 757703
+  object_id: bbc2200b-670b-4562-72db-27ce98bc3161
+  sha: 5dee8d242fc333672e14d9e1d70162b77eab5924
+# this comment prevents git conflicts
+erlang-22/otp_src_oss_22.3.4.tgz:
+  size: 57526746
+  object_id: 78887787-6973-4df6-71af-6c9b28e442a8
+  sha: sha256:6f9b0ba8b54ca3c02e7d5c5ee89e2fda13a0c4f1c7b562489e4f02e69a84a7e0
+# this comment prevents git conflicts
+golang/go1.14.3.linux-amd64.tar.gz:
+  size: 123703837
+  object_id: 596bf7d0-26cc-45c8-4835-7643ca958edf
+  sha: sha256:1c39eac4ae95781b066c144c58e45d6859652247f7515f0d2cba7be7d57d2226
+# this comment prevents git conflicts
+rabbitmq-server-3.8/rabbitmq-server-generic-unix-3.8.3.tar.xz:
+  size: 11958032
+  object_id: b8cef8eb-5090-4462-7b52-93a19be01789
+  sha: sha256:5a2739ed1dba77f88316b4c63393d8037fc4acf51881ba922470453e891875b6

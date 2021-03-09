@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head th:replace="../fragment/config::head"></head>
+
+<body class="layout-boxed skin-blue sidebar-mini">
+<script th:inline="javascript" type="text/javascript" layout:fragment="common-script">
+
+    var WELCOME_MESSAGE = /*[[#{common.system.welcome.message}]]*/ "환영합니다. Open PaaS PaaS-TA 운영자 포탈입니다.";
+    var UPDATE_MESSAGE = /*[[#{common.info.popup.update.message}]]*/ "";
+    var DELETE_MESSAGE = /*[[#{common.info.popup.delete.message}]]*/ "";
+
+    var RESULT_STATUS_SUCCESS = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).RESULT_STATUS_SUCCESS}]]*/ "SUCCESS";
+    var RESULT_STATUS_FAIL = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).RESULT_STATUS_FAIL}]]*/ "FAIL";
+
+    var CUD_C = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).CUD_C}]]*/ "";
+    var CUD_U = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).CUD_U}]]*/ "";
+
+    var RESULT_STATUS_SUCCESS_MESSAGE = /*[[#{common.info.result.success}]]*/ "";
+    var RESULT_STATUS_FAIL_MESSAGE = /*[[#{common.system.error.message}]]*/ "";
+    var INFO_EMPTY_REQUEST_DATA = /*[[#{common.info.empty.req.data}]]*/ "";
+    var IMAGE_PATH_PREFIX = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).IMAGE_PATH_PREFIX}]]*/ "";
+
+    var API_PROC_URL = "/external/configs";
+
+    function noticeAnimation() {
+        $("#notice")
+    }
+
+    $(document).ready(function () {
+
+    });
+</script>
+<div class="wrapper">
+
+    <!--<header layout:fragment="fragmentHeader" class="main-header">-->
+    <header th:replace="../fragment/header::header">
+        <!-- Logo -->
+        <a href="#" class="logo"><!-- link home -->
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+            <span class="logo-mini">
+    <b>P</b>
+                <!-- 파스타 이미지로 대체 -->
+                <!--<img src="http://portal-web-admin.115.68.46.187.xip.io./resources/images/logo.png" width="50" height="50"> -->
+  </span>
+            <!-- logo for regular state and mobile devices -->
+            <span class="logo-lg"><b>PaaS-TA</b></span>
+        </a>
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top">
+            <!-- Sidebar toggle button-->
+            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button"></a>
+            <h4 style="font-size: 16px; text-align: left; padding: 7px 10px; margin-top: 7px;color: white;" id="notice">
+                <i class="fa fa-fw fa-volume-up"></i>
+                <span><b>알림사항</b></span>
+                <span id="alertMsg" th:text="#{common.system.welcome.message}"></span>
+            </h4>
+        </nav>
+    </header>
+
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside th:replace="../fragment/left::aside"></aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div layout:fragment="content" class="content-wrapper">
+        default Contents
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="../fragment/footer::footer">
+        default Footer
+    </footer>
+
+    <!--&lt;!&ndash; Slimscroll &ndash;&gt;-->
+    <script type="text/javascript" src="/resources/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"
+            th:src="@{/resources/bower_components/jquery-slimscroll/jquery.slimscroll.min.js}"></script>
+    <!--&lt;!&ndash; FastClick &ndash;&gt;-->
+    <script type="text/javascript" src="/resources/bower_components/fastclick/lib/fastclick.js"
+            th:src="@{/resources/bower_components/fastclick/lib/fastclick.js}"></script>
+    <!--&lt;!&ndash; AdminLTE App &ndash;&gt;-->
+    <script type="text/javascript" src="/resources/dist/js/adminlte.min.js"
+            th:src="@{/resources/dist/js/adminlte.min.js}"></script>
+    <script type="text/javascript" src="/resources/dist/js/bootstrap-notify.min.js"
+            th:src="@{/resources/dist/js/bootstrap-notify.min.js}"></script>
+    <!-- AdminLTE for demo purposes -->
+    <!--<script src="./resources/dist/js/demo.js"></script>-->
+</div>
+<!-- ./wrapper -->
+<div layout:fragment="custom-area"></div>
+<script th:inline="javascript" type="text/javascript" layout:fragment="custom-script"></script>
+<script th:inline="javascript" type="text/javascript">
+    /*<![CDATA[*/
+    $(document.body).ready(function() {
+        procSetLeftMenu();
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

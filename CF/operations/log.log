@@ -1,0 +1,637 @@
+addons:
+- jobs:
+  - name: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: uaa.mgmt.dev.egovp.kr
+        targets:
+        - deployment: uaa
+          domain: bosh
+          instance_group: haproxy
+          network: vip
+          query: '*'
+      - domain: api.mgmt.dev.egovp.kr
+        targets:
+        - deployment: paasta
+          domain: bosh
+          instance_group: haproxy
+          network: vip
+          query: '*'
+      - domain: doppler.mgmt.dev.egovp.kr
+        targets:
+        - deployment: paasta
+          domain: bosh
+          instance_group: haproxy
+          network: vip
+          query: '*'
+      - domain: login.mgmt.dev.egovp.kr
+        targets:
+        - deployment: uaa
+          domain: bosh
+          instance_group: haproxy
+          network: vip
+          query: '*'
+      - domain: sql-db.service.cf.internal
+        targets:
+        - deployment: paasta
+          domain: bosh
+          instance_group: database
+          network: default
+          query: '*'
+      - domain: eureka.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-registration
+          network: default
+          query: '*'
+      - domain: haproxy.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: haproxy
+          network: default
+          query: '*'
+      - domain: cf.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-api
+          network: default
+          query: '*'
+      - domain: common.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-common-api
+          network: default
+          query: '*'
+      - domain: log.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-log-api
+          network: default
+          query: '*'
+      - domain: zuul.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-gateway
+          network: default
+          query: '*'
+      - domain: storage.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: paas-ta-portal-storage-api
+          network: default
+          query: '*'
+      - domain: swift.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: binary_storage
+          network: default
+          query: '*'
+      - domain: database.service.portalapi.internal
+        targets:
+        - deployment: cf-console
+          domain: bosh
+          instance_group: mariadb
+          network: default
+          query: '*'
+    release: bosh-dns-aliases
+  name: bosh-dns-aliases
+instance_groups:
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: mariadb
+    release: cf-console-release
+  name: mariadb
+  networks:
+  - name: default
+  persistent_disk_type: 20GB
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: haproxy
+    release: cf-console-release
+  name: haproxy
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: default
+  - name: vip
+    static_ips:
+    - 10.182.164.86
+  properties:
+    ha_proxy:
+      sslCertificate:
+        ca: |
+          -----BEGIN CERTIFICATE-----
+          MIIEYDCCAsigAwIBAgIRAMEUB55ud4pGb90xoVQ9chUwDQYJKoZIhvcNAQELBQAw
+          OTEMMAoGA1UEBhMDVVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MREwDwYDVQQD
+          Ewhwb3J0YWxDQTAeFw0yMDA3MTYxMDMxMjFaFw0yMTA3MTYxMDMxMjFaMDkxDDAK
+          BgNVBAYTA1VTQTEWMBQGA1UEChMNQ2xvdWQgRm91bmRyeTERMA8GA1UEAxMIcG9y
+          dGFsQ0EwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQDGpENW5X/+WdVj
+          hj/+tgwCP3tRJiaEeukEmR8nTLbWzLOKQECJ+QWTJqnpnAjXPiofuSsDNK22un+3
+          ymP+WZpE0sc8hit/VuRbNuFqrt2yWp/smxqnZ55jgZ8hQrmG4kM2KZX1yMBaYK0U
+          YQoZFX2TpSn9dnCk35TWG9gIHlCKrabmu2lUMxyHcmbj0cp82JVP+c+a1wtb0vD+
+          bIJQonIO0+hXUctw9SbhHsFAZAWwhPDZO2tnXpIFKA+c3SIJ734gHbSX6+hlkLfU
+          ysqJuNnKTFXXz+mCOCG1aes6eEQ+lYSuqds+Ndk1G9tR3dSDN5brbd4O3dhzgMVo
+          f5OVdXdLQ3hvdxSR2ZXJQ2B5XuOo3UXdf8eYSOU7AAr/8yL4o/MK59KRWoTrqvvW
+          gY41woH1vf3RRvfS7BT+xu5/n2BYcArCrVYTzkfMQqW7WNf4DHLnH4tpr1eEO7Cw
+          wC7dUz7KVwY+BOst1xQ8pppZS3w1pIUeWCMGOKq+E8ZvONZfYXUCAwEAAaNjMGEw
+          DgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFJmWWaRb
+          hzYny41Vx+NbfL7m7SjrMB8GA1UdIwQYMBaAFJmWWaRbhzYny41Vx+NbfL7m7Sjr
+          MA0GCSqGSIb3DQEBCwUAA4IBgQCj0qSHzJMguc+vjB+hB0mIIbIoK5CJtamzLJVc
+          KC7B9muBgLGiS5AUiPmNf6UXz2vtyg1lEo7321cmeb0UagCuyPWt0iDoesiOE5Bi
+          JAXeLq3icc0nWznYN+4f4a00hJPgix8CPIhwf0oQi4PK1p61FRgTZv1025rVu1Za
+          4Ol/uq58fyXCoZ9T7/3kvJ2YGYSt1Rv72BQ9o34tp6e0dorMBQJoQ34J6VYJSP8L
+          Rn8JKXfMiePfkN8mw2/gag9EBf41Zyc5ud1xi4Yu+fMDkC1aE8xnUOo2Ri+LJKrS
+          cKaxUZJzxjb/ZSb+GmJh/C/0LW52BB8N/D3aLkar5uuAxynOfi8kss9beAvFefQK
+          CAnIOcpAVS1Ovs9/3o/wSmDDsXjIU+HEdJvZlg/EOk40tRlo7SxjJienGC6JqqJ4
+          xh6ig4sJ5A4BVQOJ3uzDgGc5CSxnj94z6WiF7d4lRPbm4qiNL8hA1LM8kRhQgxqI
+          4MteRsPJXbWf5d4n8Umh8ZIesOI=
+          -----END CERTIFICATE-----
+        certificate: |
+          -----BEGIN CERTIFICATE-----
+          MIIDpjCCAo6gAwIBAgIJAJMARhSgZ3FeMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNV
+          BAYTAktSMQ4wDAYDVQQIDAVTRU9VTDENMAsGA1UECgwETU9JUzENMAsGA1UECwwE
+          TU9JUzEVMBMGA1UEAwwMZGV2LmVnb3ZwLmtyMB4XDTIwMDYxODAxMTI1NloXDTI5
+          MDYxNjAxMTI1NlowWTELMAkGA1UEBhMCS1IxDjAMBgNVBAgMBVNFT1VMMQ0wCwYD
+          VQQKDARNT0lTMQ0wCwYDVQQLDARNT0lTMRwwGgYDVQQDDBMqLm1nbXQuZGV2LmVn
+          b3ZwLmtyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3qU/wVC5upf
+          16hymLLMaJoPltGqA0gESRdlQK/kyFqimgB1IooxMWmFrWTAdOi5HQUOMrvECVuN
+          q2aeDSOeUyWtjCUSt/nXZo1pUbRjGflGucFHUeF05Q2kv3aCW+AFsXeby2tiL96c
+          u8TGSQyMjJDeO/iCFlL7vfDXP17Y0CJ6hifKI3W2pVSmtlqoH+LuhQcCrb0hC9wq
+          ppfNzG0kourJepf8UzYZAOxpH1ahEZ+HqYp9RePwl5j4BgoeLpXQjGBVImwWxWym
+          lmorGDGCvfeyVZDCfkXKtHEHTKP2hnuk0c7zvJcoNcEnh/CewzPj5rHQxVrAkwco
+          NauYYwgeaQIDAQABo3gwdjAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DBcBgNVHREE
+          VTBTgg4qLmRldi5lZ292cC5rcoITKi5tZ210LmRldi5lZ292cC5rcoIWKi5jb25z
+          b2xlLmRldi5lZ292cC5rcoIUKi5hZG1pbi5kZXYuZWdvdnAua3IwDQYJKoZIhvcN
+          AQELBQADggEBAGejLj1WcdPSD2FNYVRXN96KTcmk2z+HUuo12keZZ1gySe3Jcea/
+          9NIl2gNTUwtrsjew4wH2cNbKKxT5mLY9u5yuPA3Dr+cX+3bQwNrNAcVV0B7WoTRV
+          IktILw2aAJLqiTn7U3GDmkoObumu1wQYP52tTakR0AxfN6ccC5OjVuuDFo6g+IK8
+          8OQ1Z2zwoVm/AZ1HsRmstGKbxie/byZclzA0T21H0WbWxsHdbruvLgaCCgzIiCPT
+          kl/zCmAjl8h3hsOLJiOjsfBa295T4ajPUrZnWECo/b0YokksJB5V05+yht2RBlKm
+          8rcDKDd/kjCXadQJ6mXV4VfJXwrBF7ZDWXY=
+          -----END CERTIFICATE-----
+        private_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpAIBAAKCAQEAu3qU/wVC5upf16hymLLMaJoPltGqA0gESRdlQK/kyFqimgB1
+          IooxMWmFrWTAdOi5HQUOMrvECVuNq2aeDSOeUyWtjCUSt/nXZo1pUbRjGflGucFH
+          UeF05Q2kv3aCW+AFsXeby2tiL96cu8TGSQyMjJDeO/iCFlL7vfDXP17Y0CJ6hifK
+          I3W2pVSmtlqoH+LuhQcCrb0hC9wqppfNzG0kourJepf8UzYZAOxpH1ahEZ+HqYp9
+          RePwl5j4BgoeLpXQjGBVImwWxWymlmorGDGCvfeyVZDCfkXKtHEHTKP2hnuk0c7z
+          vJcoNcEnh/CewzPj5rHQxVrAkwcoNauYYwgeaQIDAQABAoIBAFxcrNDip64Zo3Qc
+          kbB2zctusuVrj6WkMjBMLV7sCPtH47mZJhwJFukwAmKFM2elS6VnWzJVXOP7TdU2
+          bgEtHg/6jQBxN0KZ/KuSWWOeSgB+1YAoH1nQiAVcbmDBIsHeoQ9oTMGvuqS4uGCt
+          Nb7BRvDtYf8LlBMpeMp/v5uBv7Dxoyz/bg4dlRr0Hq/xZdC7I3y66u81XGUhMx47
+          BBquy2luJTCrUm0uWoR9Tuj1/h07lLi73y2dp9FG6gI/tRkpxbKovKgXGwpCVUM8
+          VQY+lQQCHexEPGxzApqaDiF78KaxhOpz29ChAdb+8+pUBEJaOHObTzkcp7F2hGIn
+          keHBdIECgYEA6n6t9+S4/QNXAgsa6dTKRKwBu8viAR79/GsHRtPjPYtesFLJJxvM
+          qb38L/KBSP5CyGDwC/5GWorvgfQuuAYryRpRw2XqI3fsUgdqRvsxQImUD4elfPyM
+          9vYHl5RMgpBZkxdsPKnZsG9QRQvb/UiD+8/ZgnmrW0e1th39lLQbQdECgYEAzKwX
+          M4tHExUNk0Gw6AWlx7N3WDKsOn23TaS9fUKmmsJAda3dkmldl1vufd5u7Q7CDhIK
+          N3tysgHbZSPp0aacg28eqZRz6EVQ0v79isQY9oTLhVJcpi2f8BvG97pa4I7z/2F/
+          I1iieWaK7orUMCQLXCVPIy7VN9AsRLG9CAqm4RkCgYBXxQa0rIWZHjDo8OMn9p+m
+          yIL1mcCEDueeHSliF1kM5ieQ88uaucsHFbdY8vn1KkYw3ie7NXd72FkBWTZLZvPo
+          l9NWwcS7dd2cbm4XF1o9/8DNd0Y33AefQENjNvzUOddtOO0oX6K9aUywK1oyGXxd
+          OlT9gzDiP5sCCYOqrycsoQKBgQCf9DZFsCmhvihX11T8X72J7rXsld2H8MwawA7f
+          IAG4nOtnjLPHQtVD/zLJ59ZlKc161Zpqde3TNCRUTNblZAKZrXQXL8/NzK4319Qq
+          aMrhjjLIRO/nZ2zBZ9P9swRmzxHdmkKUSybfHcaiWpkt7l16bCYG5wj3j5epMAb9
+          i+WTsQKBgQCVMHslCqEAUyJf93d0kFGR4ehXE1rg5H3PGX7vJvjRT3+BJ1UCRO3j
+          AtT5oPBVaW5leJdLJKWLgW69tCwRkWUlk3PQ/3kHY9kBhV705bVcjtsYPr6RrbJ3
+          wCoV4hAsVI85MGOPjijVbWb3kR2JsxigU4tL9lr1ngVjTPiTxddaeg==
+          -----END RSA PRIVATE KEY-----
+      sslPrivateKey:
+        ca: |
+          -----BEGIN CERTIFICATE-----
+          MIIEYDCCAsigAwIBAgIRAMEUB55ud4pGb90xoVQ9chUwDQYJKoZIhvcNAQELBQAw
+          OTEMMAoGA1UEBhMDVVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MREwDwYDVQQD
+          Ewhwb3J0YWxDQTAeFw0yMDA3MTYxMDMxMjFaFw0yMTA3MTYxMDMxMjFaMDkxDDAK
+          BgNVBAYTA1VTQTEWMBQGA1UEChMNQ2xvdWQgRm91bmRyeTERMA8GA1UEAxMIcG9y
+          dGFsQ0EwggGiMA0GCSqGSIb3DQEBAQUAA4IBjwAwggGKAoIBgQDGpENW5X/+WdVj
+          hj/+tgwCP3tRJiaEeukEmR8nTLbWzLOKQECJ+QWTJqnpnAjXPiofuSsDNK22un+3
+          ymP+WZpE0sc8hit/VuRbNuFqrt2yWp/smxqnZ55jgZ8hQrmG4kM2KZX1yMBaYK0U
+          YQoZFX2TpSn9dnCk35TWG9gIHlCKrabmu2lUMxyHcmbj0cp82JVP+c+a1wtb0vD+
+          bIJQonIO0+hXUctw9SbhHsFAZAWwhPDZO2tnXpIFKA+c3SIJ734gHbSX6+hlkLfU
+          ysqJuNnKTFXXz+mCOCG1aes6eEQ+lYSuqds+Ndk1G9tR3dSDN5brbd4O3dhzgMVo
+          f5OVdXdLQ3hvdxSR2ZXJQ2B5XuOo3UXdf8eYSOU7AAr/8yL4o/MK59KRWoTrqvvW
+          gY41woH1vf3RRvfS7BT+xu5/n2BYcArCrVYTzkfMQqW7WNf4DHLnH4tpr1eEO7Cw
+          wC7dUz7KVwY+BOst1xQ8pppZS3w1pIUeWCMGOKq+E8ZvONZfYXUCAwEAAaNjMGEw
+          DgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFJmWWaRb
+          hzYny41Vx+NbfL7m7SjrMB8GA1UdIwQYMBaAFJmWWaRbhzYny41Vx+NbfL7m7Sjr
+          MA0GCSqGSIb3DQEBCwUAA4IBgQCj0qSHzJMguc+vjB+hB0mIIbIoK5CJtamzLJVc
+          KC7B9muBgLGiS5AUiPmNf6UXz2vtyg1lEo7321cmeb0UagCuyPWt0iDoesiOE5Bi
+          JAXeLq3icc0nWznYN+4f4a00hJPgix8CPIhwf0oQi4PK1p61FRgTZv1025rVu1Za
+          4Ol/uq58fyXCoZ9T7/3kvJ2YGYSt1Rv72BQ9o34tp6e0dorMBQJoQ34J6VYJSP8L
+          Rn8JKXfMiePfkN8mw2/gag9EBf41Zyc5ud1xi4Yu+fMDkC1aE8xnUOo2Ri+LJKrS
+          cKaxUZJzxjb/ZSb+GmJh/C/0LW52BB8N/D3aLkar5uuAxynOfi8kss9beAvFefQK
+          CAnIOcpAVS1Ovs9/3o/wSmDDsXjIU+HEdJvZlg/EOk40tRlo7SxjJienGC6JqqJ4
+          xh6ig4sJ5A4BVQOJ3uzDgGc5CSxnj94z6WiF7d4lRPbm4qiNL8hA1LM8kRhQgxqI
+          4MteRsPJXbWf5d4n8Umh8ZIesOI=
+          -----END CERTIFICATE-----
+        certificate: |
+          -----BEGIN CERTIFICATE-----
+          MIIDpjCCAo6gAwIBAgIJAJMARhSgZ3FeMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNV
+          BAYTAktSMQ4wDAYDVQQIDAVTRU9VTDENMAsGA1UECgwETU9JUzENMAsGA1UECwwE
+          TU9JUzEVMBMGA1UEAwwMZGV2LmVnb3ZwLmtyMB4XDTIwMDYxODAxMTI1NloXDTI5
+          MDYxNjAxMTI1NlowWTELMAkGA1UEBhMCS1IxDjAMBgNVBAgMBVNFT1VMMQ0wCwYD
+          VQQKDARNT0lTMQ0wCwYDVQQLDARNT0lTMRwwGgYDVQQDDBMqLm1nbXQuZGV2LmVn
+          b3ZwLmtyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3qU/wVC5upf
+          16hymLLMaJoPltGqA0gESRdlQK/kyFqimgB1IooxMWmFrWTAdOi5HQUOMrvECVuN
+          q2aeDSOeUyWtjCUSt/nXZo1pUbRjGflGucFHUeF05Q2kv3aCW+AFsXeby2tiL96c
+          u8TGSQyMjJDeO/iCFlL7vfDXP17Y0CJ6hifKI3W2pVSmtlqoH+LuhQcCrb0hC9wq
+          ppfNzG0kourJepf8UzYZAOxpH1ahEZ+HqYp9RePwl5j4BgoeLpXQjGBVImwWxWym
+          lmorGDGCvfeyVZDCfkXKtHEHTKP2hnuk0c7zvJcoNcEnh/CewzPj5rHQxVrAkwco
+          NauYYwgeaQIDAQABo3gwdjAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DBcBgNVHREE
+          VTBTgg4qLmRldi5lZ292cC5rcoITKi5tZ210LmRldi5lZ292cC5rcoIWKi5jb25z
+          b2xlLmRldi5lZ292cC5rcoIUKi5hZG1pbi5kZXYuZWdvdnAua3IwDQYJKoZIhvcN
+          AQELBQADggEBAGejLj1WcdPSD2FNYVRXN96KTcmk2z+HUuo12keZZ1gySe3Jcea/
+          9NIl2gNTUwtrsjew4wH2cNbKKxT5mLY9u5yuPA3Dr+cX+3bQwNrNAcVV0B7WoTRV
+          IktILw2aAJLqiTn7U3GDmkoObumu1wQYP52tTakR0AxfN6ccC5OjVuuDFo6g+IK8
+          8OQ1Z2zwoVm/AZ1HsRmstGKbxie/byZclzA0T21H0WbWxsHdbruvLgaCCgzIiCPT
+          kl/zCmAjl8h3hsOLJiOjsfBa295T4ajPUrZnWECo/b0YokksJB5V05+yht2RBlKm
+          8rcDKDd/kjCXadQJ6mXV4VfJXwrBF7ZDWXY=
+          -----END CERTIFICATE-----
+        private_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpAIBAAKCAQEAu3qU/wVC5upf16hymLLMaJoPltGqA0gESRdlQK/kyFqimgB1
+          IooxMWmFrWTAdOi5HQUOMrvECVuNq2aeDSOeUyWtjCUSt/nXZo1pUbRjGflGucFH
+          UeF05Q2kv3aCW+AFsXeby2tiL96cu8TGSQyMjJDeO/iCFlL7vfDXP17Y0CJ6hifK
+          I3W2pVSmtlqoH+LuhQcCrb0hC9wqppfNzG0kourJepf8UzYZAOxpH1ahEZ+HqYp9
+          RePwl5j4BgoeLpXQjGBVImwWxWymlmorGDGCvfeyVZDCfkXKtHEHTKP2hnuk0c7z
+          vJcoNcEnh/CewzPj5rHQxVrAkwcoNauYYwgeaQIDAQABAoIBAFxcrNDip64Zo3Qc
+          kbB2zctusuVrj6WkMjBMLV7sCPtH47mZJhwJFukwAmKFM2elS6VnWzJVXOP7TdU2
+          bgEtHg/6jQBxN0KZ/KuSWWOeSgB+1YAoH1nQiAVcbmDBIsHeoQ9oTMGvuqS4uGCt
+          Nb7BRvDtYf8LlBMpeMp/v5uBv7Dxoyz/bg4dlRr0Hq/xZdC7I3y66u81XGUhMx47
+          BBquy2luJTCrUm0uWoR9Tuj1/h07lLi73y2dp9FG6gI/tRkpxbKovKgXGwpCVUM8
+          VQY+lQQCHexEPGxzApqaDiF78KaxhOpz29ChAdb+8+pUBEJaOHObTzkcp7F2hGIn
+          keHBdIECgYEA6n6t9+S4/QNXAgsa6dTKRKwBu8viAR79/GsHRtPjPYtesFLJJxvM
+          qb38L/KBSP5CyGDwC/5GWorvgfQuuAYryRpRw2XqI3fsUgdqRvsxQImUD4elfPyM
+          9vYHl5RMgpBZkxdsPKnZsG9QRQvb/UiD+8/ZgnmrW0e1th39lLQbQdECgYEAzKwX
+          M4tHExUNk0Gw6AWlx7N3WDKsOn23TaS9fUKmmsJAda3dkmldl1vufd5u7Q7CDhIK
+          N3tysgHbZSPp0aacg28eqZRz6EVQ0v79isQY9oTLhVJcpi2f8BvG97pa4I7z/2F/
+          I1iieWaK7orUMCQLXCVPIy7VN9AsRLG9CAqm4RkCgYBXxQa0rIWZHjDo8OMn9p+m
+          yIL1mcCEDueeHSliF1kM5ieQ88uaucsHFbdY8vn1KkYw3ie7NXd72FkBWTZLZvPo
+          l9NWwcS7dd2cbm4XF1o9/8DNd0Y33AefQENjNvzUOddtOO0oX6K9aUywK1oyGXxd
+          OlT9gzDiP5sCCYOqrycsoQKBgQCf9DZFsCmhvihX11T8X72J7rXsld2H8MwawA7f
+          IAG4nOtnjLPHQtVD/zLJ59ZlKc161Zpqde3TNCRUTNblZAKZrXQXL8/NzK4319Qq
+          aMrhjjLIRO/nZ2zBZ9P9swRmzxHdmkKUSybfHcaiWpkt7l16bCYG5wj3j5epMAb9
+          i+WTsQKBgQCVMHslCqEAUyJf93d0kFGR4ehXE1rg5H3PGX7vJvjRT3+BJ1UCRO3j
+          AtT5oPBVaW5leJdLJKWLgW69tCwRkWUlk3PQ/3kHY9kBhV705bVcjtsYPr6RrbJ3
+          wCoV4hAsVI85MGOPjijVbWb3kR2JsxigU4tL9lr1ngVjTPiTxddaeg==
+          -----END RSA PRIVATE KEY-----
+    infra:
+      admin:
+        enable: false
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: binary_storage
+    release: cf-console-release
+  name: binary_storage
+  networks:
+  - name: default
+  persistent_disk_type: 10GB
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-gateway
+    release: cf-console-release
+  name: paas-ta-portal-gateway
+  networks:
+  - name: default
+  properties:
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-registration
+    release: cf-console-release
+  name: paas-ta-portal-registration
+  networks:
+  - name: default
+  properties:
+    infra:
+      admin:
+        enable: false
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+    server:
+      port: 2221
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-api
+    release: cf-console-release
+  name: paas-ta-portal-api
+  networks:
+  - name: default
+  properties:
+    abacus:
+      url: http://abacus.111.111.111.111.xip.io
+    cloudfoundry:
+      authorization: cf-Authorization
+      cc:
+        api:
+          sslSkipValidation: true
+          uaaUrl: https://uaa.mgmt.dev.egovp.kr
+          url: https://api.mgmt.dev.egovp.kr
+      domain: mgmt.dev.egovp.kr
+      user:
+        admin:
+          password: master77!!
+          username: admin
+        uaaClient:
+          adminClientId: admin
+          adminClientSecret: admin-secret
+          clientId: admin
+          clientSecret: admin-secret
+          loginClientId: admin
+          loginClientSecret: admin-secret
+          skipSSLValidation: true
+    config:
+      rabbitmq:
+        exchange-name: cf.topic
+        queue-name: cf.queue
+        response:
+          mp:
+            routing: egovplatform.*.mp.*
+            topic: mp.topic
+          up:
+            routing: egovplatform.*.up.*
+            topic: up.topic
+        routing-key: egovplatform.*.cf.*
+    infra:
+      admin:
+        enable: false
+    java_opts: -Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+    monitoring:
+      api:
+        url: http://192.168.22.71:8080
+    spring:
+      rabbitmq:
+        host: rabbitmq.dev.egovp.kr
+        password: uocYoYvV2OSIGLiw8MJQ
+        port: "30002"
+        username: admin
+    vault:
+      authentication: TOKEN
+      host: 10.182.164.17
+      port: "9200"
+      scheme: http
+      token: 4ScodsDb9nWH6l3ohBecbqcc
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: portal_medium
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-common-api
+    release: cf-console-release
+  name: paas-ta-portal-common-api
+  networks:
+  - name: default
+  properties:
+    datasource:
+      cc:
+        driver-class-name: com.mysql.jdbc.Driver
+        password: cc_admin
+        url: jdbc:mysql://sql-db.service.cf.internal:3306/cloud_controller
+        username: cloud_controller
+      portal:
+        driver-class-name: com.mysql.jdbc.Driver
+        password: CLOUDFOUNDRY@2020
+        username: root
+      uaa:
+        driver-class-name: com.mysql.jdbc.Driver
+        password: master77!!
+        url: jdbc:mysql://10.182.164.66:3306/uaadb
+        username: uaaadmin
+    infra:
+      admin:
+        enable: false
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+    mail:
+      smtp:
+        host: smtp.gmail.com
+        password: smtp_password
+        port: "465"
+        properties:
+          auth: "true"
+          authUrl: https://cf.console.dev.egovp.kr
+          charset: UTF-8
+          createUrl: authcreate
+          expiredUrl: authreset
+          inviteUrl: inviteorg
+          maximumTotalQps: 90
+          starttls:
+            enable: "true"
+            required: "true"
+          subject: PaaS-TA User Potal
+        useremail: smtp_usermail@gmail.com
+        username: smtp_user_name
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-storage-api
+    release: cf-console-release
+  name: paas-ta-portal-storage-api
+  networks:
+  - name: default
+  properties:
+    infra:
+      admin:
+        enable: false
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+    objectStorage:
+      swift:
+        authMethod: keystone
+        authUrl: http://((binary_storage_ips)):5000/v2.0/tokens
+        container: portal-container
+        password: paasta
+        preferredRegion: Public
+        tenantName: paasta-portal
+        username: paasta-portal
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-log-api
+    release: cf-console-release
+  name: paas-ta-portal-log-api
+  networks:
+  - name: default
+  properties:
+    cloudfoundry:
+      authorization: cf-Authorization
+      cc:
+        api:
+          sslSkipValidation: true
+          uaaUrl: uaa.mgmt.dev.egovp.kr
+          url: api.mgmt.dev.egovp.kr
+      domain: mgmt.dev.egovp.kr
+      user:
+        admin:
+          password: master77!!
+          username: admin
+        uaaClient:
+          adminClientId: admin
+          adminClientSecret: admin-secret
+          clientId: login
+          clientSecret: login-secret
+          loginClientId: login
+          loginClientSecret: login-secret
+          skipSSLValidation: true
+    infra:
+      admin:
+        enable: false
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-webadmin
+    release: cf-console-release
+  name: paas-ta-portal-webadmin
+  networks:
+  - name: default
+  properties:
+    java_opts: -Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m
+      -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8
+      -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false
+      -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow
+      -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof
+    server:
+      port: 8090
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+- azs:
+  - z6
+  instances: 1
+  jobs:
+  - name: paas-ta-portal-webuser
+    release: cf-console-release
+  name: paas-ta-portal-webuser
+  networks:
+  - name: default
+  properties:
+    automaticApproval: false
+    cf_api_version: v3
+    cloudfoundry:
+      domain: mgmt.dev.egovp.kr
+    egov_platform_user_url: https://www.dev.egovp.kr/eGovPlatform/user/app/user/login
+    logPath: /var/vcap/sys/log/paas-ta-portal-webuser
+    monitoring: true
+    portalclient:
+      secret: clientsecret
+    quantity: false
+    server:
+      port: 80
+    webDir: /var/vcap/packages/apache2/htdocs
+  stemcell: default
+  syslog_aggregator: null
+  vm_type: small
+name: cf-console
+properties:
+  binary_storage:
+    auth_port: 5000
+    binary_desc:
+    - portal binary_storage
+    container:
+    - portal-container
+    email:
+    - paasta@paasta.com
+    password:
+    - paasta
+    proxy_port: 10008
+    tenantname:
+    - paasta-portal
+    username:
+    - paasta-portal
+  mariadb:
+    admin_user:
+      password: CLOUDFOUNDRY@2020
+    host_names:
+    - mariadb0
+    port: "3306"
+releases:
+- name: cf-console-release
+  version: latest
+- name: bosh-dns-aliases
+  sha1: b0d0a0350ed87f1ded58b2ebb469acea0e026ccc
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.3
+  version: 0.0.3
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 5000-120000
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-120000
+variables: []

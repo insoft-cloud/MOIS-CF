@@ -1,0 +1,48 @@
+# RELEASE
+release_name: "service-catalog-engine-release"
+release_version: "1.0"
+
+# STEMCELL
+stemcell_os: "ubuntu-xenial"
+stemcell_version: "315.64"
+stemcell_alias: "xenial"
+
+
+# NETWORK
+network: "default"
+azs: [z5]
+
+#MARIADB
+mariadb_vm_type: "default"
+mariadb_persistent_disk_type: "10GB"
+mariadb_port: "3306"
+mariadb_admin_username: "admin"
+mariadb_admin_password: "service@catalog"
+
+
+# SERVICE CATALOG ENGINE
+engine_vm_type: "small"
+engine_port: "8333"
+
+rabbitmq_host_ip: "rabbitmq.dev.egovp.kr"
+rabbitmq_port: "30002"
+rabbitmq_username: "admin"
+rabbitmq_password: "uocYoYvV2OSIGLiw8MJQ"
+
+rabbitmq_queue_name: "sc.queue"
+rabbitmq_exchange_name: "sc.topic"
+rabbitmq_routing_key: "egovplatform.*.sc.*"
+rabbitmq_response_mp_topic_name: "mp.topic"
+rabbitmq_response_mp_routing_name: "egovplatform.*.mp.*"
+rabbitmq_response_up_topic_name: "up.topic"
+rabbitmq_response_up_routing_name: "egovplatform.*.up.*"
+
+vault_host: "10.182.164.17"
+vault_port: "9200"
+vault_token: "4ScodsDb9nWH6l3ohBecbqcc"
+
+
+# SERVICE CATALOG BROKER
+cloudfoundry_broker_vm_type: "small"
+cloudfoundry_broker_port: "8888"
+bosh_url: "192.168.22.35"

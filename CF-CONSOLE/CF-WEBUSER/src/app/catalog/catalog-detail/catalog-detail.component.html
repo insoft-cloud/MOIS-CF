@@ -1,0 +1,308 @@
+<div class="wrap dashboard">
+  <app-app-top [cursorId]="'cur_catalog'"></app-app-top>
+  <app-catalog-nav></app-catalog-nav>
+  <div class="contain" *ngIf="template">
+    <div class="content">
+      <div class="row one_line maT30">
+        <div class="col-md-12">
+          <div class="cWrap">
+            <dl>
+              <dt>
+              <h1>{{template.name}}</h1>
+              <p class="copy">{{template.description}}</p>
+              <button class="btn"  onclick="history.back()">
+                <img src="../../assets/resources/images/catalog/back.svg"  alt=""/>Back
+              </button>
+              </dt>
+              <dd>
+                <h4 class="maT30">{{ 'catalog.appTemplate.configureAppTemplates' | translate }}</h4>
+                <div class="cWrap_line maT30" >
+                  <ul class="icon">
+                    <li *ngFor="let app of apptemplate">
+                      <div>
+                        <img title="" src="{{app.Img}}" alt="{{app.name}}"  onError="this.src='assets/resources/images/catalog/catalog_3.png'" />
+                        <input id="desc" value="{{app.description}}"  type="hidden" />
+                      </div>
+                    </li>
+                  </ul>
+                  <i class="vline">
+                    <img src="../../../assets/resources/images/catalog/i_v.png"/>
+                  </i>
+                  <div class="col-6 icon_T">
+                    <h5 class="icon_TT">{{apptemplate[0].name}}</h5>
+                    <span class="icon_TC" [innerHTML]="apptemplate[0].description">
+                                        </span>
+                  </div>
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="cWrap maT30">
+            <dl>
+              <dt>
+              <h4>{{ 'catalog.appTemplate.createanApp' | translate }}</h4>
+              <div class="btnWrap" >
+                <span class="cWraprightspan">{{ 'catalog.appTemplate.whetherTheAppIsStarted' | translate }}</span>
+                <input id="switch3" type="checkbox" [(ngModel)]="appStart"  switch2="none">
+                <label for="switch3"></label>
+              </div>
+              </dt>
+              <dd>
+                <div class="cWrap_table">
+                  <table>
+                    <colgroup>
+                      <col style=''>
+                    </colgroup>
+                    <tbody>
+                    <!--<tr>-->
+                      <!--<td colspan="2"><p>{{ 'catalog.appTemplate.region' | translate }}</p>-->
+                      <!--</td>-->
+                    <!--</tr>-->
+                    <!--<tr>-->
+                      <!--<td colspan="2">-->
+                        <!--<select >-->
+                          <!--<option >{{ 'catalog.region.korea' | translate }}-->
+                          <!--</option>-->
+                          <!--<option >{{ 'catalog.region.usa' | translate }}-->
+                          <!--</option>-->
+                        <!--</select>-->
+                      <!--</td>-->
+                    <!--</tr>-->
+                    <tr>
+                      <td><p>{{ 'catalog.appTemplate.organization' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <select [(ngModel)]="org" (ngModelChange)="orgSelect()">
+                          <option *ngFor="let org of orgs"  [ngValue]="org">{{org.name}}
+                        </option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><p>{{ 'catalog.appTemplate.space' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <select [(ngModel)]="space" (ngModelChange)="spaceSelect()">
+                          <option *ngFor="let space of spaces" [ngValue]="space">{{space.name}}
+                          </option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th colspan="3"><div *ngIf="spaces.length < 2"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i>{{ 'catalog.contants.notSpace' | translate }}</p></div>
+                        <div *ngIf="spaces.length > 1 && space.name === translateEntities.nav.space_name"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i>{{ 'catalog.contants.notSelectSpace' | translate }}</p></div></th>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="cWrap_table">
+                  <table>
+                    <colgroup>
+                      <col style=''>
+                      <col style=''>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                      <td  colspan="2">
+                        <p>{{ 'catalog.appTemplate.appName' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td  colspan="2" style="position:relative;">
+                        <input type="text" name="appName" id="appName" placeholder="{{ 'catalog.contants.inputAppName' | translate }}" (keyup)="checkAppName()" autofocus maxlength="50"/>
+                        <div *ngIf="(namecheck === 1 && appname.length > 0)" style="position:absolute; bottom:-22px; left:0;"><p class="blue text-left login_red"><i class="fas fa-exclamation-circle"></i>{{ 'catalog.contants.createSuccessApp' | translate }}</p></div>
+                        <div *ngIf="(namecheck === -1 && appname.length > 0)" style="position:absolute; bottom:-22px; left:0;"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.createFalseApp' | translate }}</p></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="1">
+                        <p>{{ 'catalog.appTemplate.appURL' | translate }}</p>
+                      </td>
+                      <td colspan="1">
+                        <p>{{ 'catalog.appTemplate.domain' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="1" style="position:relative;">
+                        <input name="route" id="routename" type="text" placeholder="{{ 'catalog.contants.inputHostName' | translate }}" (keyup)="checkHostName()" maxlength="50" style="width:98%"/>
+                        <div *ngIf="(routecheck === 1 && hostname.length > 0)" style="position:absolute; bottom:-22px; left:0;"><p class="blue text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.createSuccessRoute' | translate }}</p></div>
+                        <div *ngIf="(routecheck === -1  && hostname.length > 0)" style="position:absolute; bottom:-22px; left:0;"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.createFasleRoute' | translate }}</p></div>
+                      </td>
+                      <td colspan="1">
+                        <select [(ngModel)]="currentdomain">
+                          <option *ngFor="let domain of domainList" [ngValue]="domain">{{domain.entity.name}}
+                          </option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><p>{{ 'catalog.appTemplate.memory' | translate }}</p>
+                      </td>
+                      <td><p>{{ 'catalog.appTemplate.disk' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>
+                        <select [(ngModel)]="memory">
+                          <option *ngFor="let sltmemoy of memoryoption" [ngValue]="sltmemoy.value2">{{sltmemoy.value2}}
+                          </option>
+                        </select>
+                      </th>
+                      <td>
+                        <select [(ngModel)]="disk">
+                          <option *ngFor="let sltdisk of diskoption" [ngValue]="sltdisk.value2">{{sltdisk.value2}}
+                          </option>
+                        </select>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="clear">
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="cWrap maT30 cataloglast">
+            <dl>
+              <dt>
+              <h4>{{ 'catalog.appTemplate.selectServiceUsageSpecification' | translate }}</h4>
+              </dt>
+              <dd class="cWrap_table_wrap" *ngFor="let serviceplan of serviceplanlist;let i = index">
+                <div class="btnWrap" *ngIf="serviceplan.appBindYn === 'Y'">
+                  <span class="cWraprightspan">{{ 'catalog.appTemplate.whetherTheAppIsConnected' | translate }}</span>
+                  <input id="{{serviceplan.switchid}}" type="checkbox" [(ngModel)]="serviceplan.appbind"  switch2="none">
+                  <label for="{{serviceplan.switchid}}"></label>
+                </div>
+                <div class="cWrap_table">
+                  <table>
+                    <colgroup>
+                      <col style=''>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                      <td><p>{{serviceplan.name}}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" [id]="'servicename_'+i" placeholder="{{ 'catalog.contants.inputService' | translate }}" (keyup)="serviceNameCheck(i)" maxlength="50"/>
+                        <div *ngIf="(serviceplan.servicenamecheck === 1 && serviceplan.servicename.length > 0)" ><p class="blue text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.createSuccessService' | translate }}</p></div>
+                        <div *ngIf="(serviceplan.servicenamecheck === -1 && serviceplan.servicename.length > 0)"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.createFalseService' | translate }}</p></div>
+                        <div *ngIf="(serviceplan.servicenamecheck === 2 && serviceplan.servicename.length > 0)"><p class="red text-left login_red"><i class="fas fa-exclamation-circle"></i> {{ 'catalog.contants.overLapService' | translate }}</p></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><p>{{ 'catalog.appTemplate.selectServiceUsageSpecification' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <select [(ngModel)]="serviceplan.plan">
+                          <option *ngFor="let plan of serviceplan.plans" [ngValue]="plan">{{plan.entity.name}}
+                          </option>
+                        </select>
+                        <span>{{serviceplan.plan.entity.description}}</span>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="cWrap_table">
+                  <table>
+                    <colgroup>
+                      <col style='width:62px'>
+                      <col style=''>
+                    </colgroup>
+                    <tbody>
+                    <ng-container *ngIf="serviceplan.serviceparameter && serviceplan.serviceparameter.length > 0">
+                    <tr>
+                      <td colspan="2"><p>{{ 'catalog.appTemplate.serviceCreationParameters' | translate }}</p>
+                      </td>
+                    </tr>
+                    <tr *ngFor="let parameter of serviceplan.serviceparameter">
+                      <td>
+                        <i class="cWrapDot"></i>{{parameter[1]}}:
+                      </td>
+                      <td><input type="{{parameter[0]}}" [(ngModel)]="parameter[2]" (ngModelChange)="setParmeterData(serviceplan.serviceparameter, serviceplan.hiddenserviceparameter)"/>
+                      </td>
+                    </tr>
+                    </ng-container>
+                    <ng-container *ngIf="serviceplan.appparameter && serviceplan.appparameter.length > 0 && serviceplan.appbind">
+                      <tr>
+                        <td colspan="2"><p>{{ 'catalog.appTemplate.appBindParameters' | translate }}</p>
+                        </td>
+                      </tr>
+                      <tr *ngFor="let parameter of serviceplan.appparameter">
+                        <td>
+                          <i class="cWrapDot"></i>{{parameter[1]}}:
+                        </td>
+                        <td><input type="{{parameter[0]}}" [(ngModel)]="parameter[2]"/>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="clear">
+                </div>
+                <div class="detail_bottom">
+                  <table class="line_tables">
+                    <caption>{{ 'catalog.appTemplate.serviceUsePriceGuide' | translate }}
+                    </caption>
+                    <colgroup>
+                      <col style='width:10%;'>
+                      <col style='width:10%;'>
+                      <col style=''>
+                      <col style=''>
+                    </colgroup>
+                    <thead>
+                    <td style="height: 58px"><p>{{ 'catalog.appTemplate.select' | translate }}</p>
+                    </td>
+                    <td style="height: 58px"><p>{{ 'catalog.appTemplate.goods' | translate }}</p>
+                    </td>
+                    <td style="height: 58px"><p>{{ 'catalog.appTemplate.function' | translate }}</p>
+                    </td>
+                    <td style="height: 58px"><p>{{ 'catalog.appTemplate.price' | translate }}</p>
+                    </td>
+                    </thead>
+                    <tbody>
+                    <ng-container *ngFor="let plan of serviceplan.plans">
+                    <tr>
+                      <td>
+                        <input [id]="'plan-' + plan.radioid" type="radio" name="{{serviceplan.id}}" [checked]="serviceplan.plan===plan ? 'checked' : ''" (click)="changePlan(serviceplan, plan)">
+                        <label [for]="'plan-' + plan.radioid"></label>
+                      </td>
+                      <td *ngIf="plan.entity.free">
+                        {{ 'catalog.appTemplate.free' | translate }}
+                      </td>
+                      <td *ngIf="!plan.entity.free">
+                        {{ 'catalog.appTemplate.standard' | translate }}
+                      </td>
+                      <th><p>{{plan.entity.description}}</p>
+                        {{plan.bullet}}<br/>{{plan.subbullet}}
+                      </th>
+                      <th>{{plan.amount}}
+                      </th>
+                    </tr>
+                    </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="cWrap_btn">
+            <button class="btns2 btns2_1 colors4" (click)="createApp(translate)">{{ 'catalog.appTemplate.produce' | translate }}</button>
+            <button class="btns2 btns2_1 colors5" [routerLink]="['/catalog']">{{ 'catalog.appTemplate.cancel' | translate }}</button>
+          </div>
+        </div>
+      </div><!-- row one_line -->
+    </div>
+    <div class="footer">Copyright © 2020 eGovCP CloudFoundry. All rights reserved</div>
+  </div>
+</div>
+

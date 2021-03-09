@@ -1,0 +1,7 @@
+set -e -x
+
+PKG_NAME="mariadb-10.5.8-linux-x86_64.tar.gz"
+ARCHIVE="mariadb/mariadb-10.5.8-linux-x86_64.tar.gz"
+DARCHIVE="mariadb/galera-4_26.4.6-xenial_amd64.deb"
+cp -r ${BOSH_COMPILE_TARGET}/${ARCHIVE} ${BOSH_INSTALL_TARGET}
+cp -r ${BOSH_COMPILE_TARGET}/${DARCHIVE} ${BOSH_INSTALL_TARGET}

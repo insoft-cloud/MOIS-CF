@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>PaasTa-Admin</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="../../../resources/bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../../resources/bower_components/font-awesome/css/font-awesome.min.css"/>
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="../../../resources/bower_components/Ionicons/css/ionicons.min.css"/>
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../../resources/dist/css/AdminLTE.min.css"/>
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../../../resources/dist/css/skins/_all-skins.min.css"/>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery 3 -->
+    <script src="../../resources/bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="../../resources/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <link href="../../resources/dist/css/common.css" rel="stylesheet"/>
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"/>
+</head>
+<body>
+<script th:inline="javascript" type="text/javascript">
+    // ON LOAD
+    /*<![CDATA[*/
+    $(document.body).ready(function() {
+        //getConfigInfoValue();
+        callbackLogin();
+    });
+    function callbackLogin() {
+        window.sessionStorage.getItem("USER_SE_CD");
+        let param = {
+            redirectUrl: window.location.origin + '/callback' ,
+            returnUrl:  new URLSearchParams(location.search).get('returnUrl') || 'dashboard',
+            code : new URLSearchParams(location.search).get('code'),
+            user_se_cd : window.sessionStorage.getItem("USER_SE_CD")
+        };
+
+        $.ajax({
+            url: "/login/autoLogin",
+            method: "POST",
+            data: JSON.stringify(param),
+            dataType: 'json',
+            contentType: "application/json",
+            success: function(data){
+                window.location.href = window.location.origin + '/dashboard'
+            },
+            complete : function(data) {
+            }
+        });
+    }
+
+    function procGetDomain(data) {
+        var returnUrl = new URLSearchParams(location.search).get('returnUrl') || 'dashboard';
+        var code = new URLSearchParams(location.search).get('code');
+        var accessUrl = data['UAA'] + '/oauth/token' + '?response_type=token' +
+            '&client_id=' + data['portalClient']+'&client_secret=' + data['clientSecret'] +'&redirect_uri=' + window.location.origin + '/callback' + ('%3FreturnUrl%3D' + returnUrl) +
+            '&grant_type=authorization_code' +'&code=' + code;
+        $.ajax({
+            url: accessUrl,
+            method: "POST",
+            data: null,
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded",
+            success: function(data){
+                autoLogin(data);
+            },
+            complete : function(data) {
+            }
+        });
+    }
+    function autoLogin(data){
+        $.ajax({
+            url: "/callback",
+            method: "POST",
+            data: data,
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded",
+            success: function(data){
+                sessionStorage.setItem("access_token", data['access_token'] );
+                let token_time = new Date();
+                token_time.setMilliseconds(token_time.getMilliseconds() + (data['expires_in'] * 1000));
+                sessionStorage.setItem("expires_in", token_time.getMilliseconds().toString() );
+                window.location.href = window.location.origin + '/index?Login=Succeed'
+            },
+            complete : function(data) {
+
+            }
+        });
+    }
+    /*]]>*/
+</script>
+</body>
+
+</html>

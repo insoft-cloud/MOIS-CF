@@ -1,0 +1,27 @@
+{
+    "director_id": "77598532-7e3d-46ee-6fa3-9e938247e41d",
+    "installation_id": "60260add-32e5-4322-7241-a0d9e5c3c598",
+    "current_vm_cid": "6b41672f-6cb9-4a9f-aa88-4904f3e7aa97",
+    "current_stemcell_id": "62e493bb-c9b7-4160-498d-8e31e53a60e3",
+    "current_disk_id": "0dda4a86-a275-482f-5d7b-d1315a96e446",
+    "current_release_ids": [],
+    "current_manifest_sha": "",
+    "disks": [
+        {
+            "id": "0dda4a86-a275-482f-5d7b-d1315a96e446",
+            "cid": "f92909b4-844d-4ecf-b596-a0937a1b3f0e",
+            "size": 65536,
+            "cloud_properties": {}
+        }
+    ],
+    "stemcells": [
+        {
+            "id": "62e493bb-c9b7-4160-498d-8e31e53a60e3",
+            "name": "bosh-openstack-kvm-ubuntu-xenial-go_agent",
+            "version": "315.64",
+            "api_version": 2,
+            "cid": "938cf841-e01c-4683-95e7-2f64225ec10d"
+        }
+    ],
+    "releases": []
+}

@@ -1,0 +1,78 @@
+spring:
+  application:
+      name: PortalGateWay
+  http:    # spring boot 1.x
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+      location: ${java.io.tmpdir}
+  servlet:    # spring boot 2.x
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+      location: ${java.io.tmpdir}
+  cloud:
+    client:
+      hostname: <%= spec.ip %>
+
+server:
+  address: <%= spec.ip %>
+  port: <%= p('server.port')%>
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka.service.portalapi.internal:<%= link('paas-ta-portal-registration-link').p('server.port')%>/eureka/
+      registry-fetch-interval-seconds: 5
+  instance:
+    hostname: <%= spec.ip %>
+    lease-expiration-duration-in-seconds: 5
+    lease-renewal-interval-in-seconds: 10
+
+
+
+# Zuul route rule : zuul.routes.[spring.application.name]=path
+zuul:
+  ignored-services: '*'
+  host:
+    connect-timeout-millis: 5000
+    socket-timeout-millis: 60000
+  routes:
+    PortalApi:
+      path: /portalapi/**
+      url: PORTALAPI
+      sensitiveHeaders:
+    CommonApi:
+      path: /commonapi/**
+      url: PORTALCOMMONAPI
+      sensitiveHeaders:
+    StorageApi:
+      path: /storageapi/**
+      url: PORTALSTORAGEAPI
+      sensitiveHeaders:
+
+ribbon:     # Do load balancing without discovery service
+  eureka:
+    enabled: ${EUREKA_ENABLED:true}
+  ConnectTimeout: 5000
+  ReadTimeout: 60000
+  SocketTimeout: 60000
+
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 65000
+
+management:     # If you set off security...
+  security:
+    enabled: false
+

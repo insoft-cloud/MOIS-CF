@@ -1,0 +1,125 @@
+---
+name: paas-ta-portal-api
+
+templates:
+  bin/service_ctl.erb: bin/service_ctl
+  bin/monit_debugger: bin/monit_debugger
+  data/bootstrap.yml.erb: data/bootstrap.yml
+  data/properties.sh: data/properties.sh
+  data/application.yml.erb: data/application.yml
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+  data/cf.pem.erb: data/platform.pem
+  bin/pre-start.erb: bin/pre-start
+  data/test.sh.erb: data/test.sh
+packages:
+  - java
+  - paas-ta-portal-api
+
+provides:
+  - name: paas-ta-portal-api-link 
+    type: paas-ta-portal-api 
+    properties: 
+    - server.port
+
+consumes:
+  - name: paas-ta-portal-registration-link
+    type: paas-ta-portal-registration
+  - name: paas-ta-portal-gateway-link
+    type: paas-ta-portal-gateway
+
+properties:
+  java_opts:
+    description: 'Luncher Java option'
+    default: '-Xms512m -Xmx1024m -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof'
+  server.port:
+    description: 'Enter the Service Port'
+    default: '2222'
+  cloudfoundry.cc.api.sslSkipValidation:
+    description: 'Change to true if cloud foundry api uses ssl.'
+    default: true
+  cloudfoundry.user.admin.username:
+    description: 'Please enter the cloud foundry administrator account.'
+  cloudfoundry.user.admin.password:
+    description: 'Please enter the cloud foundry administrator account password'
+  cloudfoundry.user.uaaClient.clientId:
+    description: 'uaa Enter the client with login authority.'
+    default: true
+  cloudfoundry.user.uaaClient.clientSecret:
+    description: 'uaa Enter the client secret with login privileges.'
+    default: true
+  cloudfoundry.user.uaaClient.adminClientId:
+    description: 'Enter the uaa admin client.'
+    default: true
+  cloudfoundry.user.uaaClient.adminClientSecret:
+    description: 'Enter the uaa admin client secret.'
+    default: true
+  cloudfoundry.user.uaaClient.loginClientId:
+    description: 'Enter the uaa login client secret.'
+    default: true
+  cloudfoundry.user.uaaClient.loginClientSecret:
+    description: 'Enter the uaa login client secret.'
+    default: true
+  cloudfoundry.user.uaaClient.skipSSLValidation:
+    description: 'Change to true if uaa api uses ssl.'
+    default: true
+  cloudfoundry.authorization:
+    default: 'cf-Authorization'
+  cloudfoundry.domain:
+    description: 'cloudfoundry domain'
+  abacus.url:
+    description: 'Please enter the abacus api url.'
+    default: 'http://localthost'
+  monitoring.api.url:
+    description: 'Please enter the monitoring api url.'
+    default: 'http://localthost'
+  vault.host:
+    description: "vault server host"
+  vault.port:
+    description: "vault server port"
+  vault.scheme:
+    description: "vault server scheme"
+  vault.authentication:
+    description: "vault server authentication"
+  vault.token:
+    description: "vault server token"
+  vault.path:
+    description: "vault cf path"
+  vault.iaas:
+  vault.list:
+  bosh.id:
+  bosh.secret:
+  bosh.url:
+  bosh.oauth_url:
+  ssh.key:
+  ssh.url:
+  bosh.cert:
+  bosh.secret:
+  bosh.env:
+  bosh.stemcell_path:
+  bosh.path:
+  spring.rabbitmq.host:
+    description: "rabbitmq host ip for service broker"
+  spring.rabbitmq.port:
+    description: "rabbitmq port for service broker"
+  spring.rabbitmq.username:
+    description: "rabbitmq username"
+  spring.rabbitmq.password:
+    description: "rabbitmq password"
+  config.rabbitmq.queue-name:
+    description: "rabbitmq queue name for connection"
+  config.rabbitmq.exchange-name:
+    description: "rabbitmq exchange name for connection"
+  config.rabbitmq.routing-key:
+    description: "rabbitmq routing key for connection"
+  config.rabbitmq.response.mp.topic:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.mp.routing:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.up.routing:
+    description: "rabbitmq response exchange name for connection"
+  config.rabbitmq.response.up.topic:
+    description: "rabbitmq response exchange name for connection"
+  egov_platform_user_url:
+    description: "rabbitmq response exchange name for connection"
+  

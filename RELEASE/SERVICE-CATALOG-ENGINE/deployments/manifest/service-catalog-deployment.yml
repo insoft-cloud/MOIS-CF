@@ -1,0 +1,113 @@
+name: ((deployment_name))                              # 서비스 배포이름(필수) bosh deployments 로 확인 가능한 이름
+
+stemcells:
+- alias: ((stemcell_alias))
+  os: ((stemcell_os))
+  version: ((stemcell_version))
+
+releases:
+- name: "((release_name))"
+  version: "latest"
+
+
+update:
+  canaries: 1                            # canary 인스턴스 수(필수)
+  canary_watch_time: 30000-120000        # canary 인스턴스가 수행하기 위한 대기 시간(필수)
+  max_in_flight: 1                       # non-canary 인스턴스가 병렬로 update 하는 최대 개수(필수)
+  update_watch_time: 30000-120000        # non-canary 인스턴스가 수행하기 위한 대기 시간(필수)
+########## WEB SERVICE ##########
+
+instance_groups:
+- name: mariadb
+  instances: 1
+  networks:
+  - name: ((network))
+  azs: ((azs))
+  vm_type: ((mariadb_vm_type))
+  persistent_disk_type: ((mariadb_persistent_disk_type))
+  stemcell: ((stemcell_alias))
+  jobs:
+  - name: mariadb
+    release: ((release_name))
+    properties:
+      port: ((mariadb_port))
+      admin:
+        username: ((mariadb_admin_username))
+        password: ((mariadb_admin_password))
+      metric:
+        url: ((metric_url))
+      syslog:
+        ip: ((syslog_ip))
+- name: service-catalog-engine
+  instances: 1
+  networks:
+  - name: ((network))
+  azs: ((azs))
+  vm_type: ((engine_vm_type))
+  stemcell: ((stemcell_alias))
+  jobs:
+  - name: service-catalog-engine
+    release: ((release_name)) 
+    properties:
+      server:
+        port: ((engine_port))
+      spring:
+        rabbitmq:
+          host: ((rabbitmq_host_ip))
+          port: ((rabbitmq_port))
+          username: ((rabbitmq_username))
+          password: ((rabbitmq_password))
+      config:
+        rabbitmq:
+          queue-name: ((rabbitmq_queue_name))
+          exchange-name: ((rabbitmq_exchange_name))
+          routing-key: ((rabbitmq_routing_key))
+          response:
+            mp:
+              topic: ((rabbitmq_response_mp_topic_name))
+              routing: ((rabbitmq_response_mp_routing_name))
+            up:
+              topic: ((rabbitmq_response_up_topic_name))
+              routing: ((rabbitmq_response_up_routing_name))
+      java_opts: '-XX:MaxMetaspaceSize=104857K -Xss349K -Xms681574K -XX:MetaspaceSize=104857K -Xmx681574K'
+      vault:
+        host: ((vault_host))
+        port: ((vault_port))
+        scheme: http
+        authentication: TOKEN
+        token: ((vault_token))
+        path: ((vault_path))
+      ecp:
+        url: ((ecp_url))
+        username: ((ecp_username))
+        password: ((ecp_password))
+      ecp2:
+        url: ((ecp2_url))
+        username: ((ecp2_username))
+        password: ((ecp2_password))
+      log:
+        level: ((log_level))
+
+- name: cloudfoundry-broker
+  instances: 1
+  networks:
+  - name: ((network))
+  azs: ((azs))
+  vm_type: ((cloudfoundry_broker_vm_type))
+  stemcell: ((stemcell_alias))
+  jobs:
+  - name: cloudfoundry-broker
+    release: ((release_name))
+    properties:
+      server:
+        port: ((cloudfoundry_broker_port))
+      broker:
+        username: ((broker_username))
+        password: ((broker_password))
+      bosh:
+        client_id: admin
+        client_secret: ((bosh_secret))
+        url: https://((bosh_url)):25555
+        oauth_url: https://((bosh_url)):8443
+      log:
+        level: ((log_level))

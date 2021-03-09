@@ -1,0 +1,8 @@
+[
+  {
+    "protocol": "all",
+    "destination": "192.168.22.0/24",
+    "log": true,
+    "description": "Allow tcp traffic to Z3"
+  }
+]

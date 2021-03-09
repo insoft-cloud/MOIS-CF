@@ -1,0 +1,43 @@
+---
+name: cloudfoundry-broker
+
+
+templates:
+  bin/service_ctl.erb: bin/service_ctl
+  data/application.yml.erb: data/application.yml
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+
+
+
+packages:
+- java
+- cloudfoundry-broker
+
+consumes:
+- name: mariadb-link
+  type: mariadb
+
+provides:
+- name: cloudfoundry-broker-link
+  type: cloudfoundry-broker
+  properties:
+  - server.port
+  - broker.username
+  - broker.password
+
+
+properties:
+  server.port:
+    description: "service broker server port"
+    default: 8333
+  java_opts:
+    description: "Java options"
+    default: "-Xms1024m -Xmx1024m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m"
+  broker.username:
+  broker.password:
+  bosh.client_id:
+  bosh.client_secret:
+  bosh.url:
+  bosh.oauth_url:
+  log.level:

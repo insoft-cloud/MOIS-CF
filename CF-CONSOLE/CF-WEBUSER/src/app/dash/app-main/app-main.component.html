@@ -1,0 +1,1618 @@
+<div class="wrap dashboard">
+  <app-app-top [cursorId]="'cur_dashboard_app'" [app-view]="true"></app-app-top>
+  <app-app-nav></app-app-nav>
+
+  <div class="contain">
+    <div class="content">
+      <div class="row one_line maT30">
+        <div class="col-md-6">
+          <div class="col-in col-d1">
+            <ul class="colright_btn">
+              <li class="monitoring">
+                <ul>
+                  <li *ngIf="appSummaryState == 'STARTED'"><i class="fas fa-stop" title="Stop" (click)="showPopAppStopClick()"></i></li>
+                  <li *ngIf="appSummaryState != 'STARTED'"><i class="fas fa-play" title="Start" (click)="showPopAppStartClick()"></i></li>
+                  <!--<li><i class="fas fa-stop"></i>&lt;!&ndash;i class="colorsR fas fa-sync-alt"></i&ndash;&gt;</li>-->
+                </ul>
+              </li>
+              <li class="rot_deg"><i class="rot fas fa-sync-alt" title="Refresh" (click)="refreshClick()"></i>
+              </li>
+              <li>
+                <i class="fas fa-ellipsis-v" (click)="showAppEditLayer()"></i>
+                <ol class="">
+                  <li class="name_inputTitle" (click)="renameAppClick()"><a class="fas fa-edit" > {{ 'appMain.app.rename' | translate }}</a></li>
+                  <li (click)="showPopAppRestageClick()"><a class="fas fa-sync" > {{ 'appMain.app.restage' | translate }}</a></li>
+                  <li (click)="showPopAppDelClick()"><a class="fas fa-trash-alt" > {{ 'appMain.app.delete' | translate }}</a></li>
+                </ol>
+              </li>
+            </ul>
+            <div class="col_in maT30" id="col_in1">
+              <h1 class="headTH2">&nbsp;
+                <span>{{appSummaryName}}</span>
+                <div class="headT">
+                  <input class="tempTitle" id="appName" type="text" (keyup)="pattenTest()" value="" autocomplete="off" maxlength="254"/>
+                  <button class="yess" (click)="showPopRenameSaveClick()">
+                    <i class="far fa-save"></i>
+                  </button>
+                  <button class="nos">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </h1>
+              <p class="copy">{{ 'appMain.app.summary' | translate : {appSummaryName: appSummaryName} }}</p>
+              <div [ngSwitch]="appSummaryState">
+                <button class="btns colors1" *ngSwitchCase="'STARTED'"><img src="/assets/resources/images/main/RUNNING.svg" alt=""/>STARTED</button>
+                <button class="btns colors2" *ngSwitchCase="'DOWNED'"><img src="/assets/resources/images/main/energy.svg" alt=""/>DOWN</button>
+                <button class="btns colors2"*ngSwitchCase="'CRASHED'"><img src="/assets/resources/images/main/energy.svg" alt=""/>CRASHED</button>
+                <button class="btns colors3" *ngSwitchDefault><img src="/assets/resources/images/main/moon.svg" alt=""/>STOP</button>
+              </div>
+            </div>
+            <div class="maT30">
+              <dl class="col_in1_dl">
+                <dt>
+                  <!--<ul>-->
+                    <!--<li><span class="on_dot BGcolors"></span> {{ 'appMain.app.area' | translate }}-->
+                    <!--</li>-->
+                    <!--&lt;!&ndash;<li>{{location}}</li>&ndash;&gt;-->
+                    <!--<li>대한민국</li>-->
+                  <!--</ul>-->
+                  <ul>
+                    <li>
+                      <span class="on_dot BGcolors2"></span> {{ 'appMain.app.organization' | translate }}
+                    </li>
+                    <li>{{orgName}}</li>
+                  </ul>
+                  <ul>
+                    <li><span class="on_dot BGcolors3"></span> {{ 'appMain.app.space' | translate }}
+                    </li>
+                    <li>{{spaceName}}</li>
+                  </ul>
+                </dt>
+                <dt>
+                  <ol class="monitor_pd">
+                    <li>
+                      <span>{{ 'appMain.app.appUrl' | translate }}:</span>
+                      <button class="btns4 colors4" (click)="showWindowAppLink(appSummaryRouteUri)">URL Link
+                        <div class="">
+                          <i>
+                            <img src="/assets/resources/images/main/btn_url_dot.png" alt=""/>
+                          </i>
+                          {{"https://"+appSummaryRouteUri}}
+                        </div>
+                      </button>
+                    </li>
+                    <li><span>{{ 'appMain.app.lastPush' | translate }}:</span>{{appSummaryPackageUpdatedAt}}</li>
+                    <li><span>{{ 'appMain.app.buildpack' | translate }}:</span>{{appSummaryBuildpack}}</li>
+                  </ol>
+                </dt>
+              </dl>
+              <div class="clear"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div id="instance" class="col-in col-in-bg">
+            <dl>
+              <dt class="tit">INSTANCE
+                <span class="pull-right rights"></span>
+              </dt>
+              <dd>
+                <span class="instanceS" id="instanceS1">{{appSummaryInstance}}</span>
+                <span class="instanceS" id="instanceS2" style="display:none;">
+                  <input class="instance_in" id="instance_in" type="text" style="font-size: 40px;" value="{{appSummaryInstance}}" />
+                </span>
+                <small> / {{ 'appMain.app.maximum' | translate }} <span>{{appSummaryInstanceMax}}</span>{{ 'appMain.app.amount' | translate }}</small>
+                <div class="pull-right">
+                  <div class="icon_wrap">
+                    <img src="/assets/resources/images/main/instance_ico.png" alt="" />
+                  </div>
+                  <div class="BG_wrap">
+                    <img src="/assets/resources/images/main/ico_bg.png" alt="" />
+                    <input id="instancePer" value="0"/>
+                  </div>
+                </div>
+              </dd>
+              <dt>
+              <ul class="instance_ul">
+                <li><button class="btns0 colors0" (click)="instanceUpClick()"><i class="fas fa-angle-up"></i></button>
+                </li>
+                <li><button class="btns0 colors0" (click)="instanceDownClick()"><i class="fas fa-angle-down"></i></button>
+                </li>
+                <li><button class="btns0 colors0 a0001" (click)="instanceDirectInputClick()">{{ 'appMain.app.directInput' | translate }}</button>
+                </li>
+                <li><button class="btns0 colors0 b0001" (click)="showPopInstanceSaveClick()">{{ 'appMain.app.save' | translate }}</button>
+                </li>
+              </ul>
+              </dt>
+            </dl>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div id="cpu" class="col-in col-in-bg">
+            <dl>
+              <dt class="tit">CPU
+                <span class="pull-right rights"></span>
+              </dt>
+              <dd><span>{{appStatsCpuPer}}</span><i>%</i><small> / 100%</small>
+                <div class="pull-right">
+                  <div class="icon_wrap">
+                    <img src="/assets/resources/images/main/cpu_ico.png" alt="" />
+                  </div>
+                  <div class="BG_wrap">
+                    <img src="/assets/resources/images/main/ico_bg.png" alt="" />
+                    <input id="cpuPer" value="0"/>
+                  </div>
+                </div>
+              </dd>
+              <dt>
+              <ul class="instance_ul">
+              </ul>
+              </dt>
+            </dl>
+          </div>
+        </div>
+        <div class="col-md-3 maT30">
+          <div id="memory" class="col-in col-in-bg">
+            <dl>
+              <dt class="tit">MEMORY
+                <span class="pull-right rights"></span>
+              </dt>
+              <dd>
+                <span class="memS" id="memS1">{{ (appSummaryMemory >= 1024) ? ((appSummaryMemory%1024 == 0 || appSummaryMemory%1024 < 11) ? (appSummaryMemory/1024).toFixed(0) : (appSummaryMemory/1024).toFixed(2)) : (appSummaryMemory) }}</span>
+                <span class="memS" id="memS2" style="display:none;"><input class="instance_in" id="mem_in" type="text" style="font-size: 40px;" value="{{appSummaryMemory}}" /></span>
+                <i>{{ (appSummaryMemory >= 1024 && mem_DirectInputClick) ? 'G' : 'M' }}</i><small> / {{ 'appMain.app.maximum' | translate }} {{appSummaryMemoryMax}}G</small>
+                <div class="pull-right">
+                  <div class="icon_wrap">
+                    <img src="/assets/resources/images/main/memory_ico.png" alt="" />
+                  </div>
+                  <div class="BG_wrap">
+                    <img src="/assets/resources/images/main/ico_bg.png" alt="" />
+                    <input id="memoryPer" value="0"/>
+                  </div>
+                </div>
+              </dd>
+              <dt>
+              <ul class="instance_ul">
+                <li><button class="btns0 colors0" (click)="memUpClick()"><i class="fas fa-angle-up"></i></button>
+                </li>
+                <li><button class="btns0 colors0" (click)="memDownClick()"><i class="fas fa-angle-down"></i></button>
+                </li>
+                <li><button class="btns0 colors0 a0002" (click)="memDirectInputClick()">{{ 'appMain.app.directInput' | translate }}</button>
+                </li>
+                <li><button class="btns0 colors0 b0002" (click)="showPopMemSaveClick()">{{ 'appMain.app.save' | translate }}</button>
+                </li>
+              </ul>
+              </dt>
+            </dl>
+          </div>
+        </div>
+        <div class="col-md-3 maT30">
+          <div id="disk" class="col-in col-in-bg">
+            <dl>
+              <dt class="tit">DISK
+                <span class="pull-right rights"></span>
+              </dt>
+              <dd>
+                <span class="diskS" id="diskS1">{{ (appSummaryDisk >= 1024) ? ((appSummaryDisk%1024 == 0 || appSummaryDisk%1024 < 11) ? (appSummaryDisk/1024).toFixed(0) : (appSummaryDisk/1024).toFixed(2)) : (appSummaryDisk) }}</span>
+                <span class="diskS" id="diskS2" style="display:none;"><input class="instance_in" id="disk_in" type="text" style="font-size: 40px;" value="{{appSummaryDisk}}" /></span>
+                <i>{{ (appSummaryDisk >= 1024 && disk_DirectInputClick) ? 'G' : 'M' }}</i><small> / {{ 'appMain.app.maximum' | translate }} {{appSummaryDiskMax}}G</small>
+                <div class="pull-right">
+                  <div class="icon_wrap">
+                    <img src="/assets/resources/images/main/disk_ico.png" alt="" />
+                  </div>
+                  <div class="BG_wrap">
+                    <img src="/assets/resources/images/main/ico_bg.png" alt="" />
+                    <input id="diskPer" value="0"/>
+                  </div>
+                </div>
+              </dd>
+              <dt>
+              <ul class="instance_ul">
+                <li><button class="btns0 colors0" (click)="diskUpClick()"><i class="fas fa-angle-up"></i></button>
+                </li>
+                <li><button class="btns0 colors0" (click)="diskDownClick()"><i class="fas fa-angle-down"></i></button>
+                </li>
+                <li><button class="btns0 colors0 a0003" (click)="diskDirectInputClick()">{{ 'appMain.app.directInput' | translate }}</button>
+                </li>
+                <li><button class="btns0 colors0 b0003" (click)="showPopDiskSaveClick()">{{ 'appMain.app.save' | translate }}</button>
+                </li>
+              </ul>
+              </dt>
+            </dl>
+          </div>
+        </div>
+      </div><!-- row one_line -->
+      <div class="row two_line cataloglast" id="tabContent_all">
+        <ul id="sortable">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.event.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li (click)="tabShowClick('tabContent_event')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps">
+                <div>
+                  <table class="condition">
+                    <!-- <caption>이벤트</caption> -->
+                    <colgroup>
+                      <col style='width: 30px;'>
+                      <col style='width: 40px;'>
+                      <col style='*'>
+                      <col style='*'>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                      <td>#</td>
+                      <td>Status</td>
+                      <td>Date</td>
+                      <td>Type</td>
+                      <td>Actor</td>
+                      <!--<td>Report</td>-->
+                    </tr>
+                    </thead>
+                    <tbody *ngFor="let item of appEventsEntitiesRe.slice(); let i = index">
+                      <tr>
+                        <td>{{i+1}}</td>
+                        <th><i class="{{item.iconClass}}"></i></th>
+                        <td>{{item.date}}</td>
+                        <td>{{item.type}}</td>
+                        <td>{{item.actor_name}}</td>
+                        <!--<td>{{item.requestText}}</td>-->
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.stats.title' | translate }}</p>
+                <ul class="sortable_right"><!--
+                                    <li class="rot_deg2"><i class="fas fa-undo-alt"></i></li> -->
+                  <li (click)="tabShowClick('tabContent_stats')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps">
+                <div>
+                  <table class="condition">
+                    <colgroup>
+                      <col style='width: 30px;'>
+                      <col style='width: 70px;'>
+                      <col style='*'>
+                      <col style='*'>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                      <td>#</td>
+                      <td>Status</td>
+                      <td>CPU</td>
+                      <td>Memory</td>
+                      <td>Disk</td>
+                    </tr>
+                    </thead>
+                    <tbody *ngFor="let item of appStatusEntities; let i = index">
+                      <tr>
+                        <td>{{i+1}}</td>
+                        <th><span class="BGcolors{{item.statusClass}}">{{item.statusText}}</span></th>
+                        <td>{{item.cpu}} %</td>
+                        <td>{{item.memory}}</td>
+                        <td>{{item.disk}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.route.title' | translate }}</p>
+                <ul class="sortable_right"><!--<li class="rot_deg2"><i class="fas fa-undo-alt"></i></li> -->
+                  <li (click)="tabShowClick('tabContent_route')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps">
+                <div>
+                  <table class="condition alignL">
+                    <colgroup>
+                      <col style='*'>
+                    </colgroup>
+                    <tbody *ngFor="let item of appRoutesEntitiesRe">
+                      <tr>
+                        <td><a target="_blank" href="{{getWindowAppLink(item.uri)}}" target="_blank" style="text-decoration:none">{{item.uri}}<img src="../../../assets/resources/images/link.png"/></a></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.env.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <!--<li class="bar" data-clipboard-action="cut" data-clipboard-target="#out_a" (click)="copyClick('in_a')"><i class="fas fa-clipboard"></i></li>-->
+                  <li (click)="tabShowClick('tabContent_env')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps">
+                <div>
+                  <table class="variable">
+                    <colgroup>
+                      <col style='width:130px;'>
+                      <col style='*'>
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <th>{{ 'appMain.env.userCustom' | translate }}</th>
+                        <td>
+                          <span *ngFor="let item of appEnvUserEntities">
+                          <input type="text" class="custom_url_1" value="{{item.eventID}}" disabled />
+                          <input type="text" class="custom_url_2"  value="{{item.eventData}}" disabled/>
+                          </span >
+                        </td>
+                      </tr>
+                      <tr class="H180">
+                        <th>{{ 'appMain.env.systemCustom' | translate }}</th>
+                        <td>
+                          <textarea id="in_a" disabled>{{appSystemProvidedEnv}}</textarea>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.service.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li (click)="tabShowClick('tabContent_service')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps" *ngIf="appServicesEntitiesRe2 == ''">
+                <div>
+                  <p class="service_p" [innerHTML]="'appMain.service.noneText' | translate"></p>
+                  <button class="btns2 colors4" (click)="tabShowClick('tabContent_service')">
+                    <i class="fas fa-plus"></i>{{ 'appMain.service.enrollment' | translate }}
+                  </button>
+                </div>
+              </div>
+              <div class="table_wrap table_wraps" *ngIf="appServicesEntitiesRe2 != ''">
+                <div>
+                  <table class="condition">
+                    <colgroup>
+                      <col style='width: 30px;'>
+                      <col style='width: 200px;'>
+                      <col style='width: 200px;'>
+                      <col style='*'>
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <td>#</td>
+                        <td>{{ 'appMain.service.name' | translate }}</td>
+                        <td>{{ 'appMain.service.provided' | translate }}</td>
+                        <td>{{ 'appMain.service.serviceName' | translate }}</td>
+                      </tr>
+                    </thead>
+                    <tbody *ngFor="let item of appServicesEntitiesRe2; let i = index">
+                      <tr>
+                        <td>{{i+1}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.service_plan.name}}</td>
+                        <td>{{item.service_plan.service.label}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.logs.title' | translate }}</p>
+                <ul class="sortable_right"><!--
+                                    <li class="rot_deg2"><i class="fas fa-undo-alt"></i></li> -->
+                  <li (click)="tabShowClick('tabContent_logs')"><i class="fas fa-expand"></i></li>
+                </ul>
+              </div>
+              <div class="table_wrap table_wraps">
+                <div style="height:270px;text-align:left;" innerHTML="{{appRecentLogs}}">
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_event" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.event.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li class="rot_deg2" (click)="refreshClick()"><i class="fas fa-undo-alt"></i></li>
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap">
+                <table class="table_event line_tables maT20">
+                  <colgroup>
+                    <col style='width: 8%;'>
+                    <col style='width: 12%;'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                  </colgroup>
+                  <thead>
+                  <tr>
+                    <td>#</td>
+                    <td>Status</td>
+                    <td>Date</td>
+                    <td>Type</td>
+                    <td>Actor</td>
+                    <td>Report</td>
+                  </tr>
+                  </thead>
+                  <tbody *ngFor="let item of appEventsEntitiesRe.slice(); let i = index">
+                    <tr *ngIf="i < tabContentEventListLimit">
+                      <td>{{i+1}}</td>
+                      <th><i class="{{item.iconClass}}"></i></th>
+                      <td>{{item.date}}</td>
+                      <td>{{item.type}}</td>
+                      <td>{{item.actor_name}}</td>
+                      <td>{{item.requestText}}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr *ngIf="appEventsEntitiesRe.length > tabContentEventListLimit">
+                      <td colspan="6">
+                        <button class="btns2 btns2_1 colors4 event_btns" (click)="eventListMoreClick()">{{ 'appMain.event.more' | translate }}</button>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_stats" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.stats.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li class="rot_deg2" (click)="refreshClick()"><i class="fas fa-undo-alt"></i></li>
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap">
+                <table class="table_event condition line_tables maT20">
+                  <colgroup>
+                    <col style='width: 8%;'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <td>#</td>
+                      <td>Status</td>
+                      <td>CPU</td>
+                      <td>Memory</td>
+                      <td>Disk</td>
+                      <td>UPTIME</td>
+                      <td>RESTART</td>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let item of appStatusEntities; let i = index">
+                    <tr *ngIf="i < tabContentStatsListLimit">
+                      <td>{{i+1}}</td>
+                      <th><span class="BGcolors{{item.statusClass}}">{{item.statusText}}</span></th>
+                      <td>{{item.cpu}} %</td>
+                      <td>{{item.memory}}</td>
+                      <td>{{item.disk}}</td>
+                      <td>{{item.uptime}} (min)</td>
+                      <th><a (click)="showPopStatsRestartClick(item.key)"><span class="BGcolors5 btn_bg_change2">RESTART</span></a></th>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr *ngIf="appStatusEntities.length > tabContentStatsListLimit">
+                      <td colspan="7">
+                          <button class="btns2 btns2_1 colors4 event_btns"  (click)="statsListMoreClick()">{{ 'appMain.stats.more' | translate }}</button>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_service" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.service.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li class="rot_deg2" (click)="refreshClick()"><i class="fas fa-undo-alt"></i></li>
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap service_wrap">
+                <div class="service_title maT30">
+                  <div class="pull-right">
+                    <button class="btns btns_1 colors4 serviceOn" (click)="showServiceBindClick()"><i class="fas fa-plus"></i> {{ 'appMain.service.serviceConnection' | translate }}</button>
+                  </div>
+                  <h5></h5>
+                </div>
+                <div class="maT20 service_in">
+                  <ul class="service_dl">
+                    <li>
+                      <p></p>
+                      <select id="selectBoxService" (change)="selectBoxServiceChange($event.target.value)" style="width:50%;">
+                        <option value="">
+                          {{ 'appMain.service.select' | translate }}
+                        </option>
+                        <option *ngFor="let service of servicepacksEntitiesRe" value="{{service.guid}}">
+                          {{service.name}}
+                        </option>
+                      </select>
+                      <button class="btns6 colors4" (click)="showPopServiceBindClick()"><i class="fas fa-plus"></i> {{ 'appMain.service.connection' | translate }}</button>
+                      <button class="btns6 colors5 serviceOn" (click)="showServiceBindClick()">{{ 'appMain.service.cancel' | translate }}</button>
+                    </li>
+                    <li *ngFor="let serviceParam of sltServiceParam">
+                      <div style="padding-top: 5px;">
+                        <input id="serviceParamKey_{{serviceParam.key}}" value="{{serviceParam.key}}" type="text" disabled />
+                        <input id="serviceParamVal_{{serviceParam.key}}" type="{{serviceParam.type}}" value="{{serviceParam.value}}" />
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="view_table_wrap">
+                <table class="table_event condition">
+                  <colgroup>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                    <col style='*'>
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <td>{{ 'appMain.service.name' | translate }}</td>
+                      <td>{{ 'appMain.service.provided' | translate }}</td>
+                      <td>{{ 'appMain.service.serviceName' | translate }}</td>
+                      <td>{{ 'appMain.service.dashboard' | translate }}</td>
+                      <td>{{ 'appMain.service.disconnect' | translate }}</td>
+                      <td>{{ 'appMain.service.credentials' | translate }}</td>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let item of appServicesEntitiesRe2; let i = index">
+                    <tr>
+                      <td>{{item.name}}</td>
+                      <td>{{item.service_plan.name}}</td>
+                      <td>{{item.service_plan.service.label}}</td>
+                      <td><a href="{{item.dashboard_url}}" target="_blank" *ngIf="item.useYn == 'Y'"><i class="far fa-lightbulb on"></i></a></td>
+                      <th (click)="showPopServiceUnbindClick(item.name, item.guid, item.provide)"><span class="BGcolors6 btn_bg_change1">{{ 'appMain.service.disconnect' | translate }}</span></th>
+                      <td (click)="showPopServiceCredentialsClick(item.name, item.guid, item.service_plan.service.label, item.provide)"><i class="fas fa-edit"></i></td>
+                    </tr>
+                  </tbody>
+                  <!--tfoot>
+                      <tr>
+                          <td colspan="8">
+                              <button class="btns2 btns2_1 colors4">더보기</button>
+                          </td>
+                      </tr>
+                  </tfoot-->
+                </table>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_env" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.env.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap service_wrap">
+                <div class="service_title maT30">
+                  <div class="pull-right">
+                    <button class="btns btns_1 colors4 variableSW" (click)="showAddEnvClick()"><i class="fas fa-plus"></i> {{ 'appMain.env.add' | translate }}
+                    </button>
+                  </div>
+                  <h5>{{ 'appMain.env.userCustom' | translate }}</h5>
+                </div>
+                <div id="add_env" class="maT20 service_in" style="display:none;">
+                  <dl class="variable_dl">
+                    <dt>
+                      <input type="text" placeholder="{{ 'appMain.env.placeholderText1' | translate }}" id="envAddId" (keyup)="spacingExpression($event)"/>
+                    </dt>
+                    <dd>
+                      <input type="text" placeholder="{{ 'appMain.env.placeholderText2' | translate }}"id="envAddData" />
+                    </dd>
+                    <dt>
+                      <button class="btns6 colors4" id="envAddButton" (click)="showPopEnvAddClick()">{{ 'appMain.env.save' | translate }}</button>
+                      <button class="btns6 colors5 variableSW" (click)="hideAddEnvClick()">{{ 'appMain.env.cancel' | translate }}</button>
+                    </dt>
+                  </dl>
+                </div>
+                <div *ngFor="let item of appEnvUserEntities; let i = index">
+                  <div class="service_title maT30">
+                    <div class="pull-right">
+                      <ul>
+                        <li class="variableSW2" (click)="showEditEnvClick(i)"><i class="fas fa-edit"></i></li>
+                        <li><i class="fas fa-trash-alt" (click)="showPopEnvDelClick(item.eventID)"></i></li>
+                        <!--<li data-target="#layerpop2" data-toggle="modal"><i class="fas fa-trash-alt"></i></li>-->
+                      </ul>
+                    </div>
+                    <h5>{{item.eventID}}</h5>
+                  </div>
+                  <div id="DLid{{i}}" class="maT20 service_in" style="display:none;">
+                    <dl class="variable_dl">
+                      <dd>
+                        <input type="hidden" placeholder="{{ 'appMain.env.placeholderText1' | translate }}" id="envEditId{{i}}" value="{{item.eventID}}" />
+                        <input type="text" placeholder="{{ 'appMain.env.placeholderText2' | translate }}" id="envEditData{{i}}" value="{{item.eventData}}" />
+                      </dd>
+                      <dt>
+                        <button class="btns6 colors4" (click)="showPopEnvEditClick(i)">{{ 'appMain.env.save' | translate }}</button>
+                        <button class="btns6 colors5 variableSW2" (click)="hideEditEnvClick(i)">{{ 'appMain.env.cancel' | translate }}</button>
+                      </dt>
+                    </dl>
+                  </div>
+                </div>
+                <div class="service_title maT30">
+                  <h5>{{ 'appMain.env.systemCustom' | translate }}</h5>
+                </div>
+                <div class="maT20 service_in">
+                  <textarea class="variable_text" style="height:320px;">{{appSystemProvidedEnv}}</textarea>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_route" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.route.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap service_wrap">
+                <div class="service_title maT30">
+                  <div class="pull-right">
+                    <button class="btns btns_1 colors4 lauthOn" id="add_route"><i class="fas fa-plus"></i> {{ 'appMain.route.connection' | translate }}
+                    </button>
+                  </div>
+                  <h5>&nbsp;</h5>
+                </div>
+                <div class="maT20 service_in">
+                  <dl class="lauth_dl">
+                    <dt><input type="text" id="routeAddHostName" placeholder="{{ 'appMain.route.placeholderText1' | translate }}" />
+                    </dt>
+                    <dd>
+                      <select id="selectBoxDomain">
+                        <option *ngFor="let item of appDomainsEntities" value="{{item.guid}}">
+                          {{item.name}}
+                        </option>
+                      </select>
+                    </dd>
+                    <dt>
+                      <button class="btns6 colors4" (click)="showPopRouteAddClick()">{{ 'appMain.route.save' | translate }}</button>
+                      <button class="btns6 colors5 lauthOn">{{ 'appMain.route.cancel' | translate }}</button>
+                    </dt>
+                  </dl>
+                </div>
+                <div class="">
+                  <ul class="lauth_ul" *ngFor="let item of appRoutesEntitiesRe">
+                    <li>
+                      <a target="_blank" href="{{getWindowAppLink(item.uri)}}" (click)="showWindowAppLink(item.uri)" target="_blank" style="text-decoration:none">{{item.uri}}<img src="../../../assets/resources/images/link.png"/></a>
+                      <button class="btns2 colors5" (click)="showPopRouteDelClick(item.guid, item.uri)">{{ 'appMain.route.disconnect' | translate }}</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_logs" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.logs.title' | translate }}</p>
+                <ul class="sortable_right">
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap service_wrap">
+                <div class="service_title maT30">
+                  <div class="pull-right">
+                    <ng-container *ngIf="sltLaaSView">
+                      <button _ngcontent-c6="" class="btns4 colors4" (click)="showWindowLaaS()" style="margin-right: 20px;">Log Service
+                      </button>
+                    </ng-container>
+                    <button _ngcontent-c6="" class="btns4 colors4" (click)="showWindowTailLogs()">Tail Logs
+                    </button>
+                    <!--<span class="fcolor" style="cursor: pointer;" >-->
+                      <!--<i class="fas fa-code"></i> LaaS App Details-->
+                    <!--</span>-->
+                    <!--<span class="fcolor" style="cursor: pointer;" >-->
+                      <!--<i class="fas fa-code"></i> Tail Logs-->
+                    <!--</span>-->
+                  </div>
+                  <h5>{{ 'appMain.logs.recentLogs' | translate }} <i class="rot fas fa-sync-alt" (click)="refreshClick()"></i></h5>
+                </div>
+                <dl class="log_dl" style="margin-top: 20px;">
+                  <dt>
+                  <ul>
+                    <li>
+                      <div innerHTML="{{appRecentLogs}}"></div>
+                    </li>
+                  </ul>
+                  </dt>
+                  <!--<dd>-->
+                    <!--로그 끝 <i class="fas fa-code"></i>Tail Logs-->
+                  <!--</dd>-->
+                </dl>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row two_line two_view" id="tabContent_ssh" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>SSH</p>
+                <ul class="sortable_right">
+                  <li>
+                    <select>
+                      <option>인스턴스 선택</option>
+                    </select>
+                  </li>
+                  <li (click)="tabShowClick('tabContent_all')"><i class="fas fa-compress"></i></li>
+                </ul>
+              </div>
+              <div class="view_table_wrap service_wrap">
+                <div class="service_title maT30">
+                  <canvas>
+                  </canvas>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="monitor_tabs clearfix" id="tabContent_viewchart" style="display:none;">
+        <ul>
+          <li name="tab01" class="monitor_tabs_on" (click)="tabShowViewchartClick('tab_viewchart_1')">{{ 'appMain.viewchart.tab1' | translate }}</li>
+          <li name="tab02" class="monitor_tabs_right" (click)="tabShowViewchartClick('tab_viewchart_2')">{{ 'appMain.viewchart.tab2' | translate }}</li>
+<!--          <li name="tab03" class="monitor_tabs_right" (click)="tabShowViewchartClick('tab_viewchart_3')">{{ 'appMain.viewchart.tab3' | translate }}</li>-->
+        </ul>
+        <div class="monitor_tabs_line"></div>
+      </div>
+      <!-- 추이차트 시작-->
+      <div class="monitor_content01 row two_line two_view" id="tab_viewchart_1" style="display:none;">
+        <ul class="maT30">
+          <li>
+            <div class="sortable_wrap">
+              <div class="view_table_wrap">
+                <table class="condition wiew_c">
+                  <colgroup>
+                    <col style='width: 499px;'>
+                    <col style='*'>
+                  </colgroup>
+                  <thead>
+                  <tr>
+                    <th class="table_SW">
+                      <select id="selectBoxChartInstance" (change)="selectBoxChartInstanceChange($event.target.value)">
+                        <option value="All">ALL</option>
+                        <option *ngFor="let instance of appStatusEntities; let i = index" value="{{i}}">
+                          {{i}}
+                        </option>
+                      </select>
+                    </th>
+                    <td class="table_SW">
+                      <ul class="weekday">
+                        <li class="cur" (click)="chartTimeClick(3, 1)">Now</li>
+                        <li (click)="chartTimeClick(15, 30)">15M</li>
+                        <li (click)="chartTimeClick(30, 60)">30M</li>
+                        <li (click)="chartTimeClick(60, 60*2)">1H</li>
+                        <li (click)="chartTimeClick(60*3, 60*5)">3H</li>
+                        <li (click)="chartTimeClick(60*6, 60*10)">6H</li>
+                        <li (click)="chartTimeClick(60*12, 60*25)">12H</li>
+                        <li (click)="chartTimeClick(60*24, 60*50)">1DAY</li>
+                        <li (click)="chartTimeClick(60*48, 60*100)">2DAY</li>
+                        <li (click)="chartTimeClick(60*168, 60*350)">1WEEK</li>
+                        <li (click)="chartTimeClick(60*720, 60*1350)">1MONTH</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  </thead>
+                </table>
+                <div class="chart_wrap" style="position: relative; height: 200px">
+                  <div class="chart_title">CPU</div>
+                  <canvas id="speedChart"></canvas>
+                </div>
+                <!--<div class="chart_wrap maT50" style="position: relative; height: 826px">-->
+                <div class="chart_wrap maT50" style="position: relative; height: 200px">
+                  <div class="chart_title">Memory</div>
+                  <canvas id="speedChart2"></canvas>
+                </div>
+                <div class="chart_wrap maT50" style="position: relative; height: 200px">
+                  <div class="chart_title">Network I/O</div>
+                  <canvas id="speedChart3"></canvas>
+                </div>
+                <div class="maT50"></div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <!-- 추이차트 끝 -->
+      <!-- 설정 시작-->
+      <div class="monitor_content02 row two_line two_view harf_view" id="tab_viewchart_2" style="display:none;">
+        <ul class="maT30">
+          <li class="monitor_first_box">
+            <div class="sortable_wrap">
+              <div class="sortable_top">
+                <p>{{ 'appMain.viewchart.settingTab.title' | translate }}</p>
+              </div>
+              <div class="monitor_set clearfix">
+                <ul>
+                  <li>
+                    <div>{{ 'appMain.viewchart.settingTab.instanceCnt' | translate }}</div>
+                    <div>&nbsp;</div>
+                    <div>{{ 'appMain.viewchart.settingTab.min' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingInstanceMinCnt" name="appAutoscalingInstanceMinCnt" [(ngModel)]="appAutoscalingInstanceMinCnt" class="num1"/>
+                      <div class="monitor_count_up" onClick="updown('1','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up1"/></div>
+                      <div class="monitor_count_down" onClick="updown('1','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down1" /></div>
+                    </div>
+                    <div>{{ 'appMain.viewchart.settingTab.max' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingInstanceMaxCnt" name="appAutoscalingInstanceMaxCnt" [(ngModel)]="appAutoscalingInstanceMaxCnt" class="num2"/>
+                      <div class="monitor_count_up" onClick="updown('2','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up2"/></div>
+                      <div class="monitor_count_down" onClick="updown('2','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down2" /></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div>{{ 'appMain.viewchart.settingTab.cpuThreshold' | translate }}</div>
+                    <div>
+                      <input id="autoScalingCpuYn" type="checkbox" checked="checked" >
+                      <label for="autoScalingCpuYn" style="line-height: 20px;"></label>
+                    </div>
+                    <div>{{ 'appMain.viewchart.settingTab.min' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingCpuMinThreshold" name="appAutoscalingCpuMinThreshold" [(ngModel)]="appAutoscalingCpuMinThreshold" class="num3"/>
+                      <div class="monitor_count_up" onClick="updown('3','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up3"/></div>
+                      <div class="monitor_count_down" onClick="updown('3','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down3" /></div>
+                    </div>
+                    <div>{{ 'appMain.viewchart.settingTab.max' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingCpuMaxThreshold" name="appAutoscalingCpuMaxThreshold" [(ngModel)]="appAutoscalingCpuMaxThreshold" class="num4"/>
+                      <div class="monitor_count_up" onClick="updown('4','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up4"/></div>
+                      <div class="monitor_count_down" onClick="updown('4','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down4" /></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div>{{ 'appMain.viewchart.settingTab.memoryThreshold' | translate }}</div>
+                    <div>
+                        <input id="autoScalingMemoryYn" type="checkbox" checked="checked">
+                        <label for="autoScalingMemoryYn" style="line-height: 20px;"></label>
+                    </div>
+                    <div>{{ 'appMain.viewchart.settingTab.min' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingMemoryMinThreshold" name="appAutoscalingMemoryMinThreshold" [(ngModel)]="appAutoscalingMemoryMinThreshold" class="num5"/>
+                      <div class="monitor_count_up" onClick="updown('5','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up5"/></div>
+                      <div class="monitor_count_down" onClick="updown('5','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down5" /></div>
+                    </div>
+                    <div>{{ 'appMain.viewchart.settingTab.max' | translate }}</div>
+                    <div>
+                      <input type="text" id="appAutoscalingMemoryMaxThreshold" name="appAutoscalingMemoryMaxThreshold" [(ngModel)]="appAutoscalingMemoryMaxThreshold" class="num6"/>
+                      <div class="monitor_count_up" onClick="updown('6','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up6"/></div>
+                      <div class="monitor_count_down" onClick="updown('6','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down6" /></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div>{{ 'appMain.viewchart.settingTab.measurementTime' | translate }}</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>
+                      <input type="text" id="appAutoscalingMeasureTimeSec" name="appAutoscalingMeasureTimeSec" [(ngModel)]="appAutoscalingMeasureTimeSec" class="num7"/>
+                      <div class="monitor_count_up" onClick="updown('7','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up7"/></div>
+                      <div class="monitor_count_down" onClick="updown('7','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down7" /></div>
+                    </div>
+                    <div></div>
+                    <div></div>
+                  </li>
+                  <li>
+                    <div>{{ 'appMain.viewchart.settingTab.InstanceIncrementValue' | translate }}</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>
+                      <input type="text" id="InstanceIncrementValue" name="InstanceIncrementValue" [(ngModel)]="appAutoscalingInstanceVariationUnit" class="num8"/>
+                      <div class="monitor_count_up" onClick="updown('8','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up8"/></div>
+                      <div class="monitor_count_down" onClick="updown('8','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down8" /></div>
+                    </div>
+                    <div></div>
+                    <div></div>
+                  </li>
+                  <li>
+                    <div class="monitor_switch_txt">{{ 'appMain.viewchart.settingTab.autoEx' | translate }}</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div class="monitor_switch">
+                      <input class="switch_large" id="switch10" type="checkbox" switch="none">
+                      <label for="switch10"></label>
+                    </div>
+                    <div></div>
+                    <div></div>
+                  </li>
+                  <li>
+                    <div>
+                      {{ 'appMain.viewchart.settingTab.autoSh' | translate }} <i class="fas fa-exclamation-circle monitor_red">
+                      <div class="monitor_tultip">
+                        {{ 'appMain.viewchart.settingTab.autoShText' | translate }}
+                        <div class="tultip_top"><img src="/assets/resources/images/monitor/tultip_top.png"></div>
+                      </div>
+                    </i>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>
+                      <input class="switch_large" id="switch11" type="checkbox" switch="none">
+                      <label for="switch11"></label>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="monitor_center"><button class="btns2 btns2_1 colors4 event_btns" (click)="showPopAutoscalingEditClick()">{{ 'appMain.viewchart.settingTab.change' | translate }}</button></div>
+            </div>
+          </li>
+<!--          <li class="monitor_second_box">-->
+<!--            <div class="sortable_wrap">-->
+<!--              <div class="sortable_top">-->
+<!--                <p>{{ 'appMain.viewchart.settingTab.title2' | translate }}</p>-->
+<!--              </div>-->
+<!--              <div class="monitor_set clearfix">-->
+<!--                <ul>-->
+<!--                  <li>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.cpuThreshold' | translate }}</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.min' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <input type="text" id="appAlarmCpuWarningThreshold" name="appAlarmCpuWarningThreshold" [(ngModel)]="appAlarmCpuWarningThreshold" class="num9"/>-->
+<!--                      <div class="monitor_count_up" onClick="updown('9','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up1"/></div>-->
+<!--                      <div class="monitor_count_down" onClick="updown('9','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down1" /></div>-->
+<!--                    </div>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.max' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <input type="text" id="appAlarmCpuCriticalThreshold" name="appAlarmCpuCriticalThreshold" [(ngModel)]="appAlarmCpuCriticalThreshold" class="num10"/>-->
+<!--                      <div class="monitor_count_up" onClick="updown('10','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up2"/></div>-->
+<!--                      <div class="monitor_count_down" onClick="updown('10','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down2" /></div>-->
+<!--                    </div>-->
+<!--                  </li>-->
+<!--                  <li>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.memoryThreshold' | translate }}</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.min' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <input type="text" id="appAlarmMemoryWarningThreshold" name="appAlarmMemoryWarningThreshold" [(ngModel)]="appAlarmMemoryWarningThreshold" class="num11"/>-->
+<!--                      <div class="monitor_count_up" onClick="updown('11','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up3"/></div>-->
+<!--                      <div class="monitor_count_down" onClick="updown('11','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down3" /></div>-->
+<!--                    </div>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.max' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <input type="text" id="appAlarmMemoryCriticalThreshold" name="appAlarmMemoryCriticalThreshold" [(ngModel)]="appAlarmMemoryCriticalThreshold" class="num12"/>-->
+<!--                      <div class="monitor_count_up" onClick="updown('12','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up4"/></div>-->
+<!--                      <div class="monitor_count_down" onClick="updown('12','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down4" /></div>-->
+<!--                    </div>-->
+<!--                  </li>-->
+<!--                  <li>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.measurementTime' | translate }}</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>-->
+<!--                      <input type="text" id="appAlarmMeasureTimeSec" name="appAlarmMeasureTimeSec" [(ngModel)]="appAlarmMeasureTimeSec" class="num13"/>-->
+<!--                      <div class="monitor_count_up" onClick="updown('13','+');"><img src="/assets/resources/images/monitor/count_up.gif" class="bt_up5"/></div>-->
+<!--                      <div class="monitor_count_down" onClick="updown('13','-');"><img src="/assets/resources/images/monitor/count_down.gif" class="bt_down5" /></div>-->
+<!--                    </div>-->
+<!--                    <div></div>-->
+<!--                    <div></div>-->
+<!--                  </li>-->
+<!--                  <li>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.email' | translate }}</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div><input type="text" id="appAlarmEmail" name="appAlarmEmail" [(ngModel)]="appAlarmEmail" /></div>-->
+<!--                    <div>{{ 'appMain.viewchart.settingTab.send' | translate }}</div>-->
+<!--                    <div class="monitor_switch2">-->
+<!--                      <input class="switch_large" id="switch12" type="checkbox" checked="checked" switch="none">-->
+<!--                      <label for="switch12"></label>-->
+<!--                    </div>-->
+<!--                  </li>-->
+<!--                  <li>-->
+<!--                    <div class="monitor_switch_txt">{{ 'appMain.viewchart.settingTab.usingAlarms' | translate }}</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div>&nbsp;</div>-->
+<!--                    <div class="monitor_switch">-->
+<!--                      <input class="switch_large" id="switch13" type="checkbox" switch="none">-->
+<!--                      <label for="switch13"></label>-->
+<!--                    </div>-->
+<!--                    <div></div>-->
+<!--                    <div></div>-->
+<!--                  </li>-->
+<!--                </ul>-->
+<!--              </div>-->
+<!--              <div class="monitor_centers"><button class="btns2 btns2_1 colors4 event_btns" (click)="showPopAlarmEditClick()">{{ 'appMain.viewchart.settingTab.change' | translate }}</button></div>-->
+<!--            </div>-->
+<!--          </li>-->
+        </ul>
+      </div>
+      <!-- 설정 끝 -->
+      <!-- 알림 발생 이력 시작-->
+<!--      <div class="monitor_content03 row two_line two_view" id="tab_viewchart_3" style="display:none;">-->
+<!--        <ul class="maT30">-->
+<!--          <li>-->
+<!--            <div class="sortable_wrap">-->
+<!--              <div class="sortable_top">-->
+<!--                <p>{{ 'appMain.viewchart.notificationHistoryTab.title' | translate }}</p>-->
+<!--              </div>-->
+<!--              <div class="view_table_wrap service_wrap">-->
+<!--                <div class="maT20 service_in">-->
+<!--                  <dl class="service_dl">-->
+<!--                    <dt><p>연결 할 서비스</p>-->
+<!--                    <select>-->
+<!--                      <option>-->
+<!--                        서비스 선택-->
+<!--                      </option>-->
+<!--                    </select>-->
+<!--                    </dt>-->
+<!--                    <dd>-->
+<!--                      <p>Label</p>-->
+<!--                      <input type="text" />-->
+<!--                    </dd>-->
+<!--                    <dt>-->
+<!--                    <p>파라미터 값</p>-->
+<!--                    <input type="text" />-->
+<!--                    <button class="btns6 colors4"><i class="fas fa-plus"></i> 연결</button>-->
+<!--                    <button class="btns6 colors5 serviceOn">취소</button>-->
+<!--                    </dt>-->
+<!--                  </dl>-->
+
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="view_table_wrap">-->
+<!--                <div class="monitor_sel_wrap clearfix">-->
+<!--                  <div class="monitor_sel_container">-->
+<!--                    <div>{{ 'appMain.viewchart.notificationHistoryTab.resourceType' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <select id="selectBoxAlarmType" (change)="selectBoxAlarmTypeChange($event.target.value)">-->
+<!--                        <option value="">Type</option>-->
+<!--                        <option value="cpu">cpu</option>-->
+<!--                        <option value="memory">memory</option>-->
+<!--                      </select>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <div class="monitor_sel_container">-->
+<!--                    <div>{{ 'appMain.viewchart.notificationHistoryTab.alarmRating' | translate }}</div>-->
+<!--                    <div>-->
+<!--                      <select id="selectBoxAlarmStatus" (change)="selectBoxAlarmStatusChange($event.target.value)">-->
+<!--                        <option value="">Status</option>-->
+<!--                        <option value="warning">warning</option>-->
+<!--                        <option value="critical">critical</option>-->
+<!--                      </select>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <table class="table_event condition">-->
+<!--                  <colgroup>-->
+<!--                    <col style='width: 170px;'>-->
+<!--                    <col style='width: 150px;'>-->
+<!--                    <col style='width: 100px;'>-->
+<!--                    <col style='*'>-->
+<!--                  </colgroup>-->
+<!--                  <thead>-->
+<!--                  <tr>-->
+<!--                    <td>{{ 'appMain.viewchart.notificationHistoryTab.date' | translate }}</td>-->
+<!--                    <td>{{ 'appMain.viewchart.notificationHistoryTab.resourceType' | translate }}</td>-->
+<!--                    <td>{{ 'appMain.viewchart.notificationHistoryTab.alarmRating' | translate }}</td>-->
+<!--                    <td>{{ 'appMain.viewchart.notificationHistoryTab.message' | translate }}</td>-->
+<!--                  </tr>-->
+<!--                  </thead>-->
+<!--                  <tbody *ngFor="let item of appAlarmsEntities; let i = index">-->
+<!--                    <tr>-->
+<!--                      <td>{{item.regDate}}</td>-->
+<!--                      <td>{{item.resourceType}}</td>-->
+<!--                      <td>{{item.alarmLevel}}</td>-->
+<!--                      <td>{{item.alarmMessage}}</td>-->
+<!--                    </tr>-->
+<!--                  </tbody>-->
+<!--                  <tfoot>-->
+<!--                    <tr>-->
+<!--                      <td colspan="6">-->
+<!--                        <button class="btns2 btns2_1 colors4 event_btns" (click)="alarmsMoreClick()">{{ 'appMain.viewchart.notificationHistoryTab.more' | translate }}</button>-->
+<!--                      </td>-->
+<!--                    </tr>-->
+<!--                  </tfoot>-->
+<!--                </table>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+      <!-- 알림 발생 이력 끝 -->
+
+    </div>
+    <div class="footer">Copyright © 2020 eGovCP CloudFoundry. All rights reserved</div>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="modal fade" id="layerpop_stats_restart">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.statsRestart.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.statsRestart.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="statsResrtartClick()">{{ 'appMain.layerpop.statsRestart.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.statsRestart.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_env_add">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.envAdd.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.envAdd.bodyText' | translate  : {sltEnvAddName: sltEnvAddName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="addEnvClick()">{{ 'appMain.layerpop.envAdd.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.envAdd.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_env_edit">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.envEdit.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.envEdit.bodyText' | translate  : {sltEnvEditName: sltEnvEditName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="editEnvClick()">{{ 'appMain.layerpop.envEdit.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.envEdit.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_env_del">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.envDel.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.envDel.bodyText' | translate  : {sltEnvDelName: sltEnvDelName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="delEnvClick()">{{ 'appMain.layerpop.envDel.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.envDel.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_route_add">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.routeAdd.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.routeAdd.bodyText' | translate  : {sltRouteAddName: sltRouteAddName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="addRouteClick()">{{ 'appMain.layerpop.routeAdd.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.routeAdd.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_route_del">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.routeDel.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.routeDel.bodyText' | translate  : {appSummaryName: appSummaryName, sltRouteDelUri: sltRouteDelUri}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="delRouteClick()">{{ 'appMain.layerpop.routeDel.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.routeDel.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_service_bind">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.serviceBind.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.serviceBind.bodyText' | translate  : {sltServiceBindName: sltServiceBindName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="bindServiceClick()">{{ 'appMain.layerpop.serviceBind.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.serviceBind.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_service_unbind">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.serviceUnbind.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p [innerHTML]="'appMain.layerpop.serviceUnbind.bodyText' | translate  : {sltServiceUnbindName: sltServiceUnbindName}"></p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="unbindServiceClick()">{{ 'appMain.layerpop.serviceUnbind.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.serviceUnbind.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_service_credentials">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.serviceCredentials.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <!--<div class="">-->
+            <!--<p><span>{{appSltEnvSystemLabel}}</span><br/>-->
+              <!--{{appSltEnvSystemName}}-->
+            <!--</p>-->
+          <!--</div>-->
+          <div class="">
+            <table class="modal_t2">
+              <colgroup>
+                <col>
+                <col>
+              </colgroup>
+              <ng-container *ngIf="!sltServiceUnbindProvide">
+                <tbody>
+                <tr  *ngFor="let Credential of sltServiceCredentials">
+                  <td>{{ Credential.key }}</td>
+                  <td style="width: 560px; word-wrap: break-word; display: inline-block; padding-left: 20px; padding-top: 13px; font-weight: bold;">
+                    {{Credential.value}}
+                  </td>
+                </tr>
+                </tbody>
+              </ng-container>
+              <ng-container *ngIf="sltServiceUnbindProvide">
+                <tbody>
+                <tr  *ngFor="let Credential of sltServiceUserProvideCredentials">
+                  <td>{{ Credential.key }}</td>
+                  <td style="width: 560px; word-wrap: break-word; display: inline-block; padding-left: 20px; padding-top: 13px; font-weight: bold;">
+                    {{Credential.value}}
+                  </td>
+                </tr>
+                </tbody>
+              </ng-container>
+            </table>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" data-dismiss="modal">{{ 'appMain.layerpop.serviceCredentials.btn1' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_autoscaling_edit">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.autoscalingEdit.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.autoscalingEdit.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="editAutoscalingClick()">{{ 'appMain.layerpop.autoscalingEdit.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.autoscalingEdit.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_alarm_edit">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.alarmEdit.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.alarmEdit.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="editAlarmClick()">{{ 'appMain.layerpop.alarmEdit.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.alarmEdit.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_app_restart">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.appRestart.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.appRestart.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="restageAppClick()">{{ 'appMain.layerpop.appRestart.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" (click)="ngOnInit()" data-dismiss="modal">{{ 'appMain.layerpop.appRestart.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_app_stop">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.appStop.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.appStop.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="stopAppClick()">{{ 'appMain.layerpop.appStop.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.appStop.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_app_start">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.appStart.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.appStart.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="startAppClick()">{{ 'appMain.layerpop.appStart.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.appStart.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_app_save">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.appSave.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.appSave.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="appSaveClick()">{{ 'appMain.layerpop.appSave.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.appSave.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="layerpop_app_del">
+  <div class="vertical-alignment-helper">
+    <div class="modal-dialog vertical-align-center">
+      <div class="modal-content">
+        <!-- header -->
+        <div class="modal-header">
+          <!-- 닫기(x) 버튼 -->
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <!-- header title -->
+          <h4 class="modal-title">{{ 'appMain.layerpop.appDel.title' | translate }}</h4>
+        </div>
+        <!-- body -->
+        <div class="modal-body">
+          <p>{{ 'appMain.layerpop.appDel.bodyText' | translate }}</p>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btns2 colors4" (click)="appDelClick()">{{ 'appMain.layerpop.appDel.btn1' | translate }}</button>
+          <button type="button" class="btns2 colors5" data-dismiss="modal">{{ 'appMain.layerpop.appDel.btn2' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<textarea id="out_a">
+</textarea>

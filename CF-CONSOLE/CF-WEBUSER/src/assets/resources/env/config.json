@@ -1,0 +1,21 @@
+{
+  "clientId": "cfconsole",
+  "clientSecret": "clientsecret",
+  "redirectUri": "/callback",
+  "logoutredirectUri": "/login",
+  "scope": "openid cloud_controller_service_permissions.read cloud_controller.read cloud_controller.write",
+  "authUrl": "https://keycloak.mgmt.dev.egovp.kr/auth",
+  "realm": "eGovCP",
+  "checkUrl": "https://uaa.mgmt.dev.egovp.kr/check_token",
+  "accessUrl": "https://uaa.mgmt.dev.egovp.kr/oauth/token",
+  "infoUrl": "https://uaa.mgmt.dev.egovp.kr/userinfo",
+  "logoutUrl": "http://localhost:8080/sso/logout",
+  "userinfoUrl": "/commonapi/v2/user",
+  "code": "code",
+  "sessionTimeout": "10",
+  "monitoring": true,
+  "quantity": false,
+  "automaticApproval": true,
+  "apiversion": "v3",
+  "egov_portal_url": "https://www.dev.egovp.kr/eGovPlatform/user/app/user/login"
+}

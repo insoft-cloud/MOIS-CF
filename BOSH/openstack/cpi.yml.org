@@ -1,0 +1,122 @@
+- path: /releases/-
+  type: replace
+  value:
+    name: bosh-openstack-cpi
+    sha1: b9bd5fa8f06436e7b055620d3259877907f6d99a
+    url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/bosh/bosh-openstack-cpi-release-43.tgz
+    version: "43"
+- name: stemcell
+  path: /resource_pools/name=vms/stemcell?
+  type: replace
+  value:
+    sha1: 774ba9acb1fdd9e82e93e0dbbf84beff4cd7927c
+    url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/bosh/bosh-stemcell-315.64-openstack-kvm-ubuntu-xenial-go_agent.tgz
+- path: /resource_pools/name=vms/cloud_properties?
+  type: replace
+  value:
+    availability_zone: ((az))
+    instance_type: m1.xlarge
+- path: /networks/name=default/subnets/0/cloud_properties?
+  type: replace
+  value:
+    net_id: ((net_id))
+- path: /instance_groups/name=bosh/jobs/-
+  type: replace
+  value:
+    name: registry
+    release: bosh
+- path: /instance_groups/name=bosh/properties/registry?
+  type: replace
+  value:
+    address: ((internal_ip))
+    db:
+      adapter: postgres
+      database: bosh
+      host: 127.0.0.1
+      password: ((postgres_password))
+      user: postgres
+    endpoint: http://registry:((registry_password))@((internal_ip)):25777
+    host: ((internal_ip))
+    password: ((registry_password))
+    port: 25777
+    username: registry
+- path: /instance_groups/name=bosh/jobs/-
+  type: replace
+  value:
+    name: openstack_cpi
+    release: bosh-openstack-cpi
+- path: /instance_groups/name=bosh/properties/director/cpi_job?
+  type: replace
+  value: openstack_cpi
+- path: /cloud_provider/template?
+  type: replace
+  value:
+    name: openstack_cpi
+    release: bosh-openstack-cpi
+- path: /instance_groups/name=bosh/properties/openstack?
+  type: replace
+  value:
+    api_key: ((openstack_password))
+    auth_url: ((auth_url))
+    default_key_name: ((default_key_name))
+    default_security_groups: ((default_security_groups))
+    domain: ((openstack_domain))
+    human_readable_vm_names: true
+    project: ((openstack_project))
+    region: ((region))
+    username: ((openstack_username))
+- path: /cloud_provider/ssh_tunnel?
+  type: replace
+  value:
+    host: ((internal_ip))
+    port: 22
+    private_key: ((private_key))
+    user: vcap
+- path: /cloud_provider/properties/openstack?
+  type: replace
+  value:
+    api_key: ((openstack_password))
+    auth_url: ((auth_url))
+    default_key_name: ((default_key_name))
+    default_security_groups: ((default_security_groups))
+    domain: ((openstack_domain))
+    human_readable_vm_names: true
+    project: ((openstack_project))
+    region: ((region))
+    username: ((openstack_username))
+    connection_options: 
+      ca_cert: |
+              -----BEGIN RSA PRIVATE KEY-----
+              MIIEogIBAAKCAQEAqY2P+mfxbhcEaGscxl2LVBWzIVH7bG+U1MTfaohbHis+8E8k
+              nVLi2YWOE1zI7zVdIY8otbCvRb70kg1dx5fERkhf98QTr5UW2br4jfe0DwSMIM9d
+              zbO4rgPJ3Gs5Nz8dOnXVHikEg07Gd8Tb0q1iukMDi9x/E7FqgcL8PzcU4uagzfMF
+              FQoon8Bntu8XuGY7LfCMm920EGDLvXV85WXofr+4XExLotw7on2zk6ZiAu5DG4rq
+              OvdEjSzvXiSyNfKnYQGC5bflJd8UGOqwp/dAl7RvMd9a+dXD/p9ZI3K0X4vP6lk/
+              lLTQeoJ6b5I3T2pzFgZwdX6ifkzzWT9cpuPimQIDAQABAoIBADbWPhayv3bnotlS
+              qz/MyV8slX7VUQfFHtGhytBdwXqEahq2vhTT1eKcO1Mv0xzqmXBdKMF6n3VjSR5j
+              jE0dXLGOfttXYzaKdZV9zx27W1TwF5IU/zWkRrqhJwxO8XZYx089BOx4P6loNPBP
+              jvkYcrHjMqZtbfwkiVnmgka/vdWUUqtOaAHtNBk/EnhTR8U/Uqwgx3I+zvhxYERZ
+              4/qNu+/AJduvZYSJJJOx1OQdmUrx9G2uRUhHetllKzhciMp8hknUkXnL5wDvdeb7
+              LZGXKJZKTeknMQ4tcBHqqZzFMwgbjBIkdAQQ4QrVlL2MPyCDb0Tp2lsjR3WOb3jI
+              W2JJJ7ECgYEA3hv5hyy4s0NRksaqiRGTCASe+ioPkaf6zxUZ9mI96PalqUSFkoF7
+              vbrZQmCtPQGL3WQyt4wM3mCJFSP3NlI7894iRt6aZ7UFz/GarXbkAQjsGOQCU/Zr
+              IYYJZHO/B1wQh08c2D2owY5p3cS2R0CBdLIfKFI5mpsfHu+tN4/h+TMCgYEAw2yi
+              ow38dHY9s/MMd415ARHMPSOcXADpex1v9P6FmEXqKc+Vn+mwxXF+LDxdIZ34K0On
+              x1qOLxbaAGw7F/6CqTFJ3YC+4yx1eEBr1T0YiUNJLh2vGvMCTdaEhW7VpA9ueqLc
+              3eOSsAr7xoPolkmHXBwAzH95wUuCBf0pvifQLQMCgYB6f3FKxTaE397wlZNej4vJ
+              A0tu6520lrG0Xo34HkzI3KeXSIxmtfU6OgAzJMDHAcBS9T0nkB1U1GcmerSQiCA6
+              qsu6zHDaO7Od8UF+5DByBaq5O5+xERoa3iL1/QRhmbwf9FkTRkZ5ogLvZdumRoRf
+              iRG4Gklc5KrwU/3zw+48kwKBgFMByM8TeMELHEhcG1aIm/YtViA+CQM3S/UEWvKo
+              TZyRTdY2mypSe8hR3bLybOiDjc7qrNBLkYtE3JJDZpJZg6xUCDjyn6Ik1zyduG/Z
+              xJtBHktdRmxe/gKL9LwsiMhn2ZhzpvcE2+C0uZ7nlpqHXtxr9JboKpJE/VSH5Pwl
+              MxJ7AoGAJLCDf0w7+RpF3clPVBVhl6tRiMmUzwe9krbH2gELaPMTWmL9cZSVn1MH
+              3T82uOMu5R7O3WYNlhnRPSmc5GtKDg4LP505JlS1mgTDzyMO9oDnOvUAGKmPACi7
+              QVrgqc0ZTOtoqDdPtpTGfwuBYKoCI8H8FJGxF9o35ccAKmVD8RE=
+              -----END RSA PRIVATE KEY-----
+    #  ssl_verify_peer: false
+     # read_timeout: 3600
+- path: /variables/-
+  type: replace
+  value:
+    name: registry_password
+    type: password

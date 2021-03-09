@@ -1,0 +1,44 @@
+#!/bin/bash
+
+director_name='micro-bosh'
+inception_os_user_name='ubuntu'
+paasta_bosh_workspace="/home/${inception_os_user_name}/workspace/paasta-5.0/deployment"
+paasta_bosh_iaas='azure'
+paasta_bosh_password="$(bosh int ${paasta_bosh_workspace}/bosh-deployment/${paasta_bosh_iaas}/creds.yml --path /admin_password)"
+
+bosh -e ${director_name} -n -d paasta-monitoring deploy paasta-monitoring.yml  \
+	-o use-public-network-azure.yml \
+	-v inception_os_user_name=${inception_os_user_name} \
+	-v mariadb_ip='10.0.161.100' \
+	-v mariadb_port='3306' \
+	-v mariadb_username='root' \
+	-v mariadb_password='password' \
+	-v influxdb_ip='10.0.161.101' \
+	-v bosh_url='10.0.1.6' \
+	-v bosh_password=${paasta_bosh_password} \
+	-v director_name='micro-bosh' \
+	-v resource_url='resource_url' \
+	-v paasta_deploy_name='paasta' \
+	-v paasta_cell_prefix='cell' \
+	-v paasta_username='admin' \
+	-v paasta_password='admin' \
+	-v smtp_url=smtp.naver.com \
+	-v smtp_port=587 \
+	-v mail_sender=kinskykin@naver.com \
+	-v mail_password=qwe8622! \
+	-v mail_enable=true \
+	-v mail_tls_enable=true \
+	-v redis_ip='10.0.121.101' \
+	-v redis_password='password' \
+	-v utc_time_gap='9' \
+	-v private_network_name='default' \
+	-v public_network_name='vip' \
+	-v monit_public_ip='52.231.73.188' \
+	-v system_domain='52.231.78.62.xip.io' \
+	-v system_type=PaaS,CaaS,SaaS \
+	-v prometheus_ip=10.0.121.122 \
+        -v kubernetes_ip=10.0.0.124 \
+        -v pinpoint_ip=52.141.20.172 \
+	-v pinpoint_was_ip=10.0.81.123 \
+        -v cassbroker_ip=52.141.6.113 \
+        -v kubernetes_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJtb25pdG9yaW5nLWFkbWluLXRva2VuLWQ0OXc3Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6Im1vbml0b3JpbmctYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI4MDkwNTU5Yy0wYzE2LTExZWEtYjZiYi0wMDIyNDgwNTk4NzciLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06bW9uaXRvcmluZy1hZG1pbiJ9.ZKPWJLo0LFXY9ZpW7nGlTBLJYDNL7MFB9X1i4JoEn8jPLsCQhG3lvzTjh7420lvoP5hWdV0SpsMMfZnV2WFFUWaQkYcnKhB2qsVX_xOd45gm2IfI-f1QmxcAspoGY_r8kC-vX9L4oTLA5sJTI5m_RIiuckVGcVR0OeWB5NtUFz0-iCpQRfuy9LYH0NCEEopfDji-T0Pxta8S1n8YyxVwYKpZE0PvT9H9ZVNUUAt2Z_l4B0akP6G3O6t53Xvp_l8DXzxRFXTw3sHPvvea_Uv3QbGcFkH-gNHBeG9-F8C8NMcSlCUeyAGfxZlpsdRFMB01Wh6RZzvUqeS8Kc-8Csp_jw

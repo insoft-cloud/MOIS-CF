@@ -1,0 +1,33 @@
+server:
+  port: <%= p('server.port')%>
+
+spring:
+  application:
+    name: cloudfoundry-broker
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: "jdbc:mariadb://<%= link('mariadb-link').instances[0].address %>:<%= link('mariadb-link').p('port') %>/cfbroker?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul"
+    username: <%= link('mariadb-link').p('admin.username') %>
+    password: <%= link('mariadb-link').p('admin.password') %>
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+
+broker:
+  user: <%= p('broker.username')%>
+  password: <%= p('broker.password')%>
+
+bosh:
+  client_id: <%= p('bosh.client_id')%>
+  client_secret: <%= p('bosh.client_secret')%>
+  url: <%= p('bosh.url')%>
+  oauth_url: <%= p('bosh.oauth_url')%>
+
+logging:
+  level:
+    root: <%= p('log.level')%>
+
+
+

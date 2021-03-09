@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -e pipefail
+
+DATA_DIR=/var/vcap/store/srv
+KEY_DIR=/var/vcap/store/key
+
+
+#if [ ! -d "$DATA_DIR" ]; then
+  echo "---------------------------------------------Install Files Start"
+  JOB_NAME=binary_storage
+  JOB_DIR=/var/vcap/jobs/$JOB_NAME
+  WHEEL_DIR=/var/vcap/packages/swift-all-in-one/whl-files
+  SWIFT_PKG_DIR=/var/vcap/packages/swift-all-in-one/swift
+
+
+
+
+
+
+
+  # log dir chmod
+  chmod 771 /var/log
+  if [ ! -d "/etc/swift" ]; then
+    mkdir /etc/swift
+  fi
+  # install deb files
+  # bash $JOB_DIR/helper/install_deb.sh gluster-client
+  bash $JOB_DIR/helper/install_deb.sh swift-all-in-one
+
+
+  pip install --no-index --find-links=$WHEEL_DIR python-swiftclient
+  pip install --no-index --find-links=$WHEEL_DIR pbr
+
+
+  # insatll openstack-swift dependencies
+  pip install --no-index --find-links=$WHEEL_DIR -r $SWIFT_PKG_DIR/requirements.txt
+
+  echo "---------------------------------------------Install Files End"
+
+  # install openstack-swift
+  cd $SWIFT_PKG_DIR
+  python setup.py develop
+
+
+  # swift setup
+  bash $JOB_DIR/helper/swift_set_up.sh
+
+  # install keystone
+  bash $JOB_DIR/helper/keystone_install/keystone_install.sh
+
+  sleep 10
+

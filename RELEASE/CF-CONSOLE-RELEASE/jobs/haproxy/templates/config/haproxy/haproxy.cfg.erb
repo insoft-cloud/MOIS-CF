@@ -1,0 +1,102 @@
+global
+daemon
+pidfile /var/vcap/sys/run/haproxy_dev/haproxy_dev.pid
+maxconn 100000
+tune.ssl.default-dh-param 2048
+ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+stats socket /var/vcap/sys/run/haproxy/stats.sock mode 600 level admin
+stats timeout 2m
+ssl-default-bind-options no-sslv3 no-tls-tickets
+ssl-default-server-options no-sslv3 no-tls-tickets
+ssl-default-server-ciphers ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DS
+
+
+# domain in redirect setting - Start
+#frontend http-in
+#mode http
+#bind *:80
+#acl portalregistration hdr_beg(host) -i portal-registration.
+#use_backend eurekaserver_server if portalregistration
+# domain in redirect setting - End
+    
+
+
+backend eurekaserver_server
+mode http
+server server-1 <%= link('paas-ta-portal-registration-link').instances[0].address%>:<%= link('paas-ta-portal-registration-link').p('server.port') %>
+
+
+frontend http-in-gatewayserver
+mode http
+bind *:<%= link('paas-ta-portal-gateway-link').p('server.port') %>
+default_backend gatewayserver_server
+
+backend gatewayserver_server
+mode http
+<% link("paas-ta-portal-gateway-link").instances.map do |instance| %>
+  server server-<%= instance.index %> <%= instance.address %>:<%= link('paas-ta-portal-gateway-link').p('server.port') %>
+<% end %>
+
+
+# MARIA_DB
+listen mariadb-in
+bind *:<%= link('mariadb-link').p('mariadb.port') %>
+mode tcp
+<% link("mariadb-link").instances.map do |instance| %>
+  server server-<%= instance.index %> <%= instance.address %>:<%= link('mariadb-link').p('mariadb.port') %>
+<% end %>
+
+
+listen logapi-in
+bind *:5555
+mode tcp
+<% link("paas-ta-portal-log-api-link").instances.map do |instance| %>
+  server server-<%= instance.index %> <%= instance.address %>:5555
+<% end %>
+
+# IP:Port in redirect setting - Start
+
+
+frontend http-in-eurekaserver
+mode http
+bind *:<%= link('paas-ta-portal-registration-link').p('server.port') %>
+default_backend eurekaserver_server
+
+
+frontend http-in-webuser
+  mode http
+    bind :8080  ssl crt /var/vcap/jobs/haproxy/config/cert.pem
+  default_backend webuser_server
+  reqadd X-Forwarded-Proto:\ https
+
+frontend http-in-webadmin
+  mode http
+    bind *:8090  ssl crt /var/vcap/jobs/haproxy/config/cert.pem
+  default_backend webadmin_server
+  reqadd X-Forwarded-Proto:\ https
+
+backend webadmin_server
+mode http
+<% link("paas-ta-portal-webadmin-link").instances.map do |instance| %>
+  server server-<%= instance.index %> <%= instance.address %>:<%= link('paas-ta-portal-webadmin-link').p('server.port') %>
+<% end %>
+
+backend webuser_server
+mode http
+<% link("paas-ta-portal-webuser-link").instances.map do |instance| %>
+  server server-<%= instance.index %> <%= instance.address %>:<%= link('paas-ta-portal-webuser-link').p('server.port') %>
+<% end %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+# IP:Port in redirect setting - End

@@ -1,0 +1,23 @@
+- type: replace
+  path: /releases/-
+  value:
+    name: egov-monitoring-agent
+    version: 0+dev.20
+#    url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/paasta-monitoring/paasta-monitoring-agent.tgz
+    url: file:///home/ubuntu/download/egov-monitoring-agent.tgz
+    sha1: 2e66b93860d09d93b01d1eab87fa936d4c41f426
+
+- type: replace
+  path: /instance_groups/name=bosh/jobs/-
+  value:
+    name: metrics_agent
+    release: egov-monitoring-agent
+    properties:
+      metrics_agent:
+        influxdb:
+          url: ((metric_url))
+          database: bosh_metric_db
+          measurement: bosh_metrics
+          processMeasurement: bosh_process_metrics
+        origin: container_mgmt
+        deployment: platform_cloud_engin

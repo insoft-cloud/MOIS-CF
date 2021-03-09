@@ -1,0 +1,1 @@
+ssh -o "StrictHostKeyChecking no" <%= p('ssh.url')%> -i /var/vcap/jobs/paas-ta-portal-api/data/platform.pem "source <%= p('bosh.path')%>; bosh upload-stemcell <%= p('bosh.stemcell_path')%>"

@@ -1,0 +1,35 @@
+instance_groups:
+- azs:
+  - z5
+  instances: 1
+  jobs:
+  - name: mariadb
+    release: mariadb-on-demand-release
+  name: mariadb
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: default
+  - name: service
+  persistent_disk_type: 10GB
+  stemcell: xenial
+  vm_type: small
+name: mariadb
+properties:
+  password: password
+  port: "3306"
+  username: username
+  database: userdb
+releases:
+- name: mariadb-on-demand-release
+  version: "1.0"
+stemcells:
+- alias: xenial
+  os: ubuntu-xenial
+  version: "315.64"
+update:
+  canaries: 1
+  canary_watch_time: 30000-120000
+  max_in_flight: 1
+  update_watch_time: 30000-120000

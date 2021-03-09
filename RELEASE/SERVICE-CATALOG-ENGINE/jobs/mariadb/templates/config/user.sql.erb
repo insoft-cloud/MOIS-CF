@@ -1,0 +1,10 @@
+SET password=PASSWORD('<%= p("admin.password") %>');
+<% link("service-catalog-engine-link").instances.map do |instance| %>
+  GRANT ALL PRIVILEGES ON *.* TO '<%= p("admin.username") %>'@'<%= instance.address %>' IDENTIFIED BY '<%= p("admin.password") %>' WITH GRANT OPTION;
+<% end %>
+
+<% link("cloudfoundry-broker-link").instances.map do |instance| %>
+  GRANT ALL PRIVILEGES ON *.* TO '<%= p("admin.username") %>'@'<%= instance.address %>' IDENTIFIED BY '<%= p("admin.password") %>' WITH GRANT OPTION;
+<% end %>
+FLUSH PRIVILEGES;
+

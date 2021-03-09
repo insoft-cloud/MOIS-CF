@@ -1,0 +1,98 @@
+buildscript {
+    ext {
+        gradleVersion = '4.9'
+        springBootVersion = '1.5.14.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+    springBootCfServiceBrokerVersion = "2.6.0"
+    springBootVersion = '1.5.14.RELEASE'
+    baseName = 'openpaas-cf-service-java-broker-cubrid'
+    version =  '2.4'
+
+    hibernateValidatorVersion = '5.1.0.Final'
+    jsonPathVersion = '0.9.1'
+    jacocoVersion = '0.8.4'
+}
+
+jar {
+    archiveName = 'openpaas-cf-service-java-broker-cubrid.jar'
+    
+}
+
+processResources {
+
+	if (project.hasProperty('jarType')) {
+		if (project.jarType == 'openpaas_bosh') {
+			exclude 'application-mvc.properties'
+			exclude 'datasource.properties'
+			exclude 'logback.xml'
+		}
+	}
+	
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/libs-snapshot" }
+}
+
+configurations {
+    providedRuntime
+}
+
+dependencies {
+    
+    compile files('libs/openpaas-service-java-broker.jar')
+    
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-security:${springBootVersion}")
+    //compile("org.hibernate:hibernate-validator:${hibernateValidatorVersion}")
+
+	testCompile("org.cloudfoundry:spring-boot-cf-service-broker-tests:${springBootCfServiceBrokerVersion}")
+    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    testCompile("com.jayway.jsonpath:json-path:${jsonPathVersion}")
+    testCompile("org.apache.httpcomponents:httpclient:4.4.1")
+    
+    compile("org.apache.commons:commons-dbcp2")
+    //runtime "mysql:mysql-connector-java:5.1.27"
+    runtime "com.github.jinahya:cubrid-jdbc-driver-10.1.1.7691:1.0.1"
+    compile "org.springframework:spring-jdbc:4.0.0.M3"
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compile "com.jcraft:jsch:0.1.53"
+    
+    
+}
+
+
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "${jacocoVersion}"
+}
+
+test {
+    ignoreFailures=true
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/jacoco-overall.exec")
+    }
+}

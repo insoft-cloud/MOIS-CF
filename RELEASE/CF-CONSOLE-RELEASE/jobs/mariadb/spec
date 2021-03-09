@@ -1,0 +1,39 @@
+---
+name: mariadb
+templates:
+  bin/mariadb_ctl.erb: bin/mariadb_ctl
+  bin/pre-start: bin/pre-start
+  bin/post-start.erb: bin/post-start
+  config/user.sql.erb: config/user.sql
+  config/init.sql: config/init.sql
+  config/mariadb.cnf: config/mariadb.cnf
+packages:
+  - mariadb
+
+provides:
+  - {name: mariadb-link, type: mariadb, properties: [mariadb.port, mariadb.admin_user.password, inspection.jdbc_username, inspection.jdbc_password]}
+
+consumes:
+- name: mariadb-link
+  type: mariadb
+- name: binary_storage-link
+  type: binary_storage
+- name: paas-ta-portal-common-api-link
+  type: paas-ta-portal-common-api
+- name: haproxy-link
+  type: haproxy
+
+
+properties:
+  mariadb.port:
+    description: MariaDB server port
+    default: 3306
+  mariadb.admin_user.password:
+    description: MariaDB admin user password
+    default: admin
+  inspection.jdbc_username:
+    description: MariaDB user for Inspection
+    default: sonar
+  inspection.jdbc_password:
+    description: MariaDB user password for Inspection 
+    default: sonar

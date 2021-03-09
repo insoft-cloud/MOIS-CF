@@ -1,0 +1,33 @@
+#!/bin/bash
+
+bosh create-env bosh.yml --recreate \
+        --state=openstack/state.json \
+        --vars-store=openstack/creds.yml \
+        -o openstack/cpi.yml \
+        -o uaa.yml \
+        -o credhub.yml \
+        -o jumpbox-user.yml \
+        -o openstack/disable-readable-vm-names.yml \
+        -o syslog.yml \
+        -o paasta-addon/paasta-monitoring-agent.yml \
+        -v metric_url='192.168.22.80:8059' \
+        -v syslog_address='192.168.22.90' \
+        -v syslog_port='2514' \
+        -v syslog_transport='relp' \
+        -v inception_os_user_name='ubuntu' \
+        -v director_name='micro-bosh' \
+        -v internal_cidr='192.168.22.0/24' \
+        -v internal_gw='192.168.22.1' \
+        -v internal_ip='192.168.22.35' \
+        -v auth_url='https://10.182.161.20:5000/v3/' \
+        -v az='nova' \
+        -v default_key_name='platform-keypair' \
+        -v default_security_groups=[default] \
+        -v net_id='95d995ce-8dbc-40f7-af07-3fcf3da00cf7' \
+        -v multi_zone=true \
+        -v openstack_password='platformdev123!q' \
+        -v openstack_username='platform-dev' \
+        -v openstack_domain='Default' \
+        -v openstack_project='platform-dev' \
+        -v private_key='/home/ubuntu/common/platform-keypair.pem' \
+        -v region='RegionOne'

@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="../layout/default">
+<head>
+    <script layout:fragment="ext_inc_script" type="text/javascript" src="/resources/bower_components/ckeditor/ckeditor.js"
+            th:src="@{../../resources/bower_components/ckeditor/ckeditor.js}"></script>
+
+
+</head>
+<body>
+<div>
+    <header></header>
+    <aside>/</aside>
+    <!-- Content Wrapper. Contains page content -->
+    <div layout:fragment="content" class="content-wrapper">
+        <!--<input type="hidden" id="tabName" value="STARTER"/>-->
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                카탈로그 관리
+            </h1>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- -->
+                    <div class="box">
+                        <div class="box-header with-border">
+
+                            <div class="box box-default collapsed-box" style="margin-bottom: 8px; border-top-color: #ded6d2;"><!--box-solid-->
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">검색 조건</h3>
+
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body" style="display:none;">
+
+                                    <form class="form-horizontal" id="catalogSearch"><!--form-inline-->
+                                        <div class="form-group col-sm-12">
+                                            <label for="searchUseYn" class="control-label col-sm-3 col-xs-12">공개 여부</label>
+                                            <div class="checkbox col-sm-8 col-xs-5" id="searchUseYn">
+                                                <label class="col-sm-3">
+                                                    <input type="checkbox" name="search" id="searchUseY" checked="checked"/>
+                                                    공개
+                                                </label>
+                                                <label class="col-sm-4">
+                                                    <input type="checkbox" name="search" id="searchUseN" checked="checked"/>
+                                                    비공개
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label for="searchItem" class="control-label col-sm-3 col-xs-12">검색 항목</label>
+                                            <div class="checkbox col-sm-8 col-xs-5" id="searchItem">
+                                                <label class="col-sm-3">
+                                                    <input type="checkbox" name="search" id="searchItemName" checked="checked"/>
+                                                    이름
+                                                </label>
+                                                <label class="col-sm-3">
+                                                    <input type="checkbox" name="search" id="searchItemSummary" checked="checked"/>
+                                                    요약
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label for="searchValue" class="control-label col-sm-3 col-xs-12">검색어</label>
+                                            <div class="has-feedback col-sm-4 col-xs-12">
+                                                <input type="text" id="searchValue" class="form-control"/>
+                                                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                                <input style="visibility:hidden; width:0px;"/><!-- Auto Summit 방지용 -->
+                                            </div>
+
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+
+                            <div class="nav-tabs-custom" style="margin-bottom:0px;">
+                                <ul class="nav nav-tabs">
+                                    <li class="header no-padding active"><a href="#devTab" data-toggle="tab" aria-expanded="true" data-tab-type="dev">앱 개발환경</a></li>
+                                </ul>
+                            </div>
+                            <!-- tab-content -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="devTab">
+                                    <div class="box">
+                                        <div id="devTabLoadingBar" class="overlay hide"><i class="fa fa-refresh fa-spin"></i></div>
+                                        <div class="box-header">
+                                            <div class="pull-right" style="padding-right: 0px;">
+                                                <button type="button" class="btn btn-block btn-primary btn-sm" id="devEnvRegistBtn" name="registBtn" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#devEnvFormModal">
+                                                    앱 개발환경 등록
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="box-body no-padding table-responsive">
+                                            <table class="table table-striped text-center" style="word-break:break-all;"> <!-- table-responsive -->
+                                                <colgroup>
+                                                    <col class="col-xs-3"/>
+                                                    <col class="col-xs-5"/>
+                                                    <col class="col-xs-2"/>
+                                                    <col class="col-xs-2"/>
+                                                </colgroup>
+                                                <thead>
+                                                <tr class="text-center">
+                                                    <th>이름</th>
+                                                    <th>요약</th>
+                                                    <th>분류</th>
+                                                    <th>공개</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="devList" name="dataList">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div><!-- /.box -->
+                                </div><!-- /.tab-pane tab_2 -->
+                            </div><!-- /.tab-content -->
+                        </div>
+                    </div><!-- /.div -->
+                    <!-- -->
+                </div>
+            </div>
+
+
+            <!-- [앱 개발환경] Modal -->
+            <div class="modal fade" id="devEnvFormModal" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+
+                            <h4 class="modal-title">
+                                <div id="devEnvTitle" name="modalTitle">앱 개발환경 등록</div>
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="box" style="margin-bottom: 0px; border-top: 0px; box-shadow: 0 0px 0px">
+                                <div id="devEnvModalLoadingBar" name="modalLoadingBar" class="overlay hide"><i class="fa fa-refresh fa-spin"></i></div>
+                                <form id="devEnvForm" class="form-horizontal">
+                                    <div class="box-body">
+
+                                        <div class="form-group required">
+                                            <label for="devEnvName" class="col-sm-3 control-label">이름</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control checkDevEnvForm" id="devEnvName" name="name" placeholder="" maxlength="254"/>
+                                                <input type="hidden" id="devEnvId" name="id"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group required">
+                                            <label for="categoryDevEnvList" class="col-sm-3 control-label">분류</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control checkDevEnvForm" id="categoryDevEnvList" style="width:auto;">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+
+
+
+                                        <div class="form-group required">
+                                            <label for="buildPackDevEnvList" class="col-sm-3 control-label">앱 개발환경</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control checkDevEnvForm" id="buildPackDevEnvList" style="width:auto;">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="devEnvThumbnail" class="col-sm-3 control-label">썸네일</label>
+
+                                            <div class="col-sm-9">
+                                                <input type="file" id="devEnvThumbnail" name="thumbnail" class="filestyle" data-buttonText=""/>
+                                            </div>
+
+                                            <div class="col-sm-3"></div>
+
+                                            <div id="divDevEnvPreview" name="divPreview" class="col-sm-9">
+                                                <!-- -->
+                                                <div id="devEnvPreview" class="file-preview-frame">
+                                                    <div class="file-content">
+                                                        <img src="" class="file-preview-image"/>
+                                                    </div>
+                                                </div>
+                                                <div class="pull-left" style="margin: 47px 20px;">
+                                                    <div>
+                                                        <label id="devEnvLabelThumbName" name="labelThumbName"></label>
+                                                        <div id="devEnvThumRemove" name="thumRemove" class="pull-right file-remove-button">
+                                                            <i class="fa fa-times"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- -->
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="devEnvApp" class="col-sm-3 control-label">앱 샘플</label>
+
+                                            <div class="col-sm-9">
+                                                <input type="file" id="devEnvApp" name="appSample" class="filestyle" data-buttonText=""/>
+                                                <span class="help-block" style="font-size: 7px; font-weight: bold; margin-left: 5px;"> 파일 첨부는 1개 파일만 가능합니다.</span>
+                                            </div>
+
+                                            <div class="col-sm-3"></div>
+
+                                            <div id="divDevEnvApp" class="col-sm-9">
+                                                <!-- -->
+                                                <div style="padding: 19px; background-color: #f5f5f5; border: 1px solid #e3e3e3;">
+                                                    <div id="devEnvLabelAppName">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="devEnvDocFileUrl" class="col-sm-3 control-label">문서 URL</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="devEnvDocFileUrl" name="name" placeholder="http://" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group required">
+                                            <label for="isFreeDevEnvArea" class="col-sm-3 control-label">공개</label>
+                                            <div class="col-sm-9">
+
+                                                <div id="isFreeDevEnvArea" class="radio">
+                                                    <div class="col-sm-2">
+                                                        <label>
+                                                            <input type="radio" name="devEnvUseYn" value="Y"/>
+                                                            Y
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-sm-10">
+                                                        <label>
+                                                            <input type="radio" name="devEnvUseYn" value="N" />
+                                                            N
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" name="devEnvtagParamForm" style="height:50px;">
+                                            <label for="devEnvtagParamInput" class="col-sm-3 col-xs-12 control-label">태그</label>
+                                            <div class="col-sm-4 col-xs-3">
+                                                <select class="form-control" id="devEnvtagParamInput" name="devEnvtagParamInput">
+                                                    <option value="cf">cf</option>
+                                                    <option value="community">community</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-2 col-xs-3">
+                                                <select class="form-control" name="devEnvtagParamType" id="devEnvtag1" style="width:auto;">
+                                                    <option value="colors1">tag1</option>
+                                                    <option value="colors2">tag2</option>
+                                                    <option value="colors3">tag3</option>
+                                                    <option value="colors4">tag4</option>
+                                                    <option value="colors5">tag5</option>
+                                                    <option value="colors6">tag6</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-1 col-xs-3">
+                                                <button class="user_btn colors1" name="devEnvtagPreview" id ="devEnvtagPreviewClassification" style="position: absolute;top: 6px;left: -8px;" disabled="disabled">cf</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" name="devEnvtagParamFormPaidFree" style="height:50px;">
+                                            <label for="devEnvtagParamInputPaidFree" class="col-sm-3 col-xs-12 control-label">태그</label>
+                                            <div class="col-sm-4 col-xs-3">
+                                                <select class="form-control" id="devEnvtagParamInputPaidFree" name="devEnvtagParamInput">
+                                                    <option value="pay">pay</option>
+                                                    <option value="free">free</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-2 col-xs-3">
+                                                <select class="form-control" name="devEnvtagParamType" id="devEnvtag2" style="width:auto;">
+                                                    <option value="colors1">tag1</option>
+                                                    <option value="colors2">tag2</option>
+                                                    <option value="colors3">tag3</option>
+                                                    <option value="colors4">tag4</option>
+                                                    <option value="colors5">tag5</option>
+                                                    <option value="colors6">tag6</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-1 col-xs-3">
+                                                <button class="user_btn colors1" name="devEnvtagPreview" id ="devEnvtagPreviewPaidFree" style="position: absolute;top: 6px;left: -8px;" disabled="disabled">pay</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group required">
+                                            <label for="devEnvSummary" class="col-sm-3 control-label">요약</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control checkDevEnvForm" id="devEnvSummary" name="summary" placeholder=""/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="devEnvDescription" class="col-sm-3 control-label">설명</label>
+                                            <div class="col-sm-9">
+                                                <textarea class="form-control" rows="5" id="devEnvDescription"></textarea>
+                                                <script th:inline="javascript" type="text/javascript">
+                                                    /*<![CDATA[*/
+                                                    // Replace the <textarea id="editor1"> with a CKEditor
+                                                    // instance, using default configuration.
+                                                    CKEDITOR.replace( 'devEnvDescription' );
+                                                    /*]]>*/
+                                                </script>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="devEnvDeleteBtn" name="modalDeleteBtn" class="btn btn-sm btn-danger pull-left" onClick="deleteModal();">삭제</button>
+                            <button type="button" id="devEnvSaveBtn" name="modalSaveBtn" class="btn btn-sm btn-primary pull-right" onClick="updateDevEnv();">저장</button>
+                            <button type="button" id="devEnvRegBtn" name="modalRegBtn" class="btn btn-sm btn-primary pull-right" onClick="createDevEnv();">등록</button>
+                            <button type="button" id="devEnvCloseBtn" class="btn btn-sm btn-default pull-left" data-dismiss="modal">취소</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- Modal END -->
+
+            <!-- Confirm Modal -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="confirmModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"> &times; </span></button>
+                            <h1 id="popupTitle" class="modal-title" style="font-size:25px"> TITLE </h1>
+                        </div>
+                        <div class="modal-body">
+                            <p id="popupMessage"> MESSAGE </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="popupButtonText"> SAVE CHANGES </button>
+                            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" id="popupCancelButtonText"> 취소
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer></footer>
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript" type="text/javascript" layout:fragment="custom-script">
+    /*<![CDATA[*/
+    /* To_BEf
+     앱 템플릿 등록시 동일 이름 있는지 체크 DUPLICATED_PROC_URL
+     앱 템플릿에서 사용중인지 확인 부분
+    */
+
+    var STARTER_PACK_PROC_URL = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).STARTER_PACK_PROC_URL}]]*/ "";
+    var DEVELOP_PACK_PROC_URL = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).DEVELOP_PACK_PROC_URL}]]*/ "";
+    var SERVICE_PACK_PROC_URL = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).SERVICE_PACK_PROC_URL}]]*/ "";
+
+    var STARTER_CATALOG_ID = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).STARTER_CATALOG_ID}]]*/ "";
+    var BUILD_PACK_CATALOG_ID = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).BUILD_PACK_CATALOG_ID}]]*/ "";
+    var SERVICE_PACK_CATALOG_ID = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).SERVICE_PACK_CATALOG_ID}]]*/ "";
+
+    var CATEGORY_LIST_PROC_URL = "/v2/codedetail";
+
+    //var CLIENT_LIST = new Array();
+
+    var THUMB_MAX_SIZE = 500; // KB
+    var NOT_FOUND_ATTACH_FILE_MESSAGE = "첨부된 파일이 없습니다.";
+
+    // LIST DATA
+    var STARTER_SOURCE_LIST;    // 앱 템플릿 리스트
+    var DEV_SOURCE_LIST;        // 앱 개발환경 리스트
+    var SERVICE_SOURCE_LIST;    // 앱 서비스 리스트
+
+    // SELECT BOX DATA(앱 템플릿)
+    var STARTER_CATEGORY_LIST;  // 앱 템플릿 상세 [분류]
+    var STARTER_DEV_ENV_LIST;   // 앱 템플릿 상세 [앱 개발환경]
+    var STARTER_SERVICE_LIST;   // 앱 템플릿 상세 [서비스]
+
+    var DEV_ENV_CATEGORY_LIST;  // 앱 개발환경 상세 [분류]
+    var DEV_ENV_BUILDPACK_LIST; // 앱 개발환경 상세 [앱 개발환경]
+
+    var SERVICE_CATEGORY_LIST;  // 앱 서비스 상세 [분류]
+    var SERVICE_SERVICE_LIST;   // 앱 서비스 상세 [서비스]
+
+    var ACTIVE_TAB = 'starter'; // 활성화 TAB
+
+    var BEFORE_THUMB_PATH; // 썸네일 파일 경로
+    var BEFORE_THUMB_NAME; // 썸네일 명(storage file name)
+
+    var BEFORE_SAMPLE_APP_PATH; // 샘플앱 경로
+    var BEFORE_SAMPLE_APP_NAME; // 샘플앱 명(storage file name)
+    var BEFORE_SAMPLE_APP_LABEL_NAME; //샘플앱 파일명
+    var BEFORE_SAMPLE_APP_SIZE; // 샘플앱 크기
+
+
+    $(document.body).ready(function () {
+
+        getInitMarketPlaceURL();
+        getStarterList();
+        getBuildPackList();
+        getServicePackList();
+
+        // 활성화 탭 체크
+        $('.nav-tabs li').each(function(){
+            $(this).click(function(e){
+                ACTIVE_TAB = $(e.target).data('tabType');
+
+                // 조건 검색 초기화 추가
+                $("#catalogSearch")[0].reset();
+                if(ACTIVE_TAB == 'starter'){
+                    //getStarterList(); // 탭클릭시 API재조회는 해당 항목 사용
+                    printStarterList(STARTER_SOURCE_LIST);
+                }else if(ACTIVE_TAB == 'dev'){
+                    //getBuildPackList();
+                    printDevEnvList(DEV_SOURCE_LIST);
+                }else if(ACTIVE_TAB == 'service'){
+                    //getServicePackList();
+                    printServiceList(SERVICE_SOURCE_LIST);
+                }
+
+            });
+        });
+
+        // 리스트 클릭시 상세 출력
+        $(document).on( "mouseup", 'tbody[name=dataList]' ,function(e){
+
+            initModal();
+
+            var id = $(e.target).parent().data('id');
+
+            /*if(ACTIVE_TAB == 'starter'){
+                getStarter(id);
+            }else if(ACTIVE_TAB == 'dev'){
+                getBuildPack(id);
+            }else if(ACTIVE_TAB == 'service'){
+                getServicePack(id);
+            }*/
+            getBuildPack(id);
+        });
+
+        // 파일 선택 변경시 썸네일 프리뷰 갱신
+        $("input[name=thumbnail]").on("change", function (e) {
+            setPreView($(this));
+        });
+
+        // 파일 삭제 버튼 처리
+        $('div[name=thumRemove]').on('click', function(e){
+            $('input[name=thumbnail]').filestyle('clear');
+            $('div[name=divPreview]').hide();
+            $('.file-preview-image').attr("src","");
+        });
+
+        // 앱 샘플 파일 선택 변경시 파일정보 영역 갱신
+        $("#devEnvApp").on("change", function (e) {
+            //setAppSample($(this));
+            procSetFileInfo($(this)[0].files);
+        });
+
+        // 앱 샘플 삭제 버튼 처리
+        $('#devEnvAppRemove').on('click', function(e){
+            resetAppSample("<a>"+NOT_FOUND_ATTACH_FILE_MESSAGE+"</a>");
+        });
+
+        // 등록 버튼 클릭시, 등록 팝업 이벤트 설정
+        $(document).on( "click", 'button[name=registBtn]' ,function(e){
+
+            $('div[name=modalTitle]').text($(this).text());
+
+            $('button[name=modalDeleteBtn]').hide();
+            $('button[name=modalSaveBtn]').hide();
+            $('button[name=modalRegBtn]').show();
+
+            initModal();
+        });
+
+
+        // POPUP FOCUS INIT
+        $('#starterFormModal').on('shown.bs.modal', function () {
+            $('#starterName').focus();
+        });
+
+        $('#devEnvFormModal').on('shown.bs.modal', function () {
+            $('#devEnvName').focus();
+        });
+
+        $('#serviceFormModal').on('shown.bs.modal', function () {
+            $('#serviceName').focus();
+        });
+
+        //[앱 템플릿] 컴포넌트(추후 리스트 조회의 데이터를 사용하고, 해당 항목의 중복 CALL은 제거) - developpacks, service
+        procCallAjax(CATEGORY_LIST_PROC_URL, "GET", {"groupId": STARTER_CATALOG_ID}, procCallbackStarterCategoryList, null); // [앱 서비스] 변경 시 재실행 필요
+        procCallAjax(DEVELOP_PACK_PROC_URL, "GET", null, procCallbackStarterDevEnvList, null); // [앱 개발환경] 등록/변경/삭제 시 재실행 필요
+        //DEVELOP_PACK_PROC_URL - 앱 개발 환경 리스트와 동일 URL
+
+
+        //[앱 개발환경] 컴포넌트
+        procCallAjax(CATEGORY_LIST_PROC_URL, "GET", {"groupId": BUILD_PACK_CATALOG_ID}, procCallbackDevEnvCategoryList, null);
+        procCallAjax("/v2/buildpacks", 'GET', null, procCallbackDevEnvBuildPackList, null);
+
+        //[앱 서비스] 컴포넌트
+        procCallAjax(CATEGORY_LIST_PROC_URL, "GET", {"groupId": SERVICE_PACK_CATALOG_ID}, procCallbackServiceCategoryList, null);
+        procCallAjax("/v2/services", "GET", null, procCallbackServiceServiceList, null);
+
+
+        // [앱서비스][서비스 생성 파라미터] 추가 이벤트
+        $(document).on("click", "#serviceParamAdd" ,function(e){
+            appServiceParamAdd();
+        })
+
+
+        // [앱서비스][서비스 생성 파라미터] 삭제 이벤트
+        $(document).on("click", "button[name=serviceParamRemove]" ,function(e) {
+            var index = $('button[name=serviceParamRemove]').index(this) +1;
+            $('div[name=serviceParamForm]:eq('+index+')').remove();
+        });
+
+        // [앱 서비스][앱 바인드 사용] 이벤트
+        $(document).on("click", "input:radio[name=appBindUseYn]" ,function(e){
+            var targetArea = $('#appBindParamArea');
+            if($(e.target).val() == "Y"){
+                targetArea.show();
+            }else{
+                targetArea.hide();
+            }
+        })
+
+        // [앱서비스][앱바인드 파라미터] 추가 이벤트
+        $(document).on("click", "#appBindParamAdd" ,function(e){
+            appBindParamAdd();
+        })
+
+
+        // [앱서비스][앱 바인드 파라미터] 삭제 이벤트
+        $(document).on("click", "button[name=appBindParamRemove]" ,function(e) {
+            var index = $('button[name=appBindParamRemove]').index(this) +1 ;
+            $('div[name=appBindParamForm]:eq('+index+')').remove();
+        });
+
+        // [앱서비스][앱 바인드 파라미터] 활성/비활성 이벤트
+        $(document).on("change", "input[name=appBindUseYn]" ,function(e) {
+            var useYn = $(this).val();
+            if(useYn == 'Y'){
+                $('div[name=appBindParamForm]').show();
+            }else if(useYn == 'N'){
+                $('div[name=appBindParamForm]').hide();
+                $('.app-bind-param-added').remove();
+                $('#appBindParamInput').val('');
+                $('select[name=appBindParamType]:eq(0)').val('text');
+            }
+        });
+
+        $(document).on("change","input[name=search]", function(e){
+            procSearchByKeyword();
+        });
+
+        $(document).on("keyup","#searchValue", function(e){
+            procSearchByKeyword();
+        });
+
+        //[앱템플릿][태그] PREVIEW
+        $(document).on("change keyup","select[id=startertag1], select[id=startertagParamInput]",function(e){
+            var value = $('#startertagParamInput').val();
+            var classname = 'user_btn ' + $('#startertag1').val();
+            $('#startertagPreviewClassification').removeAttr('class').attr('class', classname).val(value);
+        })
+
+
+        $(document).on("change keyup","select[id=startertag2], select[id=startertagParamInputPaidFree]",function(e){
+            var value = $('#startertagParamInputPaidFree').val();
+            var classname = 'user_btn ' + $('#startertag2').val();
+            $('#startertagPreviewPaidFree').removeAttr('class').attr('class', classname).val(value);
+        })
+
+        // [앱개발환경][태그] PREVIEW
+        $(document).on("change keyup","select[id=devEnvtag1], select[id=devEnvtagParamInput]",function(e){
+            var value = $('#devEnvtagParamInput').val();
+            var classname = 'user_btn ' + $('#devEnvtag1').val();
+            $('#devEnvtagPreviewClassification').removeAttr('class').attr('class', classname).text(value);
+        })
+
+        $(document).on("change keyup","select[id=devEnvtag2], select[id=devEnvtagParamInputPaidFree]",function(e){
+            var value = $('#devEnvtagParamInputPaidFree').val();
+            var classname = 'user_btn ' + $('#devEnvtag2').val();
+            $('#devEnvtagPreviewPaidFree').removeAttr('class').attr('class', classname).val(value);
+        })
+
+        // [앱서비스][태그] PREVIEW
+        $(document).on("change keyup","select[id=tag1], select[id=tagParamInput]",function(e){
+            var value = $('#tagParamInput').val();
+            var classname = 'user_btn ' + $('#tag1').val();
+            $('#tag1param').removeAttr('class').attr('class', classname).text(value);
+        })
+
+        $(document).on("change keyup","select[id=tag2], select[id=tagParamInputPaidFree]",function(e){
+            var value = $('#tagParamInputPaidFree').val();
+            var classname = 'user_btn ' + $('#tag2').val();
+            $('#tagPreviewPaidFree').removeAttr('class').attr('class', classname).val(value);
+        })
+
+
+        // [앱템플릿][태그][startertagParamClassification] PREVIEW
+        $(document).on("change keyup","select[name=startertagParamInput],select[name=startertagParamType]",function(e){
+
+            var target          = $(e.target).closest("div[name=startertagParamForm]");
+            var text            = target.find("select[name=startertagParamInput]").val();
+            var textClass       = target.find("select[name=startertagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=startertagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+        // [앱템플릿][태그][startertagParamPaidFree] PREVIEW
+        $(document).on("change keyup","select[name=startertagParamInput],select[name=startertagParamType]",function(e){
+
+            var target          = $(e.target).closest("div[name=startertagParamFormPaidFree]");
+            var text            = target.find("select[name=startertagParamInput]").val();
+            var textClass       = target.find("select[name=startertagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=startertagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+        // [앱개발환경][태그][devEnvtagParamClassification] PREVIEW
+        $(document).on("change keyup","select[name=devEnvtagParamInput],select[name=devEnvtagParamType]",function(e){
+            var target          = $(e.target).closest("div[name=devEnvtagParamForm]");
+            var text            = target.find("select[name=devEnvtagParamInput]").val();
+            var textClass       = target.find("select[name=devEnvtagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=devEnvtagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+        // [앱개발환경][태그][devEnvtagParamPaidFree] PREVIEW
+        $(document).on("change keyup","select[name=devEnvtagParamInput],select[name=devEnvtagParamType]",function(e){
+            var target          = $(e.target).closest("div[name=devEnvtagParamFormPaidFree]");
+            var text            = target.find("select[name=devEnvtagParamInput]").val();
+            var textClass       = target.find("select[name=devEnvtagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=devEnvtagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+        // [앱서비스][태그] [tagPreviewClassification] PREVIEW
+        $(document).on("change keyup","select[name=tagParamInput],select[name=tagParamType]",function(e){
+            var target          = $(e.target).closest("div[name=tagParamForm]");
+            var text            = target.find("select[name=tagParamInput]").val();
+            var textClass       = target.find("select[name=tagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=tagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+        // [앱서비스][태그] [PaidFree] PREVIEW
+        $(document).on("change keyup","select[name=tagParamInput],select[name=tagParamType]",function(e){
+            var target          = $(e.target).closest("div[name=tagParamFormPaidFree]");
+            var text            = target.find("select[name=tagParamInput]").val();
+            var textClass       = target.find("select[name=tagParamType]").val();
+            var tagPreviewArea  = target.find("button[name=tagPreview]");
+
+            if(text == ""){
+                tagPreviewArea.addClass("hide");
+            }else{
+                tagPreviewArea.text(text);
+                tagPreviewArea.removeClass('hide');
+                tagPreviewArea.addClass(textClass);
+            }
+        })
+
+    });
+
+    // [앱 템플릿][분류] 셀렉트 리스트
+    var procCallbackStarterCategoryList = function(data){
+        STARTER_CATEGORY_LIST = data.list;
+        defaultStarterCategoryOptionList();
+    }
+
+    // [앱 템플릿][앱 개발환경] 셀렉트 리스트
+    var procCallbackStarterDevEnvList = function(data){
+        STARTER_DEV_ENV_LIST = data.list;
+        defaultStarterDevEnvOptionList();
+    }
+
+    // [앱 개발환경][분류] 셀렉트 리스트
+    var procCallbackDevEnvCategoryList = function(data){
+        DEV_ENV_CATEGORY_LIST = data.list;
+        defaultDevEnvCategoryOptionList();
+    }
+
+    // [앱 개발환경][앱 개발환경] 셀렉트 리스트
+    var procCallbackDevEnvBuildPackList = function(data){
+        DEV_ENV_BUILDPACK_LIST = data.resources;
+        defaultDevEnvBuildpackOptionList();
+    }
+
+    // [앱 서비스][분류] 셀렉트 리스트
+    var procCallbackServiceCategoryList = function(data){
+        SERVICE_CATEGORY_LIST = data.list;
+        defaultServiceCategoryOptionList();
+    }
+
+    // [앱 서비스][서비스] 셀렉트 리스트
+    var procCallbackServiceServiceList = function(data){
+        SERVICE_SERVICE_LIST = data.resources;
+        defaultServiceServiceOptionList();
+    }
+
+    // 검색조회
+    function procSearchByKeyword() {
+
+        var searchKeyword       = $("#searchValue").val().toLowerCase();
+        var isSearchItemName    = $("#searchItemName").prop("checked");
+        var isSearchItemSummary = $("#searchItemSummary").prop("checked");
+        var isSearchUseY        = $('#searchUseY').prop("checked");
+        var isSearchUseN        = $('#searchUseN').prop("checked");
+
+        var SOURCE_LIST;
+
+        switch(ACTIVE_TAB){
+            case 'starter' : SOURCE_LIST = STARTER_SOURCE_LIST; break;
+            case 'dev'     : SOURCE_LIST = DEV_SOURCE_LIST; break;
+            case 'service' : SOURCE_LIST = SERVICE_SOURCE_LIST; break;
+            default        : break;
+        }
+
+        var searchResult = [];
+        var newIdx = 0;
+
+        for (var i=0; i < SOURCE_LIST.length; i++ ){
+
+            var name    = SOURCE_LIST[i].name.toLowerCase();
+            var summary = SOURCE_LIST[i].summary.toLowerCase();
+            var useYn   = SOURCE_LIST[i].useYn.toUpperCase();
+
+            //[공개여부] 체크
+            if( isSearchUseY && isSearchUseN ){ // 둘 다 체크
+            }else if(!isSearchUseY && !isSearchUseN) {// 둘 다 해제
+                continue;
+            }else { // 하나만 체크
+
+                if(isSearchUseY){
+                    if(useYn == 'N'){
+                        continue;
+                    }
+                }else{
+                    if(useYn == 'Y'){
+                        continue;
+                    }
+                }
+            }
+
+            // [검색항목] 체크
+            if(isSearchItemName && isSearchItemSummary){
+                if (name.includes(searchKeyword) || summary.includes(searchKeyword) ) {
+                    searchResult[newIdx++] = SOURCE_LIST[i];
+                }
+            }else{
+                if(isSearchItemName){
+                    if (name.includes(searchKeyword)) {
+                        searchResult[newIdx++] = SOURCE_LIST[i];
+                    }
+                }
+                if(isSearchItemSummary){
+                    if (summary.includes(searchKeyword)) {
+                        searchResult[newIdx++] = SOURCE_LIST[i];
+                    }
+                }
+            }
+        }
+
+        switch(ACTIVE_TAB){
+            case 'starter' : printStarterList(searchResult); break;
+            case 'dev'     : printDevEnvList(searchResult); break;
+            case 'service' : printServiceList(searchResult); break;
+            default        : break;
+        }
+
+    }
+
+    // BIND :: BUTTON EVENT
+    //    $("#btnSearch").on("click", function () {
+    //        //procGetSearchList();
+    //    });
+
+    // GET StarterList
+    var getStarterList = function () {
+        $('.modal').modal('hide');
+        $('#catalogSearch')[0].reset();
+        procCallAjax(STARTER_PACK_PROC_URL, "GET", null, procCallbackGetStarterList, $('#starterTabLoadingBar') );
+    };
+
+    // GET BuildPackList
+    var getBuildPackList = function () {
+        $('.modal').modal('hide');
+        $('#catalogSearch')[0].reset();
+        procCallAjax(DEVELOP_PACK_PROC_URL, "GET", null, procCallbackGetBuildPackList, $('#devEnvTabLoadingBar'));
+    };
+
+    // GET ServicePackList
+    var getServicePackList = function () {
+        $('.modal').modal('hide');
+        $('#catalogSearch')[0].reset();
+        procCallAjax(SERVICE_PACK_PROC_URL, "GET", null, procCallbackGetServicePackList, $('#serviceTabLoadingBar'));
+    };
+
+
+    // GET LIST CALLBACK StarterList
+    var procCallbackGetStarterList = function (data) {
+        STARTER_SOURCE_LIST = data.list;
+        printStarterList(STARTER_SOURCE_LIST);
+    };
+
+    // [앱 서비스] 리스트 출력
+    function printStarterList(dataList) {
+
+        var objTable = $("#starterList");
+        objTable.html('');
+
+        $.each(dataList, function (id, data) {
+            var useYnClass = (data.useYn == 'Y')  ? "bg-green"  : "bg-red" ;
+            objTable.append('<tr style="cursor:pointer;" data-id='+data.no+'>'
+                + '<td>' + data.name + '</td>'
+                + '<td>' + data.summary + '</td>'
+                + '<td>' + data.classificationValue + '</td>'
+                + '<td><span class="label label-default '+useYnClass+'">' + data.useYn + '</span></td>'
+                + '</tr>');
+        });
+
+        if(dataList.length == 0){
+            objTable.append('<tr><td colspan="4">'+/*[[#{common.info.empty.data}]]*/ ""+'</td></tr>');
+        }
+    };
+
+    // GET LIST CALLBACK BuildPackList
+    var procCallbackGetBuildPackList = function (data) {
+        DEV_SOURCE_LIST = data.list;
+        printDevEnvList(DEV_SOURCE_LIST);
+    };
+
+    // [앱 개발환경] 리스트 출력
+    function printDevEnvList(dataList) {
+
+        var objTable = $("#devList");
+        objTable.html('');
+
+        $.each(dataList, function (id, data) {
+            var useYnClass = (data.useYn == 'Y')  ? "bg-green"  : "bg-red" ;
+            objTable.append('<tr style="cursor:pointer;" data-id='+data.no+'>'
+                + '<td>' + data.name + '</td>'
+                + '<td>' + data.summary + '</td>'
+                + '<td>' + data.classificationValue + '</td>'
+                + '<td><span class="label label-default '+useYnClass+'">' + data.useYn + '</span></td>'
+                + '</tr>');
+        });
+
+        if(dataList.length == 0){
+            objTable.append('<tr><td colspan="4">'+/*[[#{common.info.empty.data}]]*/ ""+'</td></tr>');
+        }
+    };
+
+    // GET LIST CALLBACK ServicePackList
+    var procCallbackGetServicePackList = function (data) {
+        SERVICE_SOURCE_LIST = data.list;
+        printServiceList(SERVICE_SOURCE_LIST);
+    };
+
+    // [앱 개발환경] 리스트 출력
+    function printServiceList(dataList) {
+
+        var objTable = $('#serviceList');
+        objTable.html('');
+
+        STARTER_SERVICE_LIST = dataList;
+
+        $.each(dataList, function (id, data) {
+
+            var useYnClass = (data.useYn == 'Y')  ? "bg-green"  : "bg-red" ;
+            objTable.append('<tr style="cursor:pointer;" data-id='+data.no+'>'
+                + '<td>' + data.name + '</td>'
+                + '<td>' + data.summary + '</td>'
+                + '<td>' + data.classificationValue + '</td>'
+                + '<td><span class="label label-default '+useYnClass+'">' + data.useYn + '</span></td>'
+                + '</tr>');
+        });
+
+        if(dataList.length == 0){
+            objTable.append('<tr><td colspan="4">'+/*[[#{common.info.empty.data}]]*/ ""+'</td></tr>');
+        }
+    };
+
+    // [앱 템플릿] 상세
+    var getStarter = function(id){
+
+        $('#starterTitle').text("앱 템플릿 상세");
+        $('#starterDeleteBtn').show();
+        $('#starterSaveBtn').show();
+        $('#starterRegBtn').hide();
+        $('#starterFormModal').modal('toggle');
+
+        // Starter 상세조회
+        procCallAjax(STARTER_PACK_PROC_URL + "/" + id , "GET", null, procCallbackGetStarter, $('#starterModalLoadingBar '));
+    }
+
+    var procCallbackGetStarter = function(data){
+
+        var entity = data.info;
+
+        if(entity){
+            $("#starterId").val(entity.no);
+            //이름
+            $("#starterName").val(entity.name);
+            //분류
+            $("#categoryList").val(entity.classification);
+            //앱 개발환경
+            $("#buildPackList").val(entity.buildPackCategoryNo);
+            //서비스
+            var defaultServiceList = $('#servicePackList');
+            var selectServiceList = $('#selectedServicePackList');
+            defaultServiceList.html('');
+            selectServiceList.html('');
+
+            $.each(STARTER_SERVICE_LIST, function (index, data) {
+                var findFlag = true;
+                for( var i = 0; i < entity.servicePackCategoryNoList.length; i++){
+                    if(entity.servicePackCategoryNoList[i] == data.no && findFlag){
+                        selectServiceList.append('<option value='+data.no+'>'+data.name+'</option>');
+                        findFlag = false;
+                    }
+                }
+                if(findFlag){
+                    defaultServiceList.append('<option value='+data.no+'>'+data.name+'</option>');
+                }
+            });
+
+            if(entity.servicePackCategoryNoList.length == 0){
+                defaultStarterServiceOptionList();
+            }
+
+            //썸네일
+            if(entity.thumbImgPath){
+
+                var pathHeader = entity.thumbImgPath.lastIndexOf("/");
+                var pathEnd = entity.thumbImgPath.length;
+                var fileName = entity.thumbImgPath.substring(pathHeader + 1, pathEnd);
+
+                $('#starterLabelThumbName').text(entity.thumbImgName);
+                $('#preview img').attr('style', 'display: block; height: 60px; width: 60px;');
+                $('#preview img').attr("src","/v2/thumbnail/"+fileName );
+
+                BEFORE_THUMB_PATH = entity.thumbImgPath;
+                BEFORE_THUMB_NAME = fileName;
+
+                $('#divPreview').show();
+            }
+
+            //공개
+            eval("$('input:radio[name=starterUseYn][value="+entity.useYn+"]').prop('checked', true);");
+
+
+            // 태그 리스트
+            // 태그 리스트
+            if(entity.tagsParam != ''){ // entity.useYn
+                var obj = jQuery.parseJSON(entity.tagsParam);
+                var index = 0;
+                $.each(obj,function(key, value) {
+
+                    if(index !== ""){
+                        setStarterTagParam(index, key, value)
+                    }else{
+                        appStarterTagParamAdd(index, key, value);
+                    }
+                    index++;
+                });
+            }
+
+            //여기
+
+            //요약
+            $("#summary").val(entity.summary);
+            //설명
+            $("#description").val(entity.description);
+        }
+    }
+
+
+    // [앱 개발환경] 상세
+    var getBuildPack = function(id){
+
+        $('#devEnvTitle').text("앱 개발환경 상세");
+        $('#devEnvDeleteBtn').show();
+        $('#devEnvSaveBtn').show();
+        $('#devEnvRegBtn').hide();
+        $('#devEnvFormModal').modal('toggle');
+
+        procCallAjax(DEVELOP_PACK_PROC_URL +"/"+id, "GET", null, procCallbackGetDevEnv, $('#devEnvModalLoadingBar '));
+    }
+
+    var procCallbackGetDevEnv = function(data){
+
+        var entity = data.list[0];
+
+        if(entity){
+
+            $("#devEnvId").val(entity.no);
+            //이름
+            $("#devEnvName").val(entity.name);
+            //분류
+            $("#categoryDevEnvList").val(entity.classification);
+            //앱 개발환경
+            $("#buildPackDevEnvList").val(entity.buildPackName);
+
+            // 썸네일
+            if(entity.thumbImgPath){
+
+                var pathHeader = entity.thumbImgPath.lastIndexOf("/");
+                var pathEnd = entity.thumbImgPath.length;
+                var fileName = entity.thumbImgPath.substring(pathHeader + 1, pathEnd);
+
+                $('#devEnvLabelThumbName').text(entity.thumbImgName);
+                $('#devEnvPreview img').attr('style', 'display: block; height: 60px; width: 60px;');
+                // 파일 직접 주소 참조 불가. API를 통해 FILE 가져오기
+                $('#devEnvPreview img').attr("src","/v2/thumbnail/"+fileName);
+
+                BEFORE_THUMB_PATH = entity.thumbImgPath;
+                BEFORE_THUMB_NAME = fileName;
+
+                $('div[name=divPreview]').show();
+            }
+
+            // 앱 샘플
+            if(entity.appSampleFilePath){
+
+                var pathHeader = entity.appSampleFilePath.lastIndexOf("/");
+                var pathEnd = entity.appSampleFilePath.length;
+                var fileName = entity.appSampleFilePath.substring(pathHeader + 1, pathEnd);
+
+                BEFORE_SAMPLE_APP_PATH = entity.appSampleFilePath;
+                BEFORE_SAMPLE_APP_NAME = fileName;
+                BEFORE_SAMPLE_APP_LABEL_NAME = entity.appSampleFileName;
+                BEFORE_SAMPLE_APP_SIZE = entity.appSampleFileSize;
+
+                procSetFileLabel(entity.appSampleFileName, entity.appSampleFileSize, BEFORE_SAMPLE_APP_PATH);
+            }
+
+            //공개
+            eval("$('input:radio[name=devEnvUseYn][value="+entity.useYn+"]').prop('checked', true);");
+
+
+
+            // 태그 리스트
+            if(entity.tagsParam != ''){ // entity.useYn
+                var obj = jQuery.parseJSON(entity.tagsParam);
+                var index = 0;
+                $.each(obj,function(key, value) {
+
+                    if(index !== ""){
+                        setDevEnvTagParam(index, key, value)
+                    }else{
+                        appDevEnvTagParamAdd(index, key, value);
+                        appDevEnvTagParamAddPaidFree(index, key, value);
+                    }
+                    index++;
+                });
+            }
+
+            //요약
+            $("#devEnvSummary").val(entity.summary);
+            //설명
+            CKEDITOR.instances.devEnvDescription.setData(entity.description);
+            //문서URL
+            $('#devEnvDocFileUrl').val(entity.docFileUrl);
+        }
+    }
+
+
+
+    // [앱 서비스] 상세
+    var getServicePack = function(id){
+
+        $('#serviceTitle').text("앱 서비스 상세");
+        $('#serviceDeleteBtn').show();
+        $('#serviceSaveBtn').show();
+        $('#serviceRegBtn').hide();
+        $('#serviceFormModal').modal('toggle');
+
+        procCallAjax(SERVICE_PACK_PROC_URL +"/"+id, "GET", null, procCallbackGetServicePack, $('#serviceModalLoadingBar '));
+    }
+
+    var procCallbackGetServicePack = function(data){
+
+        var entity = data.list[0];
+
+        if(entity){
+
+            $("#serviceId").val(entity.no);
+            //이름
+            $("#serviceName").val(entity.name);
+            //분류
+            $("#categoryServiceList").val(entity.classification);
+            //서비스
+            $("#serviceServicePackList").val(entity.servicePackName);
+
+            //썸네일
+            if(entity.thumbImgPath){
+
+                var pathHeader = entity.thumbImgPath.lastIndexOf("/");
+                var pathEnd = entity.thumbImgPath.length;
+                var fileName = entity.thumbImgPath.substring(pathHeader + 1, pathEnd);
+
+                $('#serviceLabelThumbName').text(entity.thumbImgName);
+                $('#servicePreview img').attr('style', 'display: block; height: 60px; width: 60px;');
+                // 파일 직접 주소 참조 불가. API를 통해 FILE 가져오기
+                $('#servicePreview img').attr("src","/v2/thumbnail/"+fileName);
+
+                BEFORE_THUMB_PATH = entity.thumbImgPath;
+                BEFORE_THUMB_NAME = fileName;
+
+                $('div[name=divPreview]').show();
+            }
+
+            //서비스 생성 파라미터 리스트
+            if(entity.parameter != ''){
+                var obj = jQuery.parseJSON(entity.parameter);
+                var index = 0;
+                $.each(obj,function(key, value) {
+                    //console.log('key:'+key+', value:'+value);
+                    if(index == 0){
+                        // Fixed Area Set
+                        setAppServiceParam(index, key, value)
+                    }else{
+                        // Dynamic Area Create
+                        appServiceParamAdd(index, key, value);
+                    }
+                    index++;
+                });
+            }
+
+            //앱 바인드 파라미터 사용여부
+            eval("$('input:radio[name=appBindUseYn][value="+entity.appBindYn+"]').prop('checked', true);");
+
+            if(entity.appBindYn !== undefined && entity.appBindYn == 'N'){
+                $('input:radio[name=appBindUseYn]').trigger( "change" );
+            }
+
+            // 앱 바인드 파라미터 리스트
+            if(entity.appBindYn == 'Y' && entity.appBindParameter != ''){ // entity.useYn
+                var obj = jQuery.parseJSON(entity.appBindParameter);
+                var index = 0;
+                $.each(obj,function(key, value) {
+                    //console.log('key:'+key+', value:'+value);
+                    if(index == 0){
+                        setAppBindParam(index, key, value);
+                    }else{
+                        appBindParamAdd(index, key, value);
+                    }
+                    index++;
+                });
+            }
+
+            // 태그 리스트
+            if(entity.tagsParam != ''){ // entity.useYn
+                var obj = jQuery.parseJSON(entity.tagsParam);
+                var index = 0;
+                $.each(obj,function(key, value) {
+
+                    if(index !== ""){
+                        setTagParam(index, key, value);
+                    }
+                    else{
+                        appTagParamAdd(index, key, value);
+                        appTagParamAddPaidFree(index, key, value);
+                    }
+                    index++;
+                });
+            }
+
+            //공개
+            eval("$('input:radio[name=serviceUseYn][value="+entity.useYn+"]').prop('checked', true);");
+
+            // 대시보드 사용여부
+            eval("$('input:radio[name=dashBoardUseYn][value="+entity.dashboardUseYn+"]').prop('checked', true);");
+
+            // 온디멘드 사용여부
+            eval("$('input:radio[name=OnDemandYn][value="+entity.onDemandYn+"]').prop('checked', true);");
+
+            //요약
+            $("#serviceSummary").val(entity.summary);
+
+            //설명
+            CKEDITOR.instances.serviceDescription.setData(entity.description);
+
+            //문서URL
+            $('#serviceDocFileUrl').val(entity.docFileUrl);
+        }
+
+    }
+
+    //   validation Duplicate Name
+    //    var checkDupNameCount = function(){
+    //        var name;
+    //        var url;
+    //        var callback;
+    //
+    //        if(ACTIVE_TAB == 'starter'){
+    //            name = $('#starterName').val();
+    //            url = STARTER_PACK_PROC_URL;
+    //            callback = procCallbackCheckDupStarterNameCount;
+    //        }else if(ACTIVE_TAB == 'dev'){
+    //            id = $('#devEnvName').val();
+    //            url = DEVELOP_PACK_PROC_URL;
+    //            callback = procCallbackCheckDupDevEnvNameCount;
+    //        }else if(ACTIVE_TAB == 'service'){
+    //            id = $('#serviceName').val();
+    //            url = SERVICE_PACK_PROC_URL;
+    //            callback = procCallbackCheckDupServiceNameCount;
+    //        }
+    //
+    //        procCallAjax( url +"/count", "GET",{"name":name}, callback, null);
+    //    }
+    //
+    //    function procCallbackCheckDupStarterNameCount(data){
+    //        if( !(data.startpackcount < 1) ){
+    //            return false;
+    //        }
+    //    }
+    //
+    //    function procCallbackCheckDupDevEnvNameCount(data){
+    //        if( !(data.buildpackcount < 1) ){
+    //            return false;
+    //        }
+    //    }
+    //
+    //    function procCallbackCheckDupServiceNameCount(data){
+    //        if( !(data.servicepackcount < 1) ){
+    //            return false;
+    //        }
+    //    }
+
+    //
+    /* ************ C.U.D *********** */
+    //  [앱 템플릿] 생성
+    function createStarter() {
+
+        if (!procCheckValidStringSpaceClass('checkStarterForm')){
+            return false;
+        };
+
+        // 파일 첨부 확인 및 업로드
+        var file = $("#starterThumbnail")[0].files[0];
+        if (file === undefined){
+            registStarter();
+        }else{
+            var formData = new FormData();
+            formData.append("file", file);
+            uploadFile(formData,"POST","/v2/thumbnail",registStarter);
+        }
+    }
+
+    //  [앱 템플릿] 등록
+    function registStarter(fileInfo){
+        procCallAjax(STARTER_PACK_PROC_URL, "POST", JSON.stringify(starterParam(fileInfo)), getStarterList, $('#starterModalLoadingBar'));
+    }
+
+    //  [앱 템플릿] 수정 (파일저장 전 처리)
+    function updateStarter() {
+
+        if (!procCheckValidStringSpaceClass("checkStarterForm")){
+            return false;
+        };
+
+        // 파일 첨부 확인 및 업로드
+        var afterThumbPath = $('#preview img').attr("src");
+        var file = $("#starterThumbnail")[0].files[0];
+
+        if(BEFORE_THUMB_NAME == ""){
+            if(afterThumbPath == ""){
+                // NOT INCLUDE FILE
+                modifyStarterItem();
+            }else{
+                // UPLOAD FILE
+                var formData = new FormData();
+                formData.append("file", file);
+                uploadFile(formData,"POST","/v2/thumbnail",modifyStarterItem);
+            }
+
+        }else{
+
+            var pathHeader = afterThumbPath.lastIndexOf("/");
+            var pathEnd = afterThumbPath.length;
+            var afterThumbName = afterThumbPath.substring(pathHeader + 1, pathEnd);
+
+            if(afterThumbName.indexOf(BEFORE_THUMB_NAME) > -1){
+                var fileInfo = {
+                    filename: $('#starterLabelThumbName').text(),
+                    fileURL: BEFORE_THUMB_PATH
+                };
+                modifyStarterItem(fileInfo);
+            }else{
+                //기존 삭제
+                uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_THUMB_NAME, modifyStarterItem);
+
+                if(afterThumbPath != ""){
+                    // 신규 이미지 추가
+                    var formData = new FormData();
+                    formData.append("file", file);
+                    uploadFile(formData,"POST","/v2/thumbnail", modifyStarterItem);
+                }
+
+            }
+        }
+
+        notifyAlert('success',"","수정 완료 되었습니다.");
+    }
+
+    // [앱 템플릿] 수정 (파일저장 후 처리)
+    function modifyStarterItem(FILE_INFO){
+        // 파일저장 결과값(저장위치 및 파일명)을 반영한다.
+        var no = $('#starterId').val();
+        procCallAjax(STARTER_PACK_PROC_URL +"/"+ no, "PUT", JSON.stringify(starterParam(FILE_INFO)), getStarterList, null);
+    }
+
+    // [앱 템플릿][앱 개발환경][앱 서비스] 삭제 Confirm layer
+    function deleteModal() {
+
+        var title;
+        var name;
+        title = "앱 개발환경";
+        name = $('#devEnvName').val();
+
+/*
+        if(ACTIVE_TAB == 'starter'){
+            title = "앱 템플릿";
+            name = $('#starterName').val();
+        }else if(ACTIVE_TAB == 'dev'){
+            title = "앱 개발환경";
+            name = $('#devEnvName').val();
+        }else if(ACTIVE_TAB == 'service'){
+            title = "앱 서비스";
+            name  = $('#serviceName').val();
+        }
+*/
+        $('#popupButtonText').attr('onclick', "deleteItem();");
+
+        $("#popupTitle").html(title+" 삭제");
+        $("#popupMessage").html(name +/*[[#{delete.confirm.message('')}]]*/ "");
+        $("#popupButtonText").text("삭제");
+        $("#popupButtonText").addClass("pull-left");
+        $("#popupButtonText").show();
+
+        $('#confirmModal').modal("toggle");
+    }
+
+    //  [앱 템플릿][앱 개발환경][앱 서비스] 삭제
+    function deleteItem() {
+
+        var id,url,callback;
+
+        id = $('#devEnvId').val();
+        url = DEVELOP_PACK_PROC_URL +"/"+id;
+        callback = getBuildPackList;
+
+/*
+        if(ACTIVE_TAB == 'starter'){
+            id = $('#starterId').val();
+            url = STARTER_PACK_PROC_URL +"/"+id;
+            callback = getStarterList;
+        }else if(ACTIVE_TAB == 'dev'){
+            id = $('#devEnvId').val();
+            url = DEVELOP_PACK_PROC_URL +"/"+id;
+            callback = getBuildPackList;
+        }else if(ACTIVE_TAB == 'service'){
+            id = $('#serviceId').val();
+            url = SERVICE_PACK_PROC_URL +"/"+id;
+            callback = getServicePackList;
+        }
+*/
+
+        // 썸네일 파일 삭제
+        if(BEFORE_THUMB_NAME != ""){
+            uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_THUMB_NAME, null);
+        }
+        // SAMPLE APP 파일 삭제
+        if(BEFORE_SAMPLE_APP_NAME != ""){
+            uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_SAMPLE_APP_NAME, null);
+        }
+
+        // 리스트 삭제
+        procCallAjax(url,"DELETE", null, callback, $('div[name=modalLoadingBar]'));
+    }
+
+    // [앱 템플릿] 등록/수정 FORM PARAM
+    var starterParam = function(fileInfo){
+
+        var getList = document.getElementById("selectedServicePackList");
+        var selectedServicePackList = [];
+
+        for (var i = 0; i < getList.length; i++) {
+            selectedServicePackList[i] = getList.options[i].value;
+        }
+
+
+        // 태그
+        var inputTagParamJson = new Object();
+
+        $.each( $("select[name=startertagParamInput]") , function (index, data) {
+            var jsonKey   = eval("$('select[name=startertagParamInput]:eq("+index+")').val()");
+            var jsonValue = eval("$('select[name=startertagParamType]:eq("+index+")').val()");
+            if(jsonKey != ""){
+                inputTagParamJson[jsonKey] = jsonValue;
+            }
+        });
+
+        var param = {
+            name                        : $("#starterName").val(),
+            classification              : $("#categoryList").val(),
+            useYn                       : $("input[name=starterUseYn]:checked").val(),
+            pay                         : $("input[name=starterpayYn]:checked").val(),
+            summary                     : $("#summary").val(),
+            description                 : $("#description").val(),
+            buildPackCategoryNo         : $("#buildPackList").val(),
+            servicePackCategoryNoList   : selectedServicePackList,
+            tagsParam                   : JSON.stringify(inputTagParamJson)
+        };
+
+
+        if(fileInfo){
+            param.thumbImgName = fileInfo.filename;
+            param.thumbImgPath = fileInfo.fileURL;
+        }
+
+        return param;
+    }
+
+    // [앱 개발환경] 등록/수정 FORM PARAM
+    var devEnvParam= function(fileInfo){
+
+        if($("#devEnvName").val().length > 255){
+            notifyAlert('error', '', "생성할 어플리케이션 명의 길이는 255 이상 넣을 수 없습니다.");
+            return null;
+        }
+
+        // 태그
+        var inputTagParamJson = new Object();
+
+        $.each( $("select[name=devEnvtagParamInput]") , function (index, data) {
+            var jsonKey   = eval("$('select[name=devEnvtagParamInput]:eq("+index+")').val()");
+            var jsonValue = eval("$('select[name=devEnvtagParamType]:eq("+index+")').val()");
+            if(jsonKey != ""){
+                inputTagParamJson[jsonKey] = jsonValue;
+            }
+        });
+
+        var param = {
+            name                : $("#devEnvName").val(),
+            classification      : $("#categoryDevEnvList").val(),
+            buildPackName       : $("#buildPackDevEnvList").val(),
+            useYn               : $("input[name=devEnvUseYn]:checked").val(),
+            pay                 : $("input[name=devEnvpayYn]:checked").val(),
+            summary             : $("#devEnvSummary").val(),
+            description         : CKEDITOR.instances.devEnvDescription.getData(),
+            docFileUrl          : $("#devEnvDocFileUrl").val(),
+            tagsParam           : JSON.stringify(inputTagParamJson)
+        };
+
+        if(fileInfo){
+            $.extend(param, fileInfo);
+        }
+        return param;
+    }
+
+    // [서비스] 등록/수정 FORM PARAM
+    var serviceParam= function(fileInfo){
+
+
+        // 서비스 생성 파라미터
+        var inputParamJson = new Object();
+
+        $.each( $("input[name=serviceParamInput]") , function (index, data) {
+            var jsonKey   = eval("$('input[name=serviceParamInput]:eq("+index+")').val()");
+            var jsonValue = eval("$('select[name=serviceParamType]:eq("+index+")').val()");
+            if(jsonKey != ""){
+                inputParamJson[jsonKey] = jsonValue;
+            }
+        });
+
+        // 앱바인드 파라미터
+        var inputAppBindParamJson = new Object();
+
+        $.each( $("input[name=appBindParamInput]") , function (index, data) {
+            var jsonKey   = eval("$('input[name=appBindParamInput]:eq("+index+")').val()");
+            var jsonValue = eval("$('select[name=appBindParamType]:eq("+index+")').val()");
+            if(jsonKey != ""){
+                inputAppBindParamJson[jsonKey] = jsonValue;
+            }
+        });
+
+        // 태그
+        var inputTagParamJson = new Object();
+
+        $.each( $("select[name=tagParamInput]") , function (index, data) {
+            var jsonKey   = eval("$('select[name=tagParamInput]:eq("+index+")').val()");
+            var jsonValue = eval("$('select[name=tagParamType]:eq("+index+")').val()");
+            if(jsonKey != ""){
+                inputTagParamJson[jsonKey] = jsonValue;
+            }
+        });
+
+        var serviceServicePackList = 'NONE';
+        if($("#serviceServicePackList").val() != '' && $("#serviceServicePackList").val() != null && $("#serviceServicePackList").val() != 'null' && $("#serviceServicePackList").val() != 'undefined'){
+            serviceServicePackList = $("#serviceServicePackList").val();
+        }
+
+        var param = {
+            name                        : $("#serviceName").val(),
+            classification              : $("#categoryServiceList").val(),
+            classificationValue         : $("#categoryServiceList option:selected").text(),
+            servicePackName             : serviceServicePackList,
+            parameter                   : JSON.stringify(inputParamJson),
+            appBindYn                   : $("input[name=appBindUseYn]:checked").val(),
+            appBindParameter            : JSON.stringify(inputAppBindParamJson),
+            dashboardUseYn              : $("input[name=dashBoardUseYn]:checked").val(),
+            onDemandYn                   : $("input[name=OnDemandYn]:checked").val(),
+            useYn                       : $("input[name=serviceUseYn]:checked").val(),
+            pay                         : $("input[name=payYn]:checked").val(),
+            summary                     : $("#serviceSummary").val(),
+            description                 : CKEDITOR.instances.serviceDescription.getData(),
+            docFileUrl                  : $("#serviceDocFileUrl").val(),
+            tagsParam                   : JSON.stringify(inputTagParamJson)
+        };
+
+        if(fileInfo){
+            $.extend(param, fileInfo);
+        }
+
+        return param;
+    }
+
+    var FILE_INFO = {};
+
+    /* [앱 개발환경] 등록  */
+    function createDevEnv() {
+        $('#devEnvModalLoadingBar').removeClass("hide");
+        if (!procCheckValidStringSpaceClass('checkDevEnvForm')){
+            $('#devEnvModalLoadingBar').addClass('hide');
+            return false;
+        };
+
+        FILE_INFO = {};
+
+        // 썸네일 파일 첨부 확인 및 업로드
+        var file = $("#devEnvThumbnail")[0].files[0];
+
+        var AppFile = $("#devEnvApp")[0].files[0];
+
+        // STORAGE API 현재는 MULTI UPLOAD 지원 않음. 추후 formData.append("file[]", 로 처리할것
+        if (file === undefined && AppFile === undefined){
+            registDevEnv();
+        }else{
+
+            if(file !== undefined){
+                var formData = new FormData();
+                formData.append("file", file);
+                uploadFile(formData,"POST","/v2/thumbnail",createDevEnvThumbFileInfo);
+            }else{
+                // App 등록으로 pass
+                registDevEnvSampleApp();
+            }
+
+        }
+    }
+
+    // [썸네일] 파일 등록
+    function createDevEnvThumbFileInfo(data){
+        if(data != null){
+            FILE_INFO.thumbImgName  = data.filename;
+            FILE_INFO.thumbImgPath  = data.fileURL;
+        }
+        // 앱 샘플 등록
+        registDevEnvSampleApp();
+    }
+
+    // [앱 샘플] 파일 등록
+    function createAppFileInfo(data){
+        if(data != null){
+            FILE_INFO.appSampleFileName  = data.filename;
+            FILE_INFO.appSampleFilePath  = data.fileURL;
+            FILE_INFO.appSampleFileSize  = data.length;;
+        }
+        registDevEnv();
+    }
+
+    // [앱 샘플] 파일 등록
+    function registDevEnvSampleApp(){
+
+        var AppFile = $("#devEnvApp")[0].files[0];
+        if(AppFile !== undefined){
+            var formData = new FormData();
+            formData.append("file", AppFile);
+            uploadFile(formData,"POST","/v2/thumbnail",createAppFileInfo);
+        }else{
+            registDevEnv();
+        }
+    }
+
+    // [앱 개발환경] 등록 (썸네일/앱샘플 업로드 이후)
+    function registDevEnv(){
+        var param = JSON.stringify(devEnvParam(FILE_INFO));
+        if(param === null){
+            return;
+        }
+        procCallAjax(DEVELOP_PACK_PROC_URL, "POST", param, getBuildPackList, $('#devEnvModalLoadingBar'));
+    }
+
+    //  [앱 개발환경] 수정 (썸네일 파일저장 전 처리)
+    function updateDevEnv() {
+        $('#devEnvModalLoadingBar').removeClass("hide");
+        if (!procCheckValidStringSpaceClass('checkDevEnvForm')){
+            $('#devEnvModalLoadingBar').addClass('hide');
+
+            return false;
+        };
+
+        FILE_INFO = {}; // 파일정보 초기화
+
+        // 썸네일 파일 첨부 확인 및 업로드
+        var afterThumbPath = $('#devEnvPreview img').attr("src");
+        var thumbFile = $("#devEnvThumbnail")[0].files[0];
+
+        var formData = new FormData();
+        formData.append("file", thumbFile);
+
+        if(BEFORE_THUMB_NAME == ""){
+            if(afterThumbPath != ""){
+                // UPLOAD FILE
+                uploadFile(formData,"POST","/v2/thumbnail",updateDevEnvThumbFileInfo);
+            }else{
+                updateSampleApp();
+            }
+
+        }else{
+
+            var pathHeader = afterThumbPath.lastIndexOf("/");
+            var pathEnd = afterThumbPath.length;
+            var afterThumbName = afterThumbPath.substring(pathHeader + 1, pathEnd);
+            // 기존 파일과 파일명 비교
+            if(afterThumbName.indexOf(BEFORE_THUMB_NAME) > -1){
+
+                FILE_INFO.thumbImgName  = $('#devEnvLabelThumbName').text();
+                FILE_INFO.thumbImgPath  = BEFORE_THUMB_PATH;
+
+                updateDevEnvThumbFileInfo(null);
+
+            }else{
+                //기존 삭제
+                uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_THUMB_NAME, null);
+                FILE_INFO.thumbImgName = "";
+                FILE_INFO.thumbImgPath = "";
+
+                if(afterThumbPath != ""){
+                    // 신규 이미지 추가
+                    uploadFile(formData,"POST","/v2/thumbnail", updateDevEnvThumbFileInfo);
+                }else{
+                    updateDevEnvThumbFileInfo(null);
+                }
+            }
+        }
+    }
+
+
+    // [썸네일] 파일 등록
+    function updateDevEnvThumbFileInfo(data){
+        if(data != null){
+            FILE_INFO.thumbImgName  = data.filename;
+            FILE_INFO.thumbImgPath  = data.fileURL;
+        }
+        // 앱 샘플 수정
+        updateSampleApp();
+    }
+
+    // [앱 샘플] 파일 수정
+    function updateAppFileInfo(data){
+        if(data != null){
+            FILE_INFO.appSampleFileName  = data.filename;
+            FILE_INFO.appSampleFilePath  = data.fileURL;
+            FILE_INFO.appSampleFileSize  = data.length;;
+        }
+        modifyDevEnv();
+    }
+
+    // [앱 개발환경] 수정 (썸네일 처리 후 앱샘플 처리)
+    function updateSampleApp(){
+
+        var appFile = $("#devEnvApp")[0].files[0];
+        var formData = new FormData();
+        formData.append("file", appFile);
+
+        // 초기 미등록
+        if(BEFORE_SAMPLE_APP_NAME == ""){
+
+            if(appFile !== undefined){
+                // 신규 앱샘플 파일 추가
+                uploadFile(formData,"POST","/v2/thumbnail", updateAppFileInfo);
+            }else{
+                // 첨부 없음
+                modifyDevEnv();
+            }
+
+        }else{
+
+            if(appFile !== undefined){ // 업로드 파일 업데이트
+                // 기존 앱샘플 파일 삭제
+                uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_SAMPLE_APP_NAME, null);
+                // 신규 앱샘플 파일 추가
+                uploadFile(formData,"POST","/v2/thumbnail", updateAppFileInfo);
+            }else{ // 첨부 없음
+                FILE_INFO.appSampleFileName  = BEFORE_SAMPLE_APP_LABEL_NAME;
+                FILE_INFO.appSampleFilePath  = BEFORE_SAMPLE_APP_PATH;
+                FILE_INFO.appSampleFileSize  = BEFORE_SAMPLE_APP_SIZE;
+
+                updateAppFileInfo(null);
+            }
+        }
+    }
+
+    // [앱 개발환경] 수정 (파일저장 후 처리)
+    function modifyDevEnv(){
+        // 파일저장 결과값(저장위치 및 파일명)을 반영한다.
+        var no = $('#devEnvId').val();
+        var param = JSON.stringify(devEnvParam(FILE_INFO));
+        console.log(param);
+        if(param === null){
+            return;
+        }
+        procCallAjax(DEVELOP_PACK_PROC_URL +"/"+ no, "PUT", param, getBuildPackList, $('#devEnvModalLoadingBar') );
+    }
+
+
+    /* [앱 서비스] 등록  */
+    function createService() {
+
+        if (!procCheckValidStringSpaceClass('checkServiceForm')){
+            return false;
+        };
+
+        FILE_INFO = {}; // 파일정보 초기화
+
+        // 썸네일 파일 첨부 확인 및 업로드
+        var file = $("#serviceThumbnail")[0].files[0];
+
+        if (file === undefined){
+            registService();
+        }else{
+            var formData = new FormData();
+            formData.append("file", file);
+            uploadFile(formData,"POST","/v2/thumbnail",createServiceThumbFileInfo);
+        }
+    }
+
+    // [썸네일] 파일 등록
+    function createServiceThumbFileInfo(data){
+        if(data != null){
+            FILE_INFO.thumbImgName  = data.filename;
+            FILE_INFO.thumbImgPath  = data.fileURL;
+        }
+        // 앱 샘플 등록
+        registService();
+    }
+
+    //  [앱 서비스] 등록
+    function registService(){
+        procCallAjax(SERVICE_PACK_PROC_URL, "POST", JSON.stringify(serviceParam(FILE_INFO)), getServicePackList, $('#serviceModalLoadingBar'));
+    }
+
+    //  [앱 서비스] 수정 (썸네일 파일저장 전 처리)
+    function updateService(){
+
+        if (!procCheckValidStringSpaceClass('checkServiceForm')){
+            return false;
+        };
+
+        FILE_INFO = {}; // 파일정보 초기화
+
+        // 썸네일 파일 첨부 확인 및 업로드
+        var afterThumbPath = $('#servicePreview img').attr("src");
+        var thumbFile = $("#serviceThumbnail")[0].files[0];
+
+        var formData = new FormData();
+        formData.append("file", thumbFile);
+        if(BEFORE_THUMB_NAME == ""){
+            if(thumbFile != ""){
+                // UPLOAD FILE
+                uploadFile(formData,"POST","/v2/thumbnail",updateServiceThumbFileInfo);
+            }else{
+                modifyService();
+            }
+
+        }else{
+            var pathHeader = afterThumbPath.lastIndexOf("/");
+            var pathEnd = afterThumbPath.length;
+            var afterThumbName = afterThumbPath.substring(pathHeader + 1, pathEnd);
+            // 기존 파일과 파일명 비교
+            if(afterThumbName.indexOf(BEFORE_THUMB_NAME) > -1){
+
+                FILE_INFO.thumbImgName  = $('#serviceLabelThumbName').text();
+                FILE_INFO.thumbImgPath  = BEFORE_THUMB_PATH;
+
+                updateServiceThumbFileInfo(null);
+
+            }else{
+                //기존 삭제
+                uploadFile(null,"DELETE","/v2/thumbnail/"+ BEFORE_THUMB_NAME, null);
+                FILE_INFO.thumbImgName = "";
+                FILE_INFO.thumbImgPath = "";
+
+                if(afterThumbPath != ""){
+                    // 신규 이미지 추가
+                    uploadFile(formData,"POST","/v2/thumbnail", updateServiceThumbFileInfo);
+                }else{
+                    updateServiceThumbFileInfo(null);
+                }
+            }
+        }
+
+    }
+
+    // [앱 서비스] [썸네일] 파일 등록
+    function updateServiceThumbFileInfo(data){
+        if(data != null){
+            FILE_INFO.thumbImgName  = data.filename;
+            FILE_INFO.thumbImgPath  = data.fileURL;
+        }
+        modifyService();
+    }
+
+    // [앱 서비스] 수정 (파일저장 후 처리)
+    function modifyService(){
+        // 파일저장 결과값(저장위치 및 파일명)을 반영한다.
+        var no = $('#serviceId').val();
+        procCallAjax(SERVICE_PACK_PROC_URL +"/"+ no, "PUT", JSON.stringify(serviceParam(FILE_INFO)), getServicePackList, $('#serviceModalLoadingBar') );
+    }
+
+
+
+    /* ************ 컴포넌트 *********** */
+    // SET PREVIEW
+    var setPreView = function (objThumbnail) {
+        var this_form = objThumbnail[0];
+        var file = this_form.files[0];
+
+        var img_size = 0;
+
+        if (file) {
+            // image file check
+            var pathHeader = this_form.value.lastIndexOf("\\");
+            var pathMiddle = this_form.value.lastIndexOf(".");
+            var pathEnd = this_form.value.length;
+            var filename = this_form.value.substring(pathHeader + 1, pathEnd);
+            var ext = this_form.value.substring(pathMiddle + 1, pathEnd).toLowerCase();
+
+            if (ext != "jpg" && ext != "png" && ext != "gif") {
+                notifyAlert('warning','','이미지 파일(jpg, png, gif)만 등록 가능합니다.');
+                //fileinput FileReader 참고
+                resetThumbnail();
+                return false;
+            }
+
+            // file 읽어 오기
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                //$('#previewMessage').attr('style', 'display: none;');
+                var image = new Image();
+                // 파일의 내용을 읽어서 넣어준다.
+                image.src = e.target.result;
+                img_size = Math.round(e.total / 1024);
+            };
+
+            reader.onloadend = function (e) {
+                if (img_size > THUMB_MAX_SIZE) {
+                    resetThumbnail();
+                    var alertMessage = '이미지 크기는 ' + THUMB_MAX_SIZE + 'Kb를 넘을 수 없습니다.';
+                    notifyAlert('warning','',alertMessage);
+
+                    return false;
+                }
+
+                $('.file-preview-image').attr('style', 'display: block; height: 60px; width: 60px;');
+                $('.file-preview-image').attr("src", e.target.result);
+
+                if(ACTIVE_TAB == 'starter'){
+                    $('#starterLabelThumbName').text(filename);
+                }else if(ACTIVE_TAB == 'dev'){
+                    $('#devEnvLabelThumbName').text(filename);
+                }else if(ACTIVE_TAB == 'service'){
+                    $('#serviceLabelThumbName').text(filename);
+                }
+
+            };
+
+            reader.readAsDataURL(file);
+            $('div[name=divPreview]').show();
+        } else {
+            resetThumbnail();
+        }
+    };
+
+    // RESET THUMBNAIL
+    var resetThumbnail = function () {
+        //$(":file").filestyle('clear');
+        $('input[name=thumbnail]').filestyle('clear');
+        $('div[name=divPreview]').hide();
+    };
+
+    // RESET APP SAMPLE
+    var resetAppSample = function (strHtml) {
+        $('#devEnvApp').filestyle('clear');
+        var target = $('#devEnvLabelAppName');
+        target.html(strHtml);
+    };
+
+    // Modal 초기화
+    var initModal = function(){
+        // 등록/수정/삭제 시 새로고침한 데이터를 다시 셀렉트 컴포넌트에 적용(default method)
+        if(ACTIVE_TAB == 'starter'){
+
+            // [앱 템플릿]
+
+            defaultStarterCategoryOptionList();
+            defaultStarterDevEnvOptionList();
+            defaultStarterServiceOptionList();
+
+            //초기화
+            $('select[id=startertagParamInput]').val("cf");
+            $('select[id=startertagParamInputPaidFree]').val("pay");
+            $('select[id=startertag1]').val("colors1");
+            $('select[id=startertag2]').val("colors1");
+            $('#startertagPreviewClassification').removeAttr('class').attr('class', 'user_btn colors1').text('cf');
+            $('#startertagPreviewPaidFree').removeAttr('class').attr('class', 'user_btn colors1').text('pay');
+
+            // [서비스] 항목
+            $('#selectedServicePackList').html('');
+            $('input:radio[name=starterUseYn]:input[value="Y"]').prop('checked', true);
+
+        }else if(ACTIVE_TAB == 'dev'){
+
+            // [앱 개발환경]
+
+            defaultDevEnvCategoryOptionList();
+            defaultDevEnvBuildpackOptionList();
+
+            //초기화
+            $('select[id=devEnvtagParamInput]').val("cf");
+            $('select[id=devEnvtagParamInputPaidFree]').val("pay");
+            $('select[id=devEnvtag1]').val("colors1");
+            $('select[id=devEnvtag2]').val("colors1");
+            $('#devEnvtagPreviewClassification').removeAttr('class').attr('class', 'user_btn colors1').text('cf');
+            $('#devEnvtagPreviewPaidFree').removeAttr('class').attr('class', 'user_btn colors1').text('pay');
+            $('input:radio[name=devEnvUseYn]:input[value="Y"]').prop('checked', true);
+            $('#devEnvAppRemove').trigger('click');
+            $('.tag-param-added').remove();
+
+        }else if(ACTIVE_TAB == 'service'){
+
+            // [앱 서비스]
+            defaultServiceCategoryOptionList();
+            defaultServiceServiceOptionList();
+
+            $('input:radio[name=serviceUseYn]:input[value="Y"]').prop('checked', true); // 공개 여부
+            $('input:radio[name=appBindUseYn]:input[value="Y"]').prop('checked', true); // 앱 바인드 파라미터 사용
+            $('input:radio[name=dashBoardUseYn]:input[value="N"]').prop('checked', true); // 대시보드 사용
+            $('input:radio[name=OnDemandYn]:input[value="N"]').prop('checked', true); // 대시보드 사용
+
+            // 초기화
+            $('input[name=serviceParamInput]').val("");
+            $('input[name=appBindParamInput]').val("");
+            $('select[id=tagParamInput]').val("cf");
+            $('select[id=tagParamInputPaidFree]').val("pay");
+            $('select[id=tag1]').val("colors1");
+            $('select[id=tag2]').val("colors1");
+            $('#tag1param').removeAttr('class').attr('class', 'user_btn colors1').text('cf');
+            $('#tagPreviewPaidFree').removeAttr('class').attr('class', 'user_btn colors1').text('pay');
+
+
+            // 파라미터 추가 영역 삭제
+            $('.service-param-added').remove();
+            $('.app-bind-param-added').remove();
+            $('.tag-param-added').remove();
+
+            $('div[name=appRemove]').trigger('click');
+        }
+
+        BEFORE_THUMB_NAME = "";
+        BEFORE_THUMB_PATH = "";
+        BEFORE_SAMPLE_APP_NAME = "";
+        BEFORE_SAMPLE_APP_PATH = "";
+
+        $('input[name=id],input[name=name],input[name=summary]').val('');
+        $('textarea').val('');
+        $('div[name=thumRemove]').trigger('click');
+    }
+
+    // SET FILE INFO
+    var procSetFileInfo = function(reqFile) {
+        var fileName = reqFile[0].name;
+        var limitFileSizeMb = /*[[${T(org.openpaas.paasta.portal.web.admin.common.Constants).CATALOG_APP_SAMPLE_LIMIT_FILE_SIZE_MB}]]*/ "";
+        var limitFileSize = parseInt(limitFileSizeMb) << 20;
+        var orgFileSize = reqFile[0].size;
+        if (limitFileSize < orgFileSize) {
+            var alertMessage = '파일 크기는 ' + limitFileSizeMb + ' MB 를 넘을 수 없습니다.';
+            notifyAlert("danger","",alertMessage);
+            return false;
+        }
+        //REQUEST_APP_SAMPLE_FILE = reqFile;
+        procSetFileLabel(fileName, orgFileSize, null);
+    };
+
+    // SET FILE LABEL
+    var procSetFileLabel = function(reqFileName, reqOrgFileSize, reqFilePath) {
+        if (null == reqFileName || '' == reqFileName){
+            return false;
+        }
+        //var doc = document;
+        var fileSize = procConvertFormatNumber(procCalculateFloor(parseInt(reqOrgFileSize) / 1024, 2));
+        var fileName = reqFileName + " (" + fileSize + " KB)";
+        //doc.getElementById('appSampleFileName').value = reqFileName;
+        //doc.getElementById('appSampleFileSize').value = reqOrgFileSize;
+
+        var linkHtml;
+        if ( reqFilePath != null ) {
+            linkHtml = '<a href="javascript:void(0);" onclick="procDownload(\'' + reqFilePath + '\', \'' + reqFileName + '\')">' + fileName + '</a>';
+        }else{
+            linkHtml = '<a>' + fileName + '</a>';
+        }
+        linkHtml += "<i class='fa fa-times file-remove-button' id='devEnvAppRemove' name='appRemove'></i>";
+
+        $('#devEnvLabelAppName').html(linkHtml);
+
+        // 앱 샘플 삭제 버튼 처리
+        $('#devEnvAppRemove').on('click', function(e){
+            resetAppSample("<a>"+NOT_FOUND_ATTACH_FILE_MESSAGE+"</a>");
+        });
+    };
+
+    // CONVERT FORMAT NUMBER
+    var procConvertFormatNumber = function (reqString) {
+        return reqString.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // CALCULATE FLOOR
+    var procCalculateFloor = function(reqNumber, reqPosition) {
+        var digits = Math.pow(10, reqPosition);
+        var num = Math.round(reqNumber * digits) / digits;
+        return num.toFixed(reqPosition);
+    };
+
+    // [앱 템플릿] 상세 - 서비스 셀렉트 박스 초기값
+    function defaultStarterServiceOptionList(){
+        var objSelectBox = $('#servicePackList');
+        objSelectBox.html('');
+        $.each(STARTER_SERVICE_LIST, function (index, data) {
+            objSelectBox.append('<option value='+data.no+'>'+data.name+'</option>');
+        });
+    }
+
+    // [앱 템플릿] 상세 - 분류 셀렉트 박스 초기값
+    function defaultStarterCategoryOptionList(){
+        var objSelectBox = $('#categoryList');
+        objSelectBox.html('');
+        $.each(STARTER_CATEGORY_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.key + "'> " + data.value + " </option>");
+        });
+    }
+
+    // [앱 템플릿] 상세 - [앱 개발 환경] 셀렉트 박스 초기값
+    function defaultStarterDevEnvOptionList(){
+        var objSelectBox = $('#buildPackList');
+        objSelectBox.html('');
+        objSelectBox.append("<option value='0'>NONE</option>");
+        $.each(STARTER_DEV_ENV_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.no + "'> " + data.name + " </option>");
+        });
+    }
+
+    // [앱 개발환경] 상세 - [분류] 셀렉트 박스 초기값
+    function defaultDevEnvCategoryOptionList(){
+        var objSelectBox = $('#categoryDevEnvList');
+        objSelectBox.html('');
+        $.each(DEV_ENV_CATEGORY_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.key + "'> " + data.value + " </option>");
+        });
+    }
+
+    // [앱 개발환경] 상세 - [앱 개발 환경] 셀렉트 박스 초기값
+    function defaultDevEnvBuildpackOptionList(){
+        var objSelectBox = $('#buildPackDevEnvList');
+        objSelectBox.html('');
+        objSelectBox.append("<option value='NONE'>NONE</option>");
+        $.each(DEV_ENV_BUILDPACK_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.entity.name + "'> " + data.entity.name + " </option>");
+        });
+    }
+
+    // [앱 서비스] 상세 - [분류] 셀렉트 박스 초기값
+    function defaultServiceCategoryOptionList(){
+        var objSelectBox = $('#categoryServiceList');
+        objSelectBox.html('');
+        $.each(SERVICE_CATEGORY_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.key + "'> " + data.value + " </option>");
+        });
+    }
+
+    // [앱 서비스] 상세 - [서비스] 셀렉트 박스 초기값
+    function defaultServiceServiceOptionList(){
+        var objSelectBox = $('#serviceServicePackList');
+        objSelectBox.html('');
+        objSelectBox.append("<option value='NONE'>NONE</option>");
+        $.each(SERVICE_SERVICE_LIST, function (index, data) {
+            objSelectBox.append("<option value='" + data.entity.label + "'> " + data.entity.label + " </option>");
+        });
+    }
+
+    // reqType 따른 파일 업로드 / 삭제 처리
+    var uploadFile = function(formData, reqType, reqUploadUrl, reqProcFunction) {
+
+        $.ajax({
+            url : reqUploadUrl
+            , method : reqType
+            , processData : false
+            , contentType : false
+            , data : formData
+            , dataType : "json"
+            , timeout : 600000
+            ,success : function(data){
+
+                if(reqType == "DELETE"){ // 삭제시 파일정보 초기화
+                    data.filename = "";
+                    data.fileURL  = "";
+                    data.length   = "";
+                }
+
+                if(reqProcFunction != null){
+                    reqProcFunction(data);
+                }
+            },
+            error: function(xhr, status, error) {
+
+                notifyAlert('danger','',JSON.parse(xhr.responseText).message);
+            },
+            complete : function(data) {
+
+            }
+        });
+    };
+
+    // [앱 서비스] 상세 - [앱 바인드 파라미터] 템플릿
+    function appBindParamAdd(index, input, type){
+
+        var tempHtml =
+            "<div class='form-group app-bind-param-added' name='appBindParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <input type='text' class='form-control' name='appBindParamInput'/>"
+            +"       </div>"
+            +"       <div class='col-sm-3 col-xs-6'>"
+            +"           <select class='form-control' name='appBindParamType' style='width:auto;'>"
+            +"               <option value='text'>텍스트형</option>"
+            +"               <option value='password'>패스워드</option>"
+            +"               <option value='default'>자동입력</option>"
+            +"               <option value='userAppointed'>관리자 지정</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-2 col-xs-3'>"
+            +"       <button type='button' class='btn btn-sm btn-danger' name='appBindParamRemove'>삭제</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=appBindParamForm]:last').after(tempHtml);
+
+        if(index != undefined){
+            input = (input == undefined) ? "" : input;
+            type = (type == undefined) ? "" : type;
+            setAppBindParam(index, input, type);
+        }
+
+    }
+
+    // [앱 서비스] 상세 - [앱 바인드 파라미터] 셋팅
+    function setAppBindParam(index, input, type){
+        eval("$('input[name=appBindParamInput]:eq("+index+")').val('"+input+"')");
+        eval("$('select[name=appBindParamType]:eq("+index+")').val('"+type+"')");
+    }
+
+    // [앱 서비스] 상세 - [앱 서비스 파라미터] 템플릿
+    function appServiceParamAdd(index, input, type){
+
+        var tempHtml =
+            "<div class='form-group service-param-added' name='serviceParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <input type='text' class='form-control' name='serviceParamInput'/>"
+            +"       </div>"
+            +"       <div class='col-sm-3 col-xs-6'>"
+            +"           <select class='form-control' name='serviceParamType' style='width:auto;'>"
+            +"               <option value='text'>텍스트형</option>"
+            +"               <option value='password'>패스워드</option>"
+            +"               <option value='default'>자동입력</option>"
+            +"               <option value='userAppointed'>관리자 지정</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-2 col-xs-3'>"
+            +"       <button type='button' class='btn btn-sm btn-danger' name='serviceParamRemove'>삭제</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=serviceParamForm]:last').after(tempHtml);
+
+        if(index != undefined){
+            input = (input == undefined) ? "" : input;
+            type = (type == undefined) ? "" : type;
+            setAppServiceParam(index, input, type);
+        }
+    }
+
+    // [앱 서비스] 상세 - [앱 서비스 파라미터] 셋팅
+    function setAppServiceParam(index, input, type){
+        eval("$('input[name=serviceParamInput]:eq("+index+")').val('"+input+"')");
+        eval("$('select[name=serviceParamType]:eq("+index+")').val('"+type+"')");
+    }
+
+    // [앱 템플릿] 상세 - [Tag Classification 파라미터] 템플릿
+    function appStarterTagParamAdd(index, type, type2){
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='startertagParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='startertagParamInput' id='startertagPreviewClassification'>"
+            +"               <option value='cf'>cf</option>"
+            +"               <option value='community'>community</option>"
+            +"           </select>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='startertagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='startertagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=startertagParamForm]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=startertagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').removeClass('hide')");
+            setStarterTagParam(index, type, type2);
+        }
+    }
+
+    // [앱 템플릿] 상세 - [Tag PaidFree 파라미터] 템플릿
+    function appStarterTagParamAdd(index, type, type2){
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='startertagParamFormPaidFree'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='startertagParamInput' id='startertagParamInputPaidFree'>"
+            +"               <option value='pay'>pay</option>"
+            +"               <option value='free'>free</option>"
+            +"           </select>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='startertagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='startertagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=startertagParamForm]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=startertagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').removeClass('hide')");
+            setStarterTagParam(index, type, type2);
+        }
+    }
+
+    // [앱 템플릿] 상세 - [앱 Tag] 셋팅
+    function setStarterTagParam(index, type, type2){
+
+        eval("$('select[name=startertagParamInput]:eq("+index+")').val('"+type+"')");
+        eval("$('select[name=startertagParamType]:eq("+index+")').val('"+type2+"')");
+
+        if(type !== undefined){
+            eval("$('button[name=startertagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=startertagPreview]:eq("+index+")').removeClass('hide')");
+        }
+    }
+
+    // [앱 개발환경] 상세 - [Tag Classification 파라미터] 템플릿
+    function appDevEnvTagParamAdd(index, type, type2){
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='devEnvtagParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='devEnvtagParamInput' id='devEnvtagPreviewClassification'>"
+            +"               <option value='cf'>cf</option>"
+            +"               <option value='community'>community</option>"
+            +"           </select>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='devEnvtagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='devEnvtagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=devEnvtagParamForm]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').removeClass('hide')");
+            setDevEnvTagParam(index, type, type2);
+        }
+    }
+
+    // [앱 개발환경] 상세 - [Tag Paid Free 파라미터] 템플릿
+    function appDevEnvTagParamAddPaidFree(index, type, type2){
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='devEnvtagParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='devEnvtagParamInput' id='devEnvtagPreviewPaidFree'>"
+            +"               <option value='pay'>pay</option>"
+            +"               <option value='free'>free</option>"
+            +"           </select>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='devEnvtagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='devEnvtagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=devEnvtagParamFormPaidFree]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').removeClass('hide')");
+            setDevEnvTagParam(index, type, type2);
+        }
+    }
+
+    // [앱 개발환경] 상세 - [앱 Tag] 셋팅
+    function setDevEnvTagParam(index, type, type2){
+
+        eval("$('select[name=devEnvtagParamInput]:eq("+index+")').val('"+type+"')");
+        eval("$('select[name=devEnvtagParamType]:eq("+index+")').val('"+type2+"')");
+
+        if(type !== undefined){
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=devEnvtagPreview]:eq("+index+")').removeClass('hide')");
+        }
+    }
+
+    // [앱 서비스] 상세 - [Tag Classification 파라미터] 템플릿
+    function appTagParamAdd(index, type, type2){
+
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='tagParamForm'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='tagParamInput' id='tag1param'/>"
+            +"               <option value='cf'>cf</option>"
+            +"               <option value='community'>community</option>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='tagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='tagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=tagParamForm]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=tagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').removeClass('hide')");
+            setTagParam(index, type2, type);
+        }
+    }
+
+    // [앱 서비스] 상세 - [Tag Paid Free 파라미터] 템플릿
+    function appTagParamAddPaidFree(index, type, type2){
+
+        var tempHtml =
+            "<div class='form-group tag-param-added' name='tagParamInput'>"
+            +"   <div class='col-sm-3 col-xs-12 control-label'></div>"
+            +"   <div name='paramArea'>"
+            +"       <div class='col-sm-4 col-xs-3'>"
+            +"           <select class='form-control' name='tagParamInput' id='tagPreviewPaidFree'/>"
+            +"               <option value='pay'>pay</option>"
+            +"               <option value='free'>free</option>"
+            +"       </div>"
+            +"       <div class='col-sm-2 col-xs-3'>"
+            +"           <select class='form-control' name='tagParamType' style='width:auto;'>"
+            +"               <option value='colors1'>tag1</option>"
+            +"               <option value='colors2'>tag2</option>"
+            +"               <option value='colors3'>tag3</option>"
+            +"               <option value='colors4'>tag4</option>"
+            +"               <option value='colors5'>tag5</option>"
+            +"               <option value='colors6'>tag6</option>"
+            +"           </select>"
+            +"       </div>"
+            +"   <div class='col-sm-1 col-xs-3'>"
+            +"          <button class='user_btn colors1 hide' name='tagPreview' style='position: absolute;top: 6px;left: -8px;' disabled='disabled'>tag1</button>"
+            +"   </div>"
+            +"   </div>"
+            +" </div>";
+
+        $('div[name=tagParamFormPaidFree]:last').after(tempHtml);
+
+        if(type !== undefined){
+            eval("$('button[name=tagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').removeClass('hide')");
+            setTagParam(index, type2, type);
+        }
+    }
+
+    // [앱 서비스] 상세 - [앱 Tag] 셋팅
+    function setTagParam(index, type, type2){
+
+
+        eval("$('select[name=tagParamInput]:eq("+index+")').val('"+type+"')");
+        eval("$('select[name=tagParamType]:eq("+index+")').val('"+type2+"')");
+
+        if(type !== undefined){
+            eval("$('button[name=tagPreview]:eq("+index+")').text('"+type+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').addClass('"+type2+"')");
+            eval("$('button[name=tagPreview]:eq("+index+")').removeClass('hide')");
+        }
+    }
+
+    /*]]>*/
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+---
+name: cubrid
+
+dependencies:
+
+files:
+- cubrid/CUBRID-10.2.1.8849-de852d6-Linux.x86_64.tar.gz

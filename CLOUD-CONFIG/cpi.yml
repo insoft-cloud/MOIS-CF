@@ -1,0 +1,16 @@
+cpis:
+- name: default
+  type: openstack
+  properties:
+    project: platform-dev
+    auth_url: https://openstack.mgmt.dev.egovp.kr:5000/v3
+    username: platform-dev
+    api_key: platformdev123!q
+    domain: Default
+    region: RegionOne
+    default_key_name: platform-keypair
+    default_security_groups: [default]
+    connection_options:
+      ssl_verify_peer: false
+    human_readable_vm_names: true
+

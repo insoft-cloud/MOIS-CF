@@ -1,0 +1,33 @@
+---
+name: mariadb
+
+templates:
+  bin/mariadb_ctl.erb: bin/mariadb_ctl
+  bin/pre-start.erb: bin/pre-start
+  bin/post-start.erb: bin/post-start
+  config/mariadb.cnf.erb: config/mariadb.cnf
+  config/init.sql: config/init.sql
+
+packages:
+- mariadb
+
+provides:
+- name: mariadb
+  type: mariadb
+
+consumes:
+- name: mariadb
+  type: mariadb
+
+
+properties:
+  port:
+    description: MariaDB server port
+    default: 3306
+  username:
+    description: 'MariaDB admin user'
+  password:
+    description: 'MariaDB admin user password'
+    default: admin
+  database:
+    default: egovp-platform

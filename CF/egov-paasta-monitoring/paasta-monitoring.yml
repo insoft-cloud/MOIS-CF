@@ -1,0 +1,845 @@
+---
+name: egov-paasta-monitoring
+
+addons:
+- name: bpm
+  jobs:
+  - name: bpm
+    release: bpm
+#- name: egov-monitoring-agent
+#  include:
+#    stemcells:
+#    - os: ubuntu-xenial
+#  jobs:
+#  - name: metrics_agent
+#    release: egov-monitoring-agent
+#    properties:
+#      metrics_agent:
+#        influxdb:
+#          url: "192.168.22.80:8049"
+#          database: service_metric_db
+#          measurement: service_metrics
+#          processMeasurement: service_process_metrics
+#        origin: operation_mgmt
+#        deployment: platform_integrate_mgmt
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: '315.64'
+
+releases:
+- name: egov-paasta-monitoring
+  version: "1+dev.22"
+  url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/service/egov-paasta-monitoring.tgz
+- name: bpm
+  sha1: 44ffa71e70adfb262655253662c83148581ac970
+  url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/paasta-monitoring/bpm-1.1.0-ubuntu-xenial-315.36-20190605-202629-386782261.tgz
+  version: '1.1.0'
+- name: redis
+  version: '14.0.1'
+  url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/paasta-monitoring/redis-14.0.1.tgz
+  sha1: fd4a6107e1fb8aca1d551054d8bc07e4f53ddf05
+- name: influxdb
+  version: '1.5.1'
+  url: file:///home/((inception_os_user_name))/workspace/paasta-5.0/release/paasta-monitoring/influxdb.tgz
+  sha1: 2337d1f26f46100b8d438b50b71e300941da74a2
+#- name: egov-monitoring-agent                  # 서비스 릴리즈 이름(필수) bosh releases로 확인 가능
+#  version: "0+dev.28"
+
+
+instance_groups:
+- name: redis
+  azs: [z4]
+  instances: 1
+  vm_type: small
+  stemcell: default
+  persistent_disk: 10240
+  networks:
+  - name: ((private_network_name))
+    static_ips:
+    - ((redis_ip))
+ 
+  jobs:
+  - name: redis
+    release: redis
+    properties:
+      password: ((redis_password))
+- name: sanity-tests
+  azs: [z4]
+  instances: 1
+  lifecycle: errand
+  vm_type: small
+  stemcell: default
+  networks: [{name: ((private_network_name))}]
+  jobs:
+  - name: sanity-tests
+    release: redis
+
+- name: influxdb
+  azs: [z5]
+  instances: 1
+  vm_type: medium
+  stemcell: default
+  persistent_disk_type: 50GB
+  networks:
+  - name: ((private_network_name))
+    default: [dns, gateway] 
+    static_ips:
+    - ((private_influxdb_ip)) 
+  - name: ((public_network_name))
+    static_ips:
+    - ((public_influxdb_ip)) 
+
+  jobs:
+  - name: influxdb
+    release: influxdb
+    properties:
+      influxdb:
+        database: cf_metric_db
+        user: root
+        password: root
+        replication: 1
+        ips: 127.0.0.1
+  - name: chronograf
+    release: influxdb
+
+
+- name: grafana
+  azs: [z1]
+  instances: 1
+  vm_type: medium
+  stemcell: default
+  persistent_disk_type: 10GB
+  networks:
+  - name: ((private_network_name))
+    default: [dns, gateway]    
+  - name: ((public_network_name))
+    static_ips: [10.182.164.155]
+
+  jobs:
+  - name: grafana
+    release: egov-paasta-monitoring
+    properties:                                 #grafana에서 접속할 InfluxDB 설정
+      grafana:
+        root_url: https://dashboard.admin.dev.egovp.kr/grafana
+        listen_port: 3000                                              #grafana listen port
+        admin_username: admin                                        #grafana admin account
+        admin_password: admin                                     #grafana admin password
+        users:
+          allow_sign_up: true
+          auto_assign_organization: true
+        auth:
+          anonymous:
+           enabled: true
+        influxdb:
+          url: http://192.168.22.80:8086
+        mariadb:
+          url: 192.168.22.95:3306
+          user: root
+          database: infranics
+          password: password
+        prometheus:
+          url: https://k8s.console.dev.egovp.kr/k8s/clusters/c-s22mk/api/v1/namespaces/cattle-prometheus/services/http:access-prometheus:80/proxy
+          key: "R_SESS=token-z5cpk:b6pwwvhf8r2xjbxrc5jjczh7jm9wl92ddc2mcx42wg59ggs4qj9qmp"
+        elasticsearch:
+          url: http://192.168.22.180:9200
+        jsonapi:
+          url: http://192.168.22.86:8090/cf/log
+      datasource:                             #grafana에서 접속할 InfluxDB 설정
+        url: http://192.168.22.80:8086/                    #grafana에서 접속할 InfluxDB URL
+        name: Grafanadb
+        database_type: Influxdb                                #grafana에서 Influx에 접속할 DB TYPE
+        user: root                                                    #grafana에서 Influx에 접속할 계정
+        password: root                                              #grafana에서 Influx에 접속할 Password
+        database_name: cf_metric_db                
+
+
+- name: grafana_user
+  azs: [z1]
+  instances: 1
+  vm_type: medium
+  stemcell: default
+  persistent_disk_type: 10GB
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: grafana
+    release: egov-paasta-monitoring
+    properties:                                 #grafana에서 접속할 InfluxDB 설정
+      grafana:
+        root_url: https://dashboard.console.dev.egovp.kr/grafana
+        listen_port: 3000                                              #grafana listen port
+        admin_username: admin                                        #grafana admin account
+        admin_password: admin                                     #grafana admin password
+        users:
+          allow_sign_up: true
+          auto_assign_organization: true
+        auth:
+          anonymous:
+           enabled: true
+        influxdb:
+          url: http://192.168.22.80:8086
+        mariadb:
+          url: 192.168.22.95:3306
+          user: root
+          database: infranics
+          password: password
+        prometheus:
+          url: https://k8s.console.dev.egovp.kr/k8s/clusters/c-s22mk/api/v1/namespaces/cattle-prometheus/services/http:access-prometheus:80/proxy
+          key: "R_SESS=token-z5cpk:b6pwwvhf8r2xjbxrc5jjczh7jm9wl92ddc2mcx42wg59ggs4qj9qmp"
+        elasticsearch:
+          url: http://192.168.22.180:9200
+        jsonapi:
+          url: http://192.168.22.86:8090/cf/log
+      datasource:                             #grafana에서 접속할 InfluxDB 설정
+        url: http://192.168.22.80:8086/                    #grafana에서 접속할 InfluxDB URL
+        name: Grafanadb
+        database_type: Influxdb                                #grafana에서 Influx에 접속할 DB TYPE
+        user: root                                                    #grafana에서 Influx에 접속할 계정
+        password: root                                              #grafana에서 Influx에 접속할 Password
+        database_name: cf_metric_db
+
+
+
+- name: mariadb
+  azs: [z5]
+  instances: 1
+  vm_type: small
+  stemcell: default
+  persistent_disk_type: 5GB
+  networks:
+  - name: ((private_network_name))
+    static_ips: 
+    - ((mariadb_ip))
+  jobs:
+  - name: mariadb
+    release: egov-paasta-monitoring
+    properties:
+      mariadb:
+        port: ((mariadb_port))
+        admin_user:
+          password: ((mariadb_password))
+        databasename: ((mariadb_dbname))
+      use:
+        script:
+          post_start: "N"
+
+
+#- name: nw-monitoring-batch
+#  azs: [z1]
+# instances: 1
+#  vm_type: small
+#  stemcell: default
+#  networks:
+#  - name: ((private_network_name))
+#  jobs:
+#  - name: nw-monitoring-batch
+#    release: egov-paasta-monitoring
+#    consumes:
+#      influxdb: {from: influxdb}
+#    properties:
+#      monitoring-batch:
+#        influxdb:
+#          url: ((private_influxdb_ip)):8086
+#        db:
+#          ip: ((mariadb_ip))
+#          port: ((mariadb_port))
+#          username: ((mariadb_username))
+#          password: ((mariadb_password))
+#          dbname: ((mariadb_dbname))
+
+- name: perf-monitoring-batch
+  azs: [z1]
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: perf-monitoring-batch
+    release: egov-paasta-monitoring
+    consumes:
+      influxdb: {from: influxdb}
+    properties:
+      monitoring-batch:
+        influxdb:
+          url: ((private_influxdb_ip)):8086
+        db:
+          ip: ((mariadb_ip))
+          port: ((mariadb_port))
+          username: ((mariadb_username))
+          password: ((mariadb_password))
+          dbname: ((mariadb_dbname))
+
+
+- name: monitoring-batch
+  azs: [z6]
+  instances: 1
+  vm_type: small 
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-batch
+    release: egov-paasta-monitoring
+    consumes:
+      influxdb: {from: influxdb}
+    properties:
+      monitoring-batch:
+        influxdb:
+          url: ((private_influxdb_ip)):8086
+        db:
+          ip: ((mariadb_ip))
+          port: ((mariadb_port))
+          username: ((mariadb_username))
+          password: ((mariadb_password))
+          dbname: ((mariadb_dbname))
+        policy:
+          db:
+            ip: 10.182.164.66
+            port: 3306
+            username: platform
+            password: platform
+            dbname: ECP_ADMIN
+        paasta:
+          cell_prefix: ((paasta_cell_prefix))
+        bosh:
+          url: ((bosh_url))
+          password: ((bosh_password))
+          director_name: ((director_name))
+          paasta:
+            deployments: ((paasta_deploy_name))
+        mail:
+          smtp:
+            url: ((smtp_url))
+            port: ((smtp_port))
+          sender:
+            name: ((mail_sender))
+            password: ((mail_password))
+          resource:
+            url: ((resource_url))
+          send: ((mail_enable))
+          tls: ((mail_tls_enable))
+        redis:
+          url: ((redis_ip)):6379
+          password: ((redis_password))
+        paasta:
+          apiurl: https://api.((system_domain))
+          uaaurl: https://uaa.((system_domain))
+          username: ((paasta_username))
+          password: ((paasta_password))
+        logthr:
+          api: http://10.182.164.149:8300/threshold/alarms
+        rancher:
+          api: https://k8s.console.dev.egovp.kr/v3/clusterAlertRules
+          authkey: dG9rZW4tNjUydHQ6Y3htOTd0N3Nqc3BwenByd2NmbGQ5aGZuN2h6bWI2dzZ0eDZnNGRrNHZmOGg5d2R4bHZ4cm5o
+
+- name: monitoring-thr
+  azs: [z6]
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-thr
+    release: egov-paasta-monitoring
+    consumes:
+      influxdb: {from: influxdb}
+    properties:
+      monitoring-batch:
+        influxdb:
+          url: ((private_influxdb_ip)):8086
+        db:
+          ip: ((mariadb_ip))
+          port: ((mariadb_port))
+          username: ((mariadb_username))
+          password: ((mariadb_password))
+          dbname: ((mariadb_dbname))
+        policy:
+          db:
+            ip: 10.182.164.66
+            port: 3306
+            username: platform
+            password: platform
+            dbname: ECP_ADMIN
+        paasta:
+          cell_prefix: ((paasta_cell_prefix))
+        bosh:
+          url: ((bosh_url))
+          password: ((bosh_password))
+          director_name: ((director_name))
+          paasta:
+            deployments: ((paasta_deploy_name))
+        mail:
+          smtp:
+            url: ((smtp_url))
+            port: ((smtp_port))
+          sender:
+            name: ((mail_sender))
+            password: ((mail_password))
+          resource:
+            url: ((resource_url))
+          send: ((mail_enable))
+          tls: ((mail_tls_enable))
+        redis:
+          url: ((redis_ip)):6379
+          password: ((redis_password))
+        paasta:
+          apiurl: https://api.((system_domain))
+          uaaurl: https://uaa.((system_domain))
+          username: ((paasta_username))
+          password: ((paasta_password))
+        logthr:
+          api: http://10.182.164.149:8300/threshold/alarms
+        rancher:
+          api: https://k8s.console.dev.egovp.kr/v3/clusterAlertRules
+          authkey: dG9rZW4tNjUydHQ6Y3htOTd0N3Nqc3BwenByd2NmbGQ5aGZuN2h6bWI2dzZ0eDZnNGRrNHZmOGg5d2R4bHZ4cm5o
+#- name: caas-monitoring-batch
+#  azs: [z6]
+#  instances: 1
+#  vm_type: small
+#  stemcell: default
+#  networks:
+#  - name: default
+#  jobs:
+#  - name: caas-monitoring-batch
+#    release: paasta-monitoring-release
+ #   consumes:
+ #     influxdb: {from: influxdb}
+#    properties:
+#      caas-monitoring-batch:
+#        db:
+#          ip: ((mariadb_ip))
+#          port: ((mariadb_port))
+#          username: ((mariadb_username))
+#          password: ((mariadb_password))
+#        mail:
+#          smtp:
+#            url: ((smtp_url))
+#            port: ((smtp_port))
+#          sender:
+#            name: ((mail_sender))
+#            password: ((mail_password))
+#          resource:
+#            url: ((resource_url))
+#          send: ((mail_enable))
+#          tls: ((mail_tls_enable))
+#        public:
+#          url: ((monit_public_ip)):8080
+
+- name: saas-monitoring-batch
+  azs: [z6]
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: default
+  jobs:
+  - name: saas-monitoring-batch
+    release: egov-paasta-monitoring
+    consumes:
+      influxdb: {from: influxdb}
+    properties:
+     saas-monitoring-batch:
+        db:
+          ip: ((mariadb_ip))
+          port: ((mariadb_port))
+          username: ((mariadb_username))
+          password: ((mariadb_password))
+          dbname: ((mariadb_dbname))
+        mail:
+          smtp:
+            url: ((smtp_url))
+            port: ((smtp_port))
+          sender:
+            name: ((mail_sender))
+            password: ((mail_password))
+          resource:
+            url: ((resource_url))
+          send: ((mail_enable))
+          tls: ((mail_tls_enable))
+        pinpoint:
+          url: ((pinpoint_ip))
+
+- name: monitoring-collector
+  azs:
+  - z1
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-collector
+    release: egov-paasta-monitoring
+  syslog_aggregator: null
+  properties:
+    java_opts: "-Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+    datasource:
+      portal:
+        url: jdbc:mysql://((mariadb_ip)):((mariadb_port))/((mariadb_dbname))
+        username: ((mariadb_username))
+        password: ((mariadb_password))
+      prject:
+        url: jdbc:mysql://10.182.164.66:3306/ECP_ADMIN
+        username: platform
+        password: platform
+    cloudfoundry:
+      cc:
+        api:
+          url: ((cf_api_url))
+      user: # CloudFoundry Login information
+        admin:
+          username: admin
+          password: "((cf_admin_password))"
+    spring:
+      cloud:
+        vault:
+          host: vault.mgmt.dev.egovp.kr
+          port: 80
+          scheme: http
+          token: s.077H8ClcntRvzh5UPmQIWGTn
+          cf:
+            path: 'secret/data/dev/cf/{project_id}'
+          k8s:
+            path: 'secret/data/dev/k8s/{project_id}/kubeconfig'
+          iaas:
+            path: 'secret/data/dev/portal/iaas/{project_id}'
+
+    openstack:
+      natip: 10.182.161.20
+      endpoint: https://10.182.161.20:5000/v3
+      domain: Default
+      project: platform-dev
+      username: platform-admin  
+      password: 'platformadmin123!q'
+    rancher:
+      api:
+        url: https://k8s.console.dev.egovp.kr
+        authorization: 'Basic dG9rZW4tNjUydHQ6Y3htOTd0N3Nqc3BwenByd2NmbGQ5aGZuN2h6bWI2dzZ0eDZnNGRrNHZmOGg5d2R4bHZ4cm5o'
+    pinpoint:
+      api:
+        url: http://192.168.22.92
+
+- name: monitoring-backend
+  azs:
+  - z1
+  instances: 1
+  vm_type: medium
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-backend
+    release: egov-paasta-monitoring
+  syslog_aggregator: null
+  properties:
+    java_opts: "-Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+    datasource:
+      portal:
+        url: jdbc:mysql://((mariadb_ip)):((mariadb_port))/((mariadb_dbname))
+        username: ((mariadb_username))
+        password: ((mariadb_password))
+
+
+- name: monitoring-api
+  azs:
+  - z1
+  instances: 1
+  vm_type: medium
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-api
+    release: egov-paasta-monitoring
+  syslog_aggregator: null
+  properties:
+    java_opts: "-Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+    datasource:
+      portal:
+        url: jdbc:mysql://((mariadb_ip)):((mariadb_port))/((mariadb_dbname))
+        username: ((mariadb_username))
+        password: ((mariadb_password))
+    cloudfoundry:
+      cc:
+        api:
+          url: ((cf_api_url))
+          uaaUrl: ((cf_uaa_url))
+          sslSkipValidation: true
+      user: # CloudFoundry Login information
+        admin:
+          username: admin
+          password: "((cf_admin_password))"
+        uaaClient:
+          clientId: admin
+          clientSecret: ((cf_uaa_admin_client_secret))
+          adminClientId: admin
+          adminClientSecret: ((cf_uaa_admin_client_secret))
+          loginClientId: admin
+          loginClientSecret: ((cf_uaa_admin_client_secret))
+          skipSSLValidation: true
+      authorization: cf-Authorization
+
+- name: monitoring-mvinstt
+  azs:
+  - z1
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+   # static_ips: 192.168.22.91
+  jobs:
+  - name: monitoring-mvinstt
+    release: egov-paasta-monitoring
+  syslog_aggregator: null
+  properties:
+    java_opts: "-Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+    rabbitmq:
+      host: rabbitmq.dev.egovp.kr
+      port: 30002
+      username: admin
+      password: uocYoYvV2OSIGLiw8MJQ
+
+
+- name: monitoring-alarm
+  azs:
+  - z1
+  instances: 1
+  vm_type: small
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-alarm
+    release: egov-paasta-monitoring
+  syslog_aggregator: null
+  properties:
+    java_opts: "-Xmx900m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+    datasource:
+      portal:
+        url: jdbc:mysql://((mariadb_ip)):((mariadb_port))/((mariadb_dbname))
+        username: ((mariadb_username))
+        password: ((mariadb_password))
+      policy:
+        url: jdbc:mysql://10.182.164.66:3306/ECP_ADMIN
+        username: platform
+        password: platform
+    spring:
+      cloud:
+        vault:
+          host: vault.mgmt.dev.egovp.kr
+          port: 80
+          scheme: http
+          token: s.077H8ClcntRvzh5UPmQIWGTn
+          path: secret/data/dev/portal/user
+    mois:
+      alarm:
+        send:
+          exception:
+            projectid: 00000000-0000-0000-0000-000000000000
+        email:
+          smtp:
+            host: 10.182.164.88
+            port: 587
+            auth: "Y"
+            username: "mailsender"
+            password: "mailsender"
+            from:
+              name: "mailsender"
+              email: "mailsender@egovp.kr"
+        sms:
+          sender: 02101200
+        mattermost:
+          url: https://mattermost.mgmt.dev.egovp.kr
+          login_id: jaehwan.kim@infranicsmail.com 
+          password: challenge77!!
+        rabbitmq:
+          server:
+            url: http://192.168.22.94:8080
+
+
+
+- name: monitoring-web
+  azs: [z7]
+  instances: 1
+  vm_type: medium 
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+  jobs:
+  - name: monitoring-web
+    release: egov-paasta-monitoring
+    properties:
+      javava_opts: "-Xmx450m -Xss1M -XX:MaxMetaspaceSize=93382K -XX:ReservedCodeCacheSize=240m -XX:+UseCompressedOops -Djdk.tls.ephemeralDHKeySize=2048 -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -Xverify:none -XX:ErrorFile=/var/vcap/sys/log/java_error_in_idea_%p.log -XX:HeapDumpPath=/var/vcap/sys/log/java_error_in_idea.hprof"
+      api:
+        url: "http://192.168.22.91:2222"
+      frontend:
+        url: "https://dashboard.admin.dev.egovp.kr"
+      backend:
+        url: "http://192.168.22.86:8090"
+      pinpoint:
+        url: "https://pinpoint.console.dev.egovp.kr"
+      grafana:
+        #url: "https://dashboard.admin.dev.egovp.kr/grafana"
+        url: "/grafana"
+      log:
+        url: "https://kibana.mgmt.dev.egovp.kr"
+      key:
+        url: "https://k8s.console.dev.egovp.kr"
+
+      port: 8090
+      keycloak:
+        oauth:
+          uri: "https://keycloak.mgmt.dev.egovp.kr/auth/realms/eGovCP"
+          client:
+            id: monitclient
+            secret: 01af2944-be72-4576-9aef-a8970565f10a
+            scope: "openid,read"
+      console:
+        cf:
+          portal:
+            api:
+              url: http://10.182.164.86:2225
+              username: admin
+              password: openpaasta
+              token:
+                url: /portalapi/login
+                id: admin
+                password: master77!!
+            log:
+              url: /portalapi/v2/apps/{app_guid}/recentlogs
+
+
+- name: haproxy
+  azs:
+  - z7
+  instances: 1
+  persistent_disk_type: 2GB
+  vm_type: medium
+  stemcell: default
+  networks:
+  - name: ((private_network_name))
+    #static_ips:
+    #- 192.168.22.87
+    default: [dns, gateway]
+  - name: ((public_network_name))
+    static_ips: [10.182.164.79]
+  jobs:
+  - name: haproxy
+    release: egov-paasta-monitoring
+    properties:
+      haproxy:
+        host_ip: 10.21.1.147                # sourcecontrol haproxy host IP
+        url: 10.21.1.147                # sourcecontrol haproxy host IP
+        is_https: true
+        http_port: 8080                        # sourcecontrol haproxy host port
+        ssh:
+          key: |+                      # haproxy에 들어가는 key (아래의 뎁스에 맞게 key 띄어쓰기 주의하여 입력)
+            -----BEGIN CERTIFICATE-----
+            MIIDsTCCApmgAwIBAgIJAPKykP563tPOMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNV
+            BAYTAktSMQ4wDAYDVQQIDAVTRU9VTDENMAsGA1UECgwETU9JUzENMAsGA1UECwwE
+            TU9JUzEVMBMGA1UEAwwMZGV2LmVnb3ZwLmtyMB4XDTIwMDYyMDA2MjgxNVoXDTI5
+            MDYxODA2MjgxNVowVDELMAkGA1UEBhMCS1IxDjAMBgNVBAgMBVNFT1VMMQ0wCwYD
+            VQQKDARNT0lTMQ0wCwYDVQQLDARNT0lTMRcwFQYDVQQDDA4qLmRldi5lZ292cC5r
+            cjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALaza7iu/Wr1QqYjpN6w
+            TQ8WG9n0oT4ojmJOjaobL3qlq4J1Sz/OUPEnD2rBfyYNRkzE/4OfllpcVoNYKWIT
+            ieQRGujUpSCfREV8QXShUO4J+YNA6arIkLlVQnScd8AXFxTHpbIImYq0lLduSQKi
+            r6jhMFAuXa9g9gWSY86k/oNy+vs6nHgHRz3uGl0Rb7NqKLy0PGzQ6tetNgeMU55c
+            CihUgGuL84BQrKmR2KfzcnbbsGAgcHZUdxEyV1rJe0FABExlB4FBFbMDL0fPlHmK
+            X0rfMqEZsGdjwtrIqSz3wE4EYFjDLVI4+AkZxwav5G6MHQIeG4+O2e86MhlRuYFP
+            SskCAwEAAaOBhzCBhDAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DBqBgNVHREEYzBh
+            ggxkZXYuZWdvdnAua3KCDiouZGV2LmVnb3ZwLmtyghMqLm1nbXQuZGV2LmVnb3Zw
+            LmtyghYqLmNvbnNvbGUuZGV2LmVnb3ZwLmtyghQqLmFkbWluLmRldi5lZ292cC5r
+            cjANBgkqhkiG9w0BAQsFAAOCAQEAkPD152E0TUnQkNzu/4HpVpu0NUtLQ4sOuEcQ
+            s/1oMHCXpe26v7K02kbpQ0kZbJgA9ego5INyGzoj8qiZJ8MGT/1y74dEOURisGbw
+            06/lFuw+MX/iVwBMo93InzLTGrSyj6QKOio0TGt7lWK8z9NcIsA37J6dPLCGCAM6
+            ED4S7+NfimAhPM6zKIt0fhbBWaZpYHUWO1nlweVaAXjIE4+8TLbmBxmtxdL4jPQ/
+            EaVcUoIfKHsJHlo4Q1BKSTfVpGCF6OXXeW1EQ4+mTHCJ2Glmky1SEEpBJE52C2XO
+            7r4zmWsXKo8qhU86XGzs3Hu1f6q+RSTEV4hawdN+rBNwMn1DDQ==
+            -----END CERTIFICATE-----
+
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEowIBAAKCAQEAtrNruK79avVCpiOk3rBNDxYb2fShPiiOYk6NqhsveqWrgnVL
+            P85Q8ScPasF/Jg1GTMT/g5+WWlxWg1gpYhOJ5BEa6NSlIJ9ERXxBdKFQ7gn5g0Dp
+            qsiQuVVCdJx3wBcXFMelsgiZirSUt25JAqKvqOEwUC5dr2D2BZJjzqT+g3L6+zqc
+            eAdHPe4aXRFvs2oovLQ8bNDq1602B4xTnlwKKFSAa4vzgFCsqZHYp/NydtuwYCBw
+            dlR3ETJXWsl7QUAETGUHgUEVswMvR8+UeYpfSt8yoRmwZ2PC2sipLPfATgRgWMMt
+            Ujj4CRnHBq/kbowdAh4bj47Z7zoyGVG5gU9KyQIDAQABAoIBAAxYGxMjX6P2ZkZr
+            ahxRtSMrzz3utWZJvzUNMa0ooRCcWPY7jpYFDpr8lKIV6M1dYD6XoNv30GTSkFXX
+            gxRJVau/LB5HH9EQccBwIMwMijdLHTytChyr6HtdM1xFpiGobbrNsnhQ9G7WvKWY
+            If63lz7F2EnSmCndV0IRHgU8SKYA5XxJkoVcLn/pbt4dYdfqSqAW89etZc9VlJvD
+            zjCXrxjx3/pKvTTN7HqocYPhBetCflblTSCxqh/FqOkVrQzlURfE60btE1w84JEo
+            LcSrOK4p8yT2vi4VaaHGOuTPuvATUFGzPBclYHNOHFsDNsRzgIj9FPrsOZNRzs+c
+            oKvg+AECgYEA6bY1a+e6Cu5FgZ0VmMykCKuB22fCeaCTIUIMy5YzSqOltp1C85UB
+            PE0m6EXvARDVm5O0NuIWfUdklOTE1abiy0pvw3UkQpKu0foPPokCcuEofEc+ov0I
+            tpJFQDHYGsByyCsZcV0aVG4axJHsk3oLEJJMN2DWt/ldbsI1uLzhE4kCgYEAyB/X
+            s4QewuWEIPxTuBHHmOBPhWf2TkDZkGpcCUfgnUGP+lweekehsRQ2bxejNi5EbYU3
+            f02MNV6DfLHDimW7dcPdgGn7ZEdl5LOxIo1D2zhN4LvMiGVKpTCztDHHjYN+m9Hh
+            XQFKmdpxgDG5RPL8QDWuZTkOXLnFg6mzOlIYbUECgYEAieiK/XFvxqNzQFiBNfkL
+            klIh/mXry/mE2EsxYbDv80s9rdR+fV2frQWZv9YEgox8f6FY5knjG2nVYEbeH3Sq
+            v2rdKGknTGFh52W3OR9/4moaibtAqszFJ3aIhqji7GZDVPqZuNtHfiq6gOPaxetu
+            PAkYEFWEXms3RvQy3yAVcIECgYA67n2ThI2WcQYGvKdepgWz9CIWs/WpN5mZ2Gg/
+            52WyiVL/s87ZzWxE/CHHdxt94gQOiFM+brSiJrHrr2FYyPp6BHKe1RbNgeT0gyHf
+            feAEl0D/s+3YIJPprzzMDHiqKJXJBvYpcC7qvZP83yeisTctJWG0tyeOkLokOn3n
+            57L/wQKBgEy4DEhccAn6RiQZR9h2mDbpHQiiMj2a+ojkfmu/lNYcDBg4mKCgU9F3
+            xaofvySdqPlkXOs3PVQbCFAzPjF1XFRXCNs1UQ9k04x17SWQ23Y2Detlcelfx7T6
+            A6q4V0P1wX620a2O+w6ekd+ZThKl62jhE/RhwkX/tqWd74FBta6N
+            -----END RSA PRIVATE KEY-----
+
+
+            -----BEGIN CERTIFICATE REQUEST-----
+            MIIDMjCCAhoCAQAwVDELMAkGA1UEBhMCS1IxDjAMBgNVBAgMBVNFT1VMMQ0wCwYD
+            VQQKDARNT0lTMQ0wCwYDVQQLDARNT0lTMRcwFQYDVQQDDA4qLmRldi5lZ292cC5r
+            cjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALaza7iu/Wr1QqYjpN6w
+            TQ8WG9n0oT4ojmJOjaobL3qlq4J1Sz/OUPEnD2rBfyYNRkzE/4OfllpcVoNYKWIT
+            ieQRGujUpSCfREV8QXShUO4J+YNA6arIkLlVQnScd8AXFxTHpbIImYq0lLduSQKi
+            r6jhMFAuXa9g9gWSY86k/oNy+vs6nHgHRz3uGl0Rb7NqKLy0PGzQ6tetNgeMU55c
+            CihUgGuL84BQrKmR2KfzcnbbsGAgcHZUdxEyV1rJe0FABExlB4FBFbMDL0fPlHmK
+            X0rfMqEZsGdjwtrIqSz3wE4EYFjDLVI4+AkZxwav5G6MHQIeG4+O2e86MhlRuYFP
+            SskCAwEAAaCBmDCBlQYJKoZIhvcNAQkOMYGHMIGEMAkGA1UdEwQCMAAwCwYDVR0P
+            BAQDAgXgMGoGA1UdEQRjMGGCDGRldi5lZ292cC5rcoIOKi5kZXYuZWdvdnAua3KC
+            EyoubWdtdC5kZXYuZWdvdnAua3KCFiouY29uc29sZS5kZXYuZWdvdnAua3KCFCou
+            YWRtaW4uZGV2LmVnb3ZwLmtyMA0GCSqGSIb3DQEBBQUAA4IBAQA6+FMDlIw372Wn
+            Hzgo7B+aRd/JymH1Z2+FW/Ps4O3A9Qk1SIp2H632PIzjLel/HenvE3K4NKnfjrBo
+            1ox22BjK9JzsmGXLQq8F+JP7vzguQrIfn5ek8kc+Pr0p2JjDiwIaegBr1hTE4yL/
+            al4EN2ObdGMidQbIadkCUYdX12ncN/aYA4ftglMg1cZrVcnCz/kVktKBobuxQUWs
+            PDL1fFVIxqUudELIS2VA/uEzfY4GuqGFmhPeubFUx0AE9riOVqpXDCF56JUo6eOu
+            D+67eNXb2XRl0maHzHNCoPLJ5uu9i1Ii4UMle1E/J0pIMkk5PUp5/chjq58K2Vm0
+            /Z9YnQqy
+            -----END CERTIFICATE REQUEST-----
+
+      monitoring-web:
+        port: 8090
+        protocol: https
+        haproxy:
+          urls:
+          - 192.168.22.103
+      grafana:
+        port: 3000
+        protocl: http
+        haproxy:
+          urls:
+          - 192.168.22.41
+      grafanauser:
+        port: 3000
+        protocl: http
+        haproxy:
+          urls:
+          - 192.168.22.109
+
+
+
+variables:
+- name: redis_password
+  type: password
+
+update:
+  canaries: 1
+  canary_watch_time: 1000-180000
+  max_in_flight: 1
+  serial: true
+  update_watch_time: 1000-180000

@@ -1,0 +1,99 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>PaasTa-Admin</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="../../../resources/bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../../resources/bower_components/font-awesome/css/font-awesome.min.css"/>
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="../../../resources/bower_components/Ionicons/css/ionicons.min.css"/>
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../../resources/dist/css/AdminLTE.min.css"/>
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="../../../resources/dist/css/skins/_all-skins.min.css"/>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="../../resources/js/html5shiv.min.js"></script>
+    <script src="../../resources/js/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery 3 -->
+    <script src="../../resources/bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="../../resources/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <link href="../../resources/dist/css/common.css" rel="stylesheet"/>
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="../../../resources/css/googlefont.css"/>
+
+</head>
+<body class="hold-transition login-page" style="display: none">
+
+<div class="login-box">
+    <div class="login-logo">
+        <span class="login-icons"><img src="../../resources/images/mainuser.png"  class="img-circle" alt="User Image"/></span>
+    </div>
+    <div style="height: 20px"></div>
+    <div class="login-logo">
+        <a href="index"><b>MEMBER LOGIN</b></a>
+        <div><span class="login-font2" style="color: mediumblue;">운영자 포탈에 오신 것을 환영합니다.</span></div>
+    </div>
+    <!-- /.login-logo -->
+<!--    <div class="login-box-body">-->
+<!--        <p class="login-box-msg" id="warning" style="color: red;"></p>-->
+<!--        <form name='login' action='/index' method='POST' id="LOGIN">-->
+<!--            <div class="form-group has-feedback">-->
+<!--                <input class="form-control" type="text" name="id" id="id" placeholder="yourmail@example.com" value="1234"/>-->
+<!--                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>-->
+<!--            </div>-->
+<!--            <div class="form-group has-feedback">-->
+<!--                <input class="form-control" name="password" id="password" type="password" placeholder="Password" value="1234"/>-->
+<!--                <span class="glyphicon glyphicon-lock form-control-feedback"></span>-->
+<!--            </div>-->
+<!--            <div class="row">-->
+<!--                <div class="col-xs-8">-->
+<!--                    <div class="checkbox icheck">-->
+<!--                        <label>-->
+
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                &lt;!&ndash; /.col &ndash;&gt;-->
+<!--                <div class="col-xs-4">-->
+<!--                    <button type="submit" name="loginBtn" id="loginBtn" class="btn btn-primary btn-block btn-flat">로그인</button>-->
+<!--                    &lt;!&ndash;<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />&ndash;&gt;-->
+<!--                </div>-->
+<!--                &lt;!&ndash; /.col &ndash;&gt;-->
+
+<!--            </div>-->
+<!--        </form>-->
+<!--    </div>-->
+    <!-- /.login-box-body -->
+
+</div>
+<!-- /.login-box -->
+
+<script th:inline="javascript" type="text/javascript">
+    // ON LOAD
+    /*<![CDATA[*/
+    $(document.body).ready(function() {
+        window.location.href = window.location.origin + '/sso/login';
+    });
+    /*]]>*/
+
+</script>
+</body>
+</html>
+
+

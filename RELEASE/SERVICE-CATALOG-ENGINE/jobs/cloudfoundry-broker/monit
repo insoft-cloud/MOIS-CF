@@ -1,0 +1,5 @@
+check process service-broker
+  with pidfile /var/vcap/sys/run/cloudfoundry-broker/cloudfoundry-broker.pid
+  start program "/var/vcap/jobs/cloudfoundry-broker/bin/service_ctl start" with timeout 30 seconds
+  stop program "/var/vcap/jobs/cloudfoundry-broker/bin/service_ctl stop"
+  group vcap

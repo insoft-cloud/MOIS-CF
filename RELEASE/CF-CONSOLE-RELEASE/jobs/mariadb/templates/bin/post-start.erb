@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e -x
+
+JOB_NAME=mariadb
+CONF_DIR=/var/vcap/jobs/${JOB_NAME}/config
+PKG_DIR=/var/vcap/store/${JOB_NAME}
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+DATA_DIR=/var/vcap/store/mariadb-data
+
+<% if spec.bootstrap -%>
+if [ ! -d "$DATA_DIR/keystone" ]; then
+  echo "##### SERVICE-BROKER ::: DATABASE SCRIPT ::::: CREATE SCHEMA"
+  ${PKG_DIR}/bin/mysql -u root < ${CONF_DIR}/init.sql  
+fi
+${PKG_DIR}/bin/mysql -u root < ${CONF_DIR}/user.sql
+<% end -%>
+
+if [ ! -d "$DATA_DIR/test" ]; then
+  rm -rf ${DATA_DIR}/test
+fi
+
+chmod 750 /var/vcap/store/mariadb/support-files/mysql.server
+

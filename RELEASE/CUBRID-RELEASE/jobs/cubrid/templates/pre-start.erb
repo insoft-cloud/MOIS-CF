@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+
+if [[ ! `cat /etc/bash.bashrc|grep '#cubrid env'` ]];
+then
+  echo '#cubrid env' >> /etc/bash.bashrc
+  echo '. /var/vcap/jobs/cubrid/config/.cubrid.sh' >> /etc/bash.bashrc
+  echo 'vcap ALL=NOPASSWD: ALL' >> /etc/sudoers
+  chmod -R 777 /tmp
+fi
+
+if [ ! $CUBRID ]
+then
+  . /var/vcap/jobs/cubrid/config/.cubrid.sh
+fi
+
+

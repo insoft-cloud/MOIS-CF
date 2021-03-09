@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e -x pipefail
+
+export OS_USERNAME=admin
+export OS_PASSWORD=<%= p("password")%>
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_AUTH_URL=http://localhost:35357/v3
+export OS_IDENTITY_API_VERSION=3
+
+DATA_DIR=/var/vcap/store/end
+
+if [ ! -d "$DATA_DIR" ]; then
+  mkdir ${DATA_DIR}
+  sleep 60
+  echo "---------------------------------------------Service Install Start"
+
+  openstack service create --name=swift --description="Swift Service" object-store
+
+  openstack endpoint create --region RegionOne swift public http://<%= spec.ip %>:<%= p("proxy_port") %>/v1/AUTH_%\(project_id\)s
+
+
+  openstack endpoint create --region RegionOne swift admin http://localhost:<%= p("proxy_port") %>/v1
+  openstack endpoint create --region RegionOne swift internal http://localhost:<%= p("proxy_port") %>/v1/AUTH_%\(project_id\)s
+
+
+  echo "---------------------------------------------Service Install End"
+  echo "---------------------------------------------------------------------"
+
+  sleep 3
+  echo "---------------------------------------------Service Install Succecc"
+  echo "---------------------------------------------------------------------"
+fi
+

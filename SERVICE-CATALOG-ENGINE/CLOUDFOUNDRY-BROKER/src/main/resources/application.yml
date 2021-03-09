@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cloudfoundry-broker
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: "jdbc:mariadb://localhost:3306/cfbroker?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul"
+    username: root
+    password: pch3770
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+
+bosh:
+  client_id:
+  client_secret:
+  url:
+  oauth_url:
+
+broker:
+  user: vcap.service.{service}.key
+  password:
+
+
+logging:
+  level:
+    root: debug
+

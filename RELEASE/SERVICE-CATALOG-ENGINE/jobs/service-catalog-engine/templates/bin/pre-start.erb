@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+KEY_STORE="/var/vcap/packages/java/lib/security/cacerts"
+SSL_KEY="/var/vcap/jobs/service-catalog-engine/data/cf.pem"
+KEY_TOOL="/var/vcap/packages/java/bin"
+
+
+#echo 'y' | $KEY_TOOL/keytool -import -alias cf_key -file $SSL_KEY -keystore $KEY_STORE -storepass changeit

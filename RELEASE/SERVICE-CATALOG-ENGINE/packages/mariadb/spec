@@ -1,0 +1,9 @@
+---
+name: mariadb
+
+dependencies: []
+
+files:
+- mariadb/mariadb-10.5.8-linux-x86_64.tar.gz
+- mariadb/galera-arbitrator-4_26.4.6-xenial_amd64.deb
+- mariadb/galera-4_26.4.6-xenial_amd64.deb

@@ -1,0 +1,10 @@
+SET password=PASSWORD('<%= p("mariadb.admin_user.password") %>');
+
+<% link("haproxy-link").instances.map do |instance| %>
+  GRANT ALL PRIVILEGES ON *.* TO 'root'@'<%= instance.address %>' IDENTIFIED BY '<%= p("mariadb.admin_user.password") %>' WITH GRANT OPTION;
+<% end %>
+
+<% link("paas-ta-portal-common-api-link").instances.map do |instance| %>
+  GRANT ALL PRIVILEGES ON *.* TO 'root'@'<%= instance.address %>' IDENTIFIED BY '<%= p("mariadb.admin_user.password") %>' WITH GRANT OPTION;
+<% end %>
+FLUSH PRIVILEGES;

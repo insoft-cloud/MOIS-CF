@@ -1,0 +1,127 @@
+---
+# Bosh DNS Aliases
+- type: replace
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases
+  value:
+  - domain: uaa.mgmt.dev.egovp.kr
+    targets:
+    - query: '*'
+      instance_group: haproxy
+      deployment: ((paasta_deployment_name))
+      network: ((paasta_public_haproxy_network_name))
+      domain: bosh
+  - domain: api.((paasta_domain))
+    targets:
+    - query: '*'
+      instance_group: haproxy
+      deployment: ((paasta_deployment_name))
+      network: ((paasta_public_haproxy_network_name))
+      domain: bosh
+  - domain: doppler.((paasta_domain))
+    targets:
+    - query: '*'
+      instance_group: haproxy
+      deployment: ((paasta_deployment_name))
+      network: ((paasta_public_haproxy_network_name))
+      domain: bosh
+  - domain: login.mgmt.dev.egovp.kr
+    targets:
+    - query: '*'
+      instance_group: haproxy
+      deployment: ((paasta_deployment_name))
+      network: ((paasta_public_haproxy_network_name))
+      domain: bosh
+  - domain: sql-db.service.cf.internal
+    targets:
+    - query: '*'
+      instance_group: database
+      deployment: ((paasta_deployment_name))
+      network: ((paasta_network_name))
+      domain: bosh
+  - domain: eureka.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-registration
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: haproxy.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: haproxy
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: cf.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-api
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: common.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-common-api
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: log.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-log-api
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: zuul.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-gateway
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: storage.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: paas-ta-portal-storage-api
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: swift.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: binary_storage
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: database.service.portalapi.internal
+    targets:
+    - query: '*'
+      instance_group: mariadb
+      deployment: ((portal_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+  - domain: '_.cell.service.cf.internal'
+    targets:
+    - query: '_'
+      instance_group: diego-cell
+      deployment: ((paasta_deployment_name)
+      network: ((internal_networks_name))
+      domain: bosh
+    - query: '_'
+      instance_group: windows2012R2-cell
+      deployment: ((paasta_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+    - query: '_'
+      instance_group: windows2016-cell
+      deployment: ((paasta_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+    - query: '_'
+      instance_group: isolated-diego-cell
+      deployment: ((paasta_deployment_name))
+      network: ((internal_networks_name))
+      domain: bosh
+
+

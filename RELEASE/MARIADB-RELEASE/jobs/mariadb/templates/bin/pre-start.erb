@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -e -x
+
+##############################################################################
+### BASE SETTING
+##############################################################################
+
+JOB_NAME=mariadb
+PKG_NAME=mariadb-10.5.8-linux-x86_64
+SRC_NAME=mariadb-10.5.8-linux-x86_64.tar.gz
+DATA_NAME=mariadb-data
+STORE_DIR=/var/vcap/store
+STORE_SRC_DIR=${STORE_DIR}/${PKG_NAME}
+JOB_DIR=/var/vcap/jobs/${JOB_NAME}
+CONF_DIR=${JOB_DIR}/config
+PKG_DIR=/var/vcap/packages
+PKG_JOB_DIR=${PKG_DIR}/${JOB_NAME}
+DATA_DIR=${STORE_DIR}/${DATA_NAME}
+PKG_MARIADB=${PKG_JOB_DIR}/${JOB_NAME}
+
+
+RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+TMP_DIR=/var/vcap/sys/tmp/${JOB_NAME}
+
+#########################################
+dpkg -i ${PKG_JOB_DIR}/galera-4_26.4.6-xenial_amd64.deb
+#########################################
+
+  tar zxvf ${PKG_JOB_DIR}/${SRC_NAME} -C ${STORE_DIR}
+  rm -rf ${PKG_JOB_DIR}/*
+  mv ${STORE_SRC_DIR} ${PKG_JOB_DIR}/
+  ln -s ${PKG_JOB_DIR}/${PKG_NAME} ${PKG_MARIADB}
+
+if [ ! -d "$DATA_DIR" ]; then
+  mkdir -p ${DATA_DIR}
+  sudo chown -R vcap:vcap ${DATA_DIR}
+fi
+
+rm -rf ${DATA_DIR}/galera.cache
+rm -rf ${DATA_DIR}/grastate.dat
+
+function setup_environment() {
+
+  for dir in ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} 
+  do
+    mkdir -p ${dir}
+    chown vcap:vcap ${dir}
+    chmod 775 ${dir}
+    echo "##### SETUP_ENVIRONMENT :: BROKER :: ${dir}"
+  done
+
+}
+
+setup_environment
+
+if [ ! -d /usr/local/mysql ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /usr/local/mysql -- ${PKG_DIR}"
+  ln -s ${PKG_JOB_DIR} /usr/local/mysql
+fi
+
+if [ ! -e /tmp/mysql.sock ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /tmp/mysql.sock -- ${RUN_DIR}/mysql.sock"
+  ln -sf ${RUN_DIR}/mysql.sock /tmp/mysql.sock
+fi
+
+if [ ! -f /etc/mariadb/mariadb.cnf ]; then
+  echo "##### PRE-START :: BROKER-DATABASE :: link :: /etc/mariadb/mariadb.cnf -- ${CONF_DIR}/mariadb.cnf"
+  mkdir -p /etc/mariadb
+  ln -sf ${CONF_DIR}/mariadb.cnf /etc/mariadb/mariadb.cnf
+fi
+
+
+cd $PKG_MARIADB
+./scripts/mysql_install_db --defaults-file=${CONF_DIR}/mariadb.cnf --user=vcap
+echo 'export PATH=$PATH:/'${PKG_MARIADB}'/bin/' >> /home/vcap/.bashrc

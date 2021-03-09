@@ -1,0 +1,19 @@
+---
+- type: replace
+  path: /instance_groups/name=paas-ta-portal-common-api/properties/datasource/-
+  value:
+    cc:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://sql-db.service.cf.internal:5524/cloud_controller
+      username: "((cc_db_id))"
+      password: "((cc_db_password))"
+    portal:
+      driver-class-name: com.mysql.jdbc.Driver
+      username: root
+      password: "((mariadb_user_password))"
+    uaa:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://sql-db.service.cf.internal:5524/uaa               
+      username: "((uaa_db_id))"
+      password: "((uaa_db_password))"
+
