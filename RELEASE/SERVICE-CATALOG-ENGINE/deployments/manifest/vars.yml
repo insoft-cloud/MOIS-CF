@@ -61,3 +61,4 @@ broker_password: cloudfoundry
 
 syslog_ip: 192.168.22.189
 metric_url: 192.168.22.80:8049
+console: 192.168.24.206

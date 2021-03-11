@@ -56,7 +56,7 @@ rabbitmq_response_up_routing_name: "egovplatform.*.up.*"
 
 vault_host: "vault.mgmt.dev.egovp.kr"
 vault_port: "80"
-vault_token: "s.0d7i6JRRo0vdpmhr3svDNAHQ"
+vault_token: "s.077H8ClcntRvzh5UPmQIWGTn"
 vault_path: "/secret/data/dev/cf/"
 
 #user portal, abacus, paasta-monitoring setting
@@ -91,6 +91,7 @@ bosh_id: admin
 bosh_secret: e6mlw21gvk9bkbnb64ep
 bosh_url: https://192.168.22.35:25555
 bosh_oauth_url: https://192.168.22.35:8443
+bosh_cert: ""
 ssh_url: ubuntu@10.182.164.18
 bosh_env: micro-bosh
 bosh_stemcell_path: /home/ubuntu/workspace/paasta-5.0/stemcell/paasta/bosh-stemcell-315.64-openstack-kvm-ubuntu-xenial-go_agent.tgz
@@ -98,7 +99,10 @@ portalclient_client: cfconsole
 portalclient_auth_url: https://keycloak.mgmt.dev.egovp.kr/auth
 portalclient_realm: eGovCP
 portalclient_logout_url: https://cf.console.dev.egovp.kr/sso/logout
-key_realm : eGovCP
+key_realm : eGovCP-Admin
 key_client : cfAdminConsole
 key_url : https://keycloak.mgmt.dev.egovp.kr/auth
 bosh_path: "/home/ubuntu/workspace/user/PAAS-TA-PORTAL-API-RELEASE/deployments/bosh_profile.sh"
+syslog_ip: 192.168.22.189
+metric_url: 192.168.22.80:8049
+

@@ -1,0 +1,35 @@
+- type: replace
+  path: /addons?/-
+  value:
+    jobs:
+    - name: metrics_agent
+      properties:
+        metrics_agent:
+          influxdb:
+            database: cf_metric_db
+            measurement: cf_metrics
+            processMeasurement: cf_process_metrics
+            url: ((metric_url)):8089
+          metadata: platform_cf
+          origin: container_mgmt
+          deployment: platform_cloud_engine
+      release: egov-monitoring-agent
+    name: paasta_metrics_agent
+- type: replace
+  path: /addons?/-
+  value:
+    jobs:
+    - name: syslog_forwarder
+      properties:
+        syslog:
+          address: ((syslog_ip))
+          custom_rule: |
+            if ($msg contains "DEBUG") then stop
+            if ($msg contains "INFO") then stop
+            if ($programname startswith "vcap.") then stop
+          fallback_servers: []
+          port: 2514
+          tls_enabled: false
+          transport: relp
+      release: syslog
+    name: syslog_forwarder

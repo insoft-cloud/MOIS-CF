@@ -4,4 +4,11 @@ KEY_STORE="/var/vcap/packages/java/jre/lib/security/cacerts"
 SSL_KEY="/var/vcap/jobs/paas-ta-portal-webadmin/data/egovp.pem"
 KEY_TOOL="/var/vcap/packages/java/jre/bin/"
 
+
+if [ ! -d /var/vcap/packages/java/jre/bin/webadmin ]; then
+mkdir /var/vcap/packages/java/jre/bin/webadmin
+
 echo 'Y' | $KEY_TOOL/keytool -import -alias egovpRootCA -file $SSL_KEY -keystore $KEY_STORE -storepass "changeit"
+
+fi
+

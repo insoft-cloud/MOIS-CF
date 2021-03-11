@@ -38,3 +38,4 @@ properties:
     default: admin
   syslog.ip:
   metric.url:
+  console:

@@ -135,10 +135,10 @@ public class UserService extends Common {
             user_id.append(u_result.get("data").get(Constants.USER_ID));
             final List<String> spaceIds = this.getSpaces(org_id.toString(), cloudFoundryClient()).getResources().stream().map(space -> space.getMetadata().getId()).filter(id -> null != id).collect(Collectors.toList());
             for (String spaceId : spaceIds) {
-                removeSpaceUserRole(reactorCloudFoundryClient,spaceId, userId, user_type);
+                removeSpaceUserRole(reactorCloudFoundryClient,spaceId, user_id.toString(), user_type);
             }
-            removeOrgUserRole(reactorCloudFoundryClient,org_id.toString(), userId, user_type);
-            reactorCloudFoundryClient.organizations().removeUser(RemoveOrganizationUserRequest.builder().organizationId(org_id.toString()).userId(userId).build()).block();
+            removeOrgUserRole(reactorCloudFoundryClient,org_id.toString(), user_id.toString(), user_type);
+            reactorCloudFoundryClient.organizations().removeUser(RemoveOrganizationUserRequest.builder().organizationId(org_id.toString()).userId(user_id.toString()).build()).block();
         }catch (Exception e){
             LOGGER.error(e.getMessage());
             return ErrorMessage.builder().message(e.getMessage()).code(5000).build();

@@ -7,4 +7,5 @@ bosh -d ${PORTAL_DEPLOYMENT_NAME} -n deploy manifests/cf-console.yml \
    -l manifests/cf-console-vars.yml \
    -o operations/use-public-network.yml \
    -o manifests/rename-network-and-deployment.yml \
+   -o manifests/agent.yml \
    -v portal_deployment_name=${PORTAL_DEPLOYMENT_NAME}

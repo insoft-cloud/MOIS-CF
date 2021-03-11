@@ -1,5 +1,38 @@
 name: ((deployment_name))                              # 서비스 배포이름(필수) bosh deployments 로 확인 가능한 이름
 
+addons:
+- jobs:
+  - name: syslog_forwarder
+    properties:
+      syslog:
+        address: ((syslog_ip))
+        custom_rule: |
+          if ($msg contains "DEBUG") then stop
+          if ($msg contains "INFO") then stop
+          if ($programname startswith "vcap.") then stop
+        fallback_servers: []
+        port: 2514
+        tls_enabled: false
+        transport: relp
+    release: syslog
+  name: syslog_forwarder
+- jobs:
+  - name: metrics_agent
+    properties:
+      metrics_agent:
+        deployment: platform_cloud_engine
+        influxdb:
+          database: cf_metirc_db
+          measurement: cf_metric
+          processMeasurement: cf_process_metrics
+          url: ((metric_url))
+        metadata: service_catalog_engine
+        origin: service_catalog
+    release: egov-monitoring-agent
+  name: egov-monitoring-agent
+
+
+
 stemcells:
 - alias: ((stemcell_alias))
   os: ((stemcell_os))
@@ -8,6 +41,10 @@ stemcells:
 releases:
 - name: "((release_name))"
   version: "latest"
+- name: syslog
+  version: latest
+- name: egov-monitoring-agent
+  version: latest
 
 
 update:
@@ -38,6 +75,7 @@ instance_groups:
         url: ((metric_url))
       syslog:
         ip: ((syslog_ip))
+      console: ((console))
 - name: service-catalog-engine
   instances: 1
   networks:

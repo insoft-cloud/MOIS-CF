@@ -29,15 +29,19 @@ public class MeteringService {
     private final JpaServiceInstanceModelRepository jpaServiceInstanceModelRepository;
     private final JpaServiceMeteringUseInfoRepository jpaServiceMeteringUseInfoRepository;
     private final JpaServiceMeteringRequestTypeRepository jpaServiceMeteringRequestTypeRepository;
-
+    private final JpaServiceRepository jpaServiceRepository;
+    private final JpaServiceInstanceRepository jpaServiceInstanceRepository;
 
     public MeteringService(JpaServiceMeteringRepository jpaServiceMeteringRepository, JpaServiceMeteringInfoRepository jpaServiceMeteringInfoRepository,
-                           JpaServiceInstanceModelRepository jpaServiceInstanceModelRepository, JpaServiceMeteringUseInfoRepository jpaServiceMeteringUseInfoRepository, JpaServiceMeteringRequestTypeRepository jpaServiceMeteringRequestTypeRepository) {
+                           JpaServiceInstanceModelRepository jpaServiceInstanceModelRepository, JpaServiceMeteringUseInfoRepository jpaServiceMeteringUseInfoRepository, JpaServiceMeteringRequestTypeRepository jpaServiceMeteringRequestTypeRepository,
+                           JpaServiceRepository jpaServiceRepository, JpaServiceInstanceRepository jpaServiceInstanceRepository) {
         this.jpaServiceMeteringRepository = jpaServiceMeteringRepository;
         this.jpaServiceMeteringInfoRepository = jpaServiceMeteringInfoRepository;
         this.jpaServiceInstanceModelRepository = jpaServiceInstanceModelRepository;
         this.jpaServiceMeteringUseInfoRepository = jpaServiceMeteringUseInfoRepository;
         this.jpaServiceMeteringRequestTypeRepository = jpaServiceMeteringRequestTypeRepository;
+        this.jpaServiceRepository = jpaServiceRepository;
+        this.jpaServiceInstanceRepository = jpaServiceInstanceRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -63,6 +67,7 @@ public class MeteringService {
                 .filter(res -> (plan_id == null || res.getServicePlan().equals(plan_id)))
                 .collect(Collectors.toList());
 
+
         if(!"CF".equals(fromPartyId.toUpperCase())){
             if(jpaServiceInstnModel.size() < 1){
                 return ErrorMessage.builder().message(service_instance_id + " - Invalid Service Instance ID").code(3013).build();
@@ -83,14 +88,21 @@ public class MeteringService {
                 return ErrorMessage.builder().message(" - Duplicate Metering Service Instance ID").code(3070).build();
             }
 
+            //서비스 인스턴스 아이디로 MESUR_TY 조회
+            JpaServiceInstn jpaServiceInstn = jpaServiceInstanceRepository.findById(service_instance_id).get();
+
+            //서비스 아이디로 UNIT_TY 값 조회
+            JpaService jpaService = jpaServiceRepository.findById(service_id).get();
+
             jpaServiceMeteringRepository.save(JpaServiceMetering.builder()
                     .serviceId(service_id)
                     .serviceInstanceId(service_instance_id)
                     .planId(plan_id)
-                    .mesurTy("MT1")
+                    .mesurTy(jpaServiceInstn.getMesurTy())
                     .beginDe(LocalDateTime.now().toString())
                     .projectId(project_id)
                     .useAt(1)
+                    .unitType(jpaService.getUnit_ty())
                     .creatId(usrId)
                     .updtId(usrId)
                     .build());
@@ -232,12 +244,15 @@ public class MeteringService {
                     return ErrorMessage.builder().message("- Metering Unit Value Limit:'9999999999999999999'").code(3074).build();
                 }
 
+                //서비스 인스턴스 아이디로 MESUR_TY 조회
+                JpaServiceInstn jpaServiceInstn = jpaServiceInstanceRepository.findById(service_instance_id).get();
+
                 //미터링 테이블
                 jpaServiceMeteringRepository.save(JpaServiceMetering.builder()
                         .serviceId(service_id)
                         .serviceInstanceId(service_instance_id)
                         .planId(plan_id)
-                        .mesurTy("MT2")
+                        .mesurTy(jpaServiceInstn.getMesurTy())
                         .beginDe(LocalDateTime.now().toString())
                         .unitType(unit_type)
                         .unitValue(pUnitValue)

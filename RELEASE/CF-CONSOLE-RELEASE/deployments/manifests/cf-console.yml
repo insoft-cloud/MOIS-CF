@@ -1,15 +1,19 @@
 name: ((portal_deployment_name))                      # 서비스 배포이름(필수) bosh deployments 로 확인 가능한 이름
 
+
 stemcells:
 - alias: ((stemcell_alias))
   os: ((stemcell_os))
   version: "((stemcell_version))"
 
-
 releases:
 - name: "((releases_name))"                   # 서비스 릴리즈 이름(필수) bosh releases로 확인 가능
   version: latest                                             # 서비스 릴리즈 버전(필수):latest 시 업로드된 서비스 릴리즈 최신버전
 - name: bosh-dns-aliases
+  version: latest
+- name: syslog
+  version: latest
+- name: egov-monitoring-agent
   version: latest
 
 update:
@@ -84,7 +88,7 @@ instance_groups:
 - name: paas-ta-portal-gateway
   azs:
   - z1
-  instances: 1
+  instances: 4
   vm_type: "((vm_type_small))"
   stemcell: "((stemcell_alias))"
   networks:
@@ -119,7 +123,7 @@ instance_groups:
 - name: paas-ta-portal-api
   azs:
   - z1
-  instances: 1
+  instances: 2
   vm_type: "((vm_type_medium))"
   stemcell: "((stemcell_alias))"
   networks:

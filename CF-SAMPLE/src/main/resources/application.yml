@@ -1,0 +1,45 @@
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+      location: ${java.io.tmpdir}
+server:
+  port: 7777
+
+---
+spring:
+  profiles: mariadb
+  datasource:
+    url: "jdbc:mysql://localhost:3306/covid19?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: pch3770
+    username: root
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+
+
+
+#---
+#spring:
+#  profiles: cubrid
+#  datasource:
+#    url: "jdbc:mysql://localhost/music"
+#    driver-class-name: cubrid.jdbc.driver.CUBRIDDriver
+#    username:
+#    password:
+#  jpa:
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL55Dialect
+
+

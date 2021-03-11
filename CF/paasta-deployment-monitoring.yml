@@ -402,6 +402,8 @@ instance_groups:
     properties:
       admin_password: ((cf_mysql_mysql_admin_password))
       engine_config:
+        innodb_flush_log_at_trx_commit: 0
+        long_query_time: 1
         binlog:
           enabled: false
         galera:
